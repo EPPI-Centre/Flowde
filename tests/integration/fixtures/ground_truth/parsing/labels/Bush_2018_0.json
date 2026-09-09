@@ -1,0 +1,76 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "labels": ["Enrollment"]
+        },
+        {
+          "node_number": 2,
+          "labels": ["Enrollment"]
+        },
+        {
+          "node_number": 3,
+          "labels": ["Enrollment"]
+        },
+        {
+          "node_number": 4,
+          "labels": ["Enrollment"]
+        },
+        {
+          "node_number": 5,
+          "labels": ["Enrollment"]
+        },
+        {
+          "node_number": 6,
+          "labels": ["Allocation"]
+        },
+        {
+          "node_number": 7,
+          "labels": ["Allocation"]
+        },
+        {
+          "node_number": 8,
+          "labels": ["Allocation"]
+        },
+        {
+          "node_number": 9,
+          "labels": ["Allocation"]
+        },
+        {
+          "node_number": 10,
+          "labels": ["Allocation"]
+        },
+        {
+          "node_number": 11,
+          "labels": ["Allocation"]
+        },
+        {
+          "node_number": 12,
+          "labels": ["Follow-up"]
+        },
+        {
+          "node_number": 13,
+          "labels": ["Follow-up"]
+        },
+        {
+          "node_number": 14,
+          "labels": ["Follow-up"]
+        },
+        {
+          "node_number": 15,
+          "labels": ["Follow-up"]
+        },
+        {
+          "node_number": 16,
+          "labels": ["Follow-up"]
+        },
+        {
+          "node_number": 17,
+          "labels": ["Follow-up"]
+        }
+      ]
+    }
+  ]
+}

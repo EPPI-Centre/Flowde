@@ -1,0 +1,76 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "Initial Population (n=8806)\n*Quitline callers over the age of 18 from eligible contracts who smoked cigarettes and stated an intent to quit\nwithin 30 days. Callers were considered for screening if they had registered via phone, spoke English, were not\npregnant or diabetic, and had a means of accessing the Internet."
+        },
+        {
+          "node_number": 2,
+          "text": "Excluded (n=3724)\n\u2022 CPD < 10 = 1956\n\u2022 BMI < 18.5 = 872\n\u2022 Eating disorder = 146\n\u2022 Weight loss surgery = 81\n\u2022 No internet access = 227\n\u2022 Unavailable for 2+ weeks = 201\n\u2022 Declined 10-call program = 241"
+        },
+        {
+          "node_number": 3,
+          "text": "Invited to Study (5082)"
+        },
+        {
+          "node_number": 4,
+          "text": "Excluded post-invitation (n=2542)\n\u2022 Declined invitation to study = 793\n\u2022 Unreachable for consent/tech error = 1205\n\u2022 Accepted invitation, but declined consent = 524\n\u2022 Accepted invitation and consent, but declined baseline survey = 2\n\u2022 Accepted invitation, consent, baseline but declined randomization = 9\n\u2022 De-randomized prior to treatment due to tech error = 9"
+        },
+        {
+          "node_number": 5,
+          "text": "Randomized (2540)"
+        },
+        {
+          "node_number": 6,
+          "text": "Control (n=844) -"
+        },
+        {
+          "node_number": 7,
+          "text": "Simultaneous (n=845)"
+        },
+        {
+          "node_number": 8,
+          "text": "Sequential (n=851)"
+        },
+        {
+          "node_number": 9,
+          "text": "Excluded from analyses\ndue to other household\nmember in study (n=4)"
+        },
+        {
+          "node_number": 10,
+          "text": "Excluded from analyses\ndue to other household\nmember in study (n=6)"
+        },
+        {
+          "node_number": 11,
+          "text": "Excluded from analyses\ndue to other household\nmember in study (n=2)"
+        },
+        {
+          "node_number": 12,
+          "text": "6-month follow-up\n(n=410)"
+        },
+        {
+          "node_number": 13,
+          "text": "6-month follow-up\n(n=359)"
+        },
+        {
+          "node_number": 14,
+          "text": "6-month follow-up\n(n=395)"
+        },
+        {
+          "node_number": 15,
+          "text": "12-month follow-up\n(n=515)"
+        },
+        {
+          "node_number": 16,
+          "text": "12-month follow-up\n(n=493)"
+        },
+        {
+          "node_number": 17,
+          "text": "12-month follow-up\n(n=506)"
+        }
+      ]
+    }
+  ]
+}

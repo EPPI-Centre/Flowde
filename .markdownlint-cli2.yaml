@@ -1,0 +1,7 @@
+---
+config:
+  MD046:
+    style: fenced
+  MD013:
+    line_length: 88
+    tables: false

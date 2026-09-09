@@ -1,0 +1,100 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # Checks if files larger than 500kb added
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-illegal-windows-names
+      - id: check-symlinks
+      - id: destroyed-symlinks
+      - id: trailing-whitespace # Think it can be a bit funny with md
+        exclude: ^data/
+      - id: end-of-file-fixer
+        exclude: ^data/
+        exclude_types:
+          - svg
+      - id: name-tests-test
+        args: ["--pytest-test-first"]
+      # Ensures that you don't commit to main or master branches directly
+      - id: no-commit-to-branch
+        args: ["--branch", "main", "--branch", "master"]
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+        exclude: ^data/
+      - id: check-merge-conflict
+      - id: check-json
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: forbid-tabs
+
+  # Basic checking of secrets leaking without customisation. No need to
+  # configure it.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
+
+  # Configure in pyproject.toml
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.1
+    hooks:
+      - id: ruff-check
+        files: ^(src|scripts)/
+      - id: ruff-format
+        exclude: ^data/
+
+  # Lint github actions workflows, no need to configure it
+  # TODO: If run from a conda env with shellcheck-py installed, it I think it
+  # will also shellcheck the run commands. Need to double check it directly
+  # though
+  # TODO: also check that shellcheck is automatically installed on the ubuntu
+  # actions runners.
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.8
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.29.0
+    hooks:
+      - id: yamllint
+
+  # May need to add config to disable line limit for tables. This has to be
+  # done in a config file.
+  # TODO: Check it correctly works on normal md, . files, and nested md files.
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.18.1
+    hooks:
+      - id: markdownlint-cli2
+
+  # Places a table of contents in README.md
+  # Need to use <!-- START doctoc --> <!-- END doctoc --> to specify where you
+  # want it.
+  - repo: https://github.com/thlorenz/doctoc
+    rev: v2.2.0
+    hooks:
+      - id: doctoc
+        files: ^README\.md$
+        args: [--github, --maxlevel=3]
+
+  # Format js, json, css, html, md, yaml files. This one doesn't need a config.
+  # Uses --check, so it reports formatting issues but does not edit files.
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.6.2
+    hooks:
+      - id: prettier
+        args: [--check]
+        files: \.(css|html|js|json|md|ya?ml)$
+        exclude: ^data/
+        additional_dependencies:
+          - prettier@3.6.2
+
+  # Format toml files. Config in pyproject.toml.
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.24.2
+    hooks:
+      - id: toml-sort
+        exclude: ^data/

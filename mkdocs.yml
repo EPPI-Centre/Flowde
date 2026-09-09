@@ -1,0 +1,49 @@
+site_name: flowde
+site_description: >
+  Tools for extracting structured flowchart data from CONSORT-style diagrams.
+repo_url: https://github.com/EPPI-Centre/Flowde
+repo_name: GitHub
+edit_uri: edit/main/docs/
+strict: true
+
+theme:
+  name: readthedocs
+  prev_next_buttons_location: none
+
+plugins:
+  - search
+  # - git-revision-date-localized:
+  #     enable_creation_date: true
+  #     type: date
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/copy-code.js
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - User Guide:
+      - Installation: installation.md
+      - Core pipeline:
+          - Overview: pipeline/index.md
+          - Setup default pipeline functions: pipeline/setup-default-funcs.md
+          - Image extraction: pipeline/image-extraction.md
+          - Image classification: pipeline/classification.md
+          - Image rotation: pipeline/rotation.md
+          - Flowchart parsing: pipeline/parsing.md
+      - Benchmarking:
+          - Overview: benchmarking/index.md
+          - Classification: benchmarking/classification.md
+          - Rotation: benchmarking/rotation.md
+          - Parsing: benchmarking/parsing.md
+      - Recipes:
+          - Overview: recipes/index.md
+          - End-to-end:
+              - CONSORT: recipes/consort.md
