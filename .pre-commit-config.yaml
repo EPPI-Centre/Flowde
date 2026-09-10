@@ -74,12 +74,12 @@ repos:
   # Places a table of contents in README.md
   # Need to use <!-- START doctoc --> <!-- END doctoc --> to specify where you
   # want it.
-  - repo: https://github.com/thlorenz/doctoc
-    rev: v2.2.0
-    hooks:
-      - id: doctoc
-        files: ^README\.md$
-        args: [--github, --maxlevel=3]
+  # - repo: https://github.com/thlorenz/doctoc
+  #   rev: v2.2.0
+  #   hooks:
+  #     - id: doctoc
+  #       files: ^README\.md$
+  #       args: [--github, --maxlevel=3]
 
   # Format js, json, css, html, md, yaml files. This one doesn't need a config.
   # Uses --check, so it reports formatting issues but does not edit files.
