@@ -9,6 +9,18 @@
 This repo contains the code for extracting structured data from CONSORT flow
 diagrams in PDF files reporting randomized trials.
 
+**Try the complete CONSORT demo in your browser:**
+
+[![Open demo in Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EPPI-Centre/Flowde/blob/main/notebooks/CONSORT_demo.ipynb)
+
+Follow six open-access studies from PDFs to extracted images, orientation
+correction, CONSORT classification, structured parsing and evaluation against
+manual annotations. Requires a Google account and the workshop's Azure endpoint
+and API key. No installation on your computer is needed. The notebook also works
+locally with Azure settings in your `.env` file.
+
+[Example data and article licences](data/consort-demo/README.md)
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 

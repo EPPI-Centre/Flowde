@@ -1,0 +1,100 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "points_to": [
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "node_number": 2,
+          "points_to": [
+            5
+          ]
+        },
+        {
+          "node_number": 3,
+          "points_to": [
+            6
+          ]
+        },
+        {
+          "node_number": 4,
+          "points_to": [
+            7
+          ]
+        },
+        {
+          "node_number": 5,
+          "points_to": [
+            8
+          ]
+        },
+        {
+          "node_number": 6,
+          "points_to": [
+            9
+          ]
+        },
+        {
+          "node_number": 7,
+          "points_to": [
+            10
+          ]
+        },
+        {
+          "node_number": 8,
+          "points_to": [
+            11
+          ]
+        },
+        {
+          "node_number": 9,
+          "points_to": [
+            12
+          ]
+        },
+        {
+          "node_number": 10,
+          "points_to": [
+            13
+          ]
+        },
+        {
+          "node_number": 11,
+          "points_to": [
+            14
+          ]
+        },
+        {
+          "node_number": 12,
+          "points_to": [
+            15
+          ]
+        },
+        {
+          "node_number": 13,
+          "points_to": [
+            16
+          ]
+        },
+        {
+          "node_number": 14,
+          "points_to": []
+        },
+        {
+          "node_number": 15,
+          "points_to": []
+        },
+        {
+          "node_number": 16,
+          "points_to": []
+        }
+      ]
+    }
+  ]
+}

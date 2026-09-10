@@ -1,0 +1,88 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "Assessed for eligibility\nn= 1888"
+        },
+        {
+          "node_number": 2,
+          "text": "Enrollment"
+        },
+        {
+          "node_number": 3,
+          "text": "Excluded n=1570\nNot meeting inclusion criteria\nn= 472\nRefused to participate\nn= 246\nOther reasons (non-smokers)\nn= 852"
+        },
+        {
+          "node_number": 4,
+          "text": "Randomized"
+        },
+        {
+          "node_number": 5,
+          "text": "Allocated to intervention group\nn= 169\nReceived allocated intervention\nn= 65\nDid not receive allocated intervention\nn= 102 refused intervention\nn= 1 insufficient English\nn= 1 uncontactable"
+        },
+        {
+          "node_number": 6,
+          "text": "Allocated to control group\nn= 149\nReceived allocated intervention\nn= 144\nDid not receive allocated intervention\nn= 5, administrative error"
+        },
+        {
+          "node_number": 7,
+          "text": "Lost to follow-up (did not return\nquestionnaires)\nn= 36 at 6/12\nn= 52 at 12/12"
+        },
+        {
+          "node_number": 8,
+          "text": "Lost to follow-up (did not return\nquestionnaires)\nn=39 at 6/12\nn=61 at 12/12"
+        },
+        {
+          "node_number": 9,
+          "text": "Analyzed (n= 169)\nExcluded from analysis (n= 0)\nThose lost to follow up were\nconsidered to be continuing\nsmokers"
+        },
+        {
+          "node_number": 10,
+          "text": "Analyzed (n= 149)\nExcluded from analysis (n= 0)\nThose lost to follow up were\nconsidered to be continuing\nsmokers"
+        }
+      ]
+    },
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "Assessed for eligibility\nn= 1888"
+        },
+        {
+          "node_number": 2,
+          "text": "Excluded n=1570\nNot meeting inclusion criteria\nn= 472\nRefused to participate\nn= 246\nOther reasons (non-smokers)\nn= 852"
+        },
+        {
+          "node_number": 3,
+          "text": "Randomized"
+        },
+        {
+          "node_number": 4,
+          "text": "Allocated to intervention group\nn= 169\nReceived allocated intervention\nn= 65\nDid not receive allocated intervention\nn= 102 refused intervention\nn= 1 insufficient English\nn= 1 uncontactable"
+        },
+        {
+          "node_number": 5,
+          "text": "Allocated to control group\nn= 149\nReceived allocated intervention\nn= 144\nDid not receive allocated intervention\nn= 5, administrative error"
+        },
+        {
+          "node_number": 6,
+          "text": "Lost to follow-up (did not return\nquestionnaires)\nn= 36 at 6/12\nn= 52 at 12/12"
+        },
+        {
+          "node_number": 7,
+          "text": "Lost to follow-up (did not return\nquestionnaires)\nn=39 at 6/12\nn=61 at 12/12"
+        },
+        {
+          "node_number": 8,
+          "text": "Analyzed (n= 169)\nExcluded from analysis (n= 0)\nThose lost to follow up were\nconsidered to be continuing\nsmokers"
+        },
+        {
+          "node_number": 9,
+          "text": "Analyzed (n= 149)\nExcluded from analysis (n= 0)\nThose lost to follow up were\nconsidered to be continuing\nsmokers"
+        }
+      ]
+    }
+  ]
+}

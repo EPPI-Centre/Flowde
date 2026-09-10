@@ -61,7 +61,7 @@ def rotate_imgs_from_paths(
         for img_path, angle in zip(img_paths, responses, strict=True):
             if angle != 0:
                 with Image.open(img_path) as img:
-                    rotated_img = img.rotate(angle, expand=True)
+                    rotated_img = img.rotate(-angle, expand=True)
                 rotated_img.save(img_path)
 
     if save_paths is not None:
@@ -70,7 +70,7 @@ def rotate_imgs_from_paths(
             img_paths, save_paths, responses, strict=True
         ):
             with Image.open(img_path) as img:
-                rotated_img = img.rotate(angle, expand=True)
+                rotated_img = img.rotate(-angle, expand=True)
             save_path.parent.mkdir(parents=True, exist_ok=True)
             rotated_img.save(save_path)
 

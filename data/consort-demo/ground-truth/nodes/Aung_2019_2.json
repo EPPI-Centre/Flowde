@@ -1,0 +1,44 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "Assessed for eligibility (n=340)"
+        },
+        {
+          "node_number": 2,
+          "text": "Excluded (n= 21)\n\u2666 Declined to quit (n= 21)\nEligibility\nSmokers at CVD risk through being\ndiabetic and /or hypertensive"
+        },
+        {
+          "node_number": 3,
+          "text": "Randomized (n=319)"
+        },
+        {
+          "node_number": 4,
+          "text": "Allocated to intervention (n=160)\n\u2666 Received allocated intervention (n=160)\n\u2666 Did not receive allocated intervention (n=0 )"
+        },
+        {
+          "node_number": 5,
+          "text": "Allocated to control (n=159)\n\u2666 Received allocated intervention (n=159)\n\u2666 Did not receive allocated intervention (n=0 )"
+        },
+        {
+          "node_number": 6,
+          "text": "Lost to follow-up (n=1)\nReason: Moved to Japan\nDied (n=2)"
+        },
+        {
+          "node_number": 7,
+          "text": "Lost to follow-up (n= 4)\nReason: Domestic migration\nDied (n=5)"
+        },
+        {
+          "node_number": 8,
+          "text": "Analysed (n=160)"
+        },
+        {
+          "node_number": 9,
+          "text": "Analysed (n= 159 )"
+        }
+      ]
+    }
+  ]
+}

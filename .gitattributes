@@ -2,3 +2,7 @@ tests/integration/fixtures/paddle_expected/Bush_2018_0.png filter=lfs diff=lfs m
 tests/integration/fixtures/pdfs/Bush_2018.pdf filter=lfs diff=lfs merge=lfs -text
 *.pdf filter=lfs diff=lfs merge=lfs -text
 data/**/*.png filter=lfs diff=lfs merge=lfs -text
+
+# The small conference dataset downloads directly in a Colab source archive.
+data/consort-demo/**/*.pdf -filter -diff -merge -text
+data/consort-demo/**/*.png -filter -diff -merge -text

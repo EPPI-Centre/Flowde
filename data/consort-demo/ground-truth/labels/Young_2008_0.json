@@ -1,0 +1,118 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "labels": []
+        },
+        {
+          "node_number": 2,
+          "labels": []
+        },
+        {
+          "node_number": 3,
+          "labels": []
+        },
+        {
+          "node_number": 4,
+          "labels": []
+        },
+        {
+          "node_number": 5,
+          "labels": [
+            "Allocation"
+          ]
+        },
+        {
+          "node_number": 6,
+          "labels": [
+            "Allocation"
+          ]
+        },
+        {
+          "node_number": 7,
+          "labels": [
+            "Follow-Up"
+          ]
+        },
+        {
+          "node_number": 8,
+          "labels": [
+            "Follow-Up"
+          ]
+        },
+        {
+          "node_number": 9,
+          "labels": [
+            "Analysis"
+          ]
+        },
+        {
+          "node_number": 10,
+          "labels": [
+            "Analysis"
+          ]
+        }
+      ]
+    },
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "labels": [
+            "Enrollment"
+          ]
+        },
+        {
+          "node_number": 2,
+          "labels": [
+            "Enrollment"
+          ]
+        },
+        {
+          "node_number": 3,
+          "labels": [
+            "Enrollment"
+          ]
+        },
+        {
+          "node_number": 4,
+          "labels": [
+            "Allocation"
+          ]
+        },
+        {
+          "node_number": 5,
+          "labels": [
+            "Allocation"
+          ]
+        },
+        {
+          "node_number": 6,
+          "labels": [
+            "Follow-Up"
+          ]
+        },
+        {
+          "node_number": 7,
+          "labels": [
+            "Follow-Up"
+          ]
+        },
+        {
+          "node_number": 8,
+          "labels": [
+            "Analysis"
+          ]
+        },
+        {
+          "node_number": 9,
+          "labels": [
+            "Analysis"
+          ]
+        }
+      ]
+    }
+  ]
+}

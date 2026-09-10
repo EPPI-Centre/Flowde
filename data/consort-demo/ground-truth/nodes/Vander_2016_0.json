@@ -1,0 +1,60 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "Recruitment Letters Sent\n(N = 847)"
+        },
+        {
+          "node_number": 2,
+          "text": "Excluded (n = 706)\n263 Refused\n254 Unable to reach/not contacted\n183 Ineligible\n22 Deceased\n118 Already quit smoking\n42 Non-cigarette tobacco user\n1 Mental health exclusion\n6 Other reason for non-enrollment"
+        },
+        {
+          "node_number": 3,
+          "text": "Initially Expressed Interest in Study\n(n = 141)"
+        },
+        {
+          "node_number": 4,
+          "text": "Excluded (n = 72)\n48 Did not return enrollment forms\n22 Refused\n1 Already quit smoking\n1 Non-cigarette tobacco user"
+        },
+        {
+          "node_number": 5,
+          "text": "Consented\n(N = 69)"
+        },
+        {
+          "node_number": 6,
+          "text": "Not eligible (n = 6)\n4 Elevated PHQ or suicidal ideation\n1 Already quit smoking\n1 Non-cigarette tobacco user"
+        },
+        {
+          "node_number": 7,
+          "text": "Randomized\n(N = 63)"
+        },
+        {
+          "node_number": 8,
+          "text": "Quitline Referral\n(n = 32)"
+        },
+        {
+          "node_number": 9,
+          "text": "Tailored tobacco Intervention\n(n = 31)"
+        },
+        {
+          "node_number": 10,
+          "text": "12-week follow-up\n30 (94%) Complete\n2 (6%) Missing"
+        },
+        {
+          "node_number": 11,
+          "text": "12-week follow-up\n23 (74%) Complete\n8 (26%) Missing"
+        },
+        {
+          "node_number": 12,
+          "text": "Six-month follow-up\n28 (88%) Complete\n4 (12%) Missing"
+        },
+        {
+          "node_number": 13,
+          "text": "Six-month follow-up\n23 (74%) Complete\n8 (26%) Missing"
+        }
+      ]
+    }
+  ]
+}
