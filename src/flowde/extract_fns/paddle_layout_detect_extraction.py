@@ -11,11 +11,8 @@ from flowde.extract_fns.extract_types import ExtractImgsFunction
 def _get_layout_detection_pipeline(
     device: str,
     cpu_threads: int,
-    enable_mkldnn: bool,
 ) -> LayoutDetection:
-    return LayoutDetection(
-        device=device, cpu_threads=cpu_threads, enable_mkldnn=enable_mkldnn
-    )
+    return LayoutDetection(device=device, cpu_threads=cpu_threads)
 
 
 def make_paddle_layout_extract_fn(
@@ -24,14 +21,12 @@ def make_paddle_layout_extract_fn(
     batch_size: int = 1,
     dpi: int = 144,
     padding: int = 3,
-    *,
-    enable_mkldnn: bool = True,
 ) -> ExtractImgsFunction:
     def extract_imgs(pdf_path: Path, save_dir: Path) -> None:
         save_dir.mkdir(parents=True, exist_ok=True)
 
         pipeline = _get_layout_detection_pipeline(
-            device=device, cpu_threads=cpu_threads, enable_mkldnn=enable_mkldnn
+            device=device, cpu_threads=cpu_threads
         )
 
         output = pipeline.predict(
