@@ -1,13 +1,16 @@
 import json
 import signal
+import sys
 import time
 from datetime import UTC, datetime
+from multiprocessing.managers import SyncManager
 from pathlib import Path
 from unittest.mock import Mock
 
 import httpx
 import pytest
 from google.genai.errors import ClientError
+from joblib.externals.loky.backend.context import get_context
 from openai import BadRequestError
 from pydantic import BaseModel, ConfigDict
 
@@ -112,9 +115,32 @@ def wait_for(condition):
         time.sleep(0.01)
 
 
+@pytest.fixture
+def read_run_state(monkeypatch):
+    if sys.platform != "win32":
+        yield Path.read_text
+        return
+
+    # Windows refuses replacement while the test has run.state open for reading.
+    with SyncManager(ctx=get_context()) as manager:
+        state_lock = manager.Lock()
+        save = _run_state.RunState.save
+
+        def save_with_lock(state):
+            with state_lock:
+                save(state)
+
+        def read_with_lock(path):
+            with state_lock:
+                return path.read_text()
+
+        monkeypatch.setattr(_run_state.RunState, "save", save_with_lock)
+        yield read_with_lock
+
+
 @pytest.mark.parametrize("provider", ["custom", "openai", "gemini"])
 def test_parallel_failure_saves_the_other_active_image_and_starts_no_more(
-    task, images, tmp_path, provider
+    task, images, tmp_path, provider, read_run_state
 ):
     output = tmp_path / "output"
     started = tmp_path / "b-started"
@@ -141,7 +167,7 @@ def test_parallel_failure_saves_the_other_active_image_and_starts_no_more(
             # Finish only after the parent has observed the other worker's error.
             wait_for(
                 lambda: (
-                    json.loads(state_path.read_text())["items"][failed_key]["error"]
+                    json.loads(read_run_state(state_path))["items"][failed_key]["error"]
                     is not None
                 )
             )
