@@ -1,0 +1,72 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "Potential participants,\nrandomized (N=2551)"
+        },
+        {
+          "node_number": 2,
+          "text": "Allocated to video condition\n(n=851)"
+        },
+        {
+          "node_number": 3,
+          "text": "Allocated to text condition\n(n=842)"
+        },
+        {
+          "node_number": 4,
+          "text": "Allocated to control condition\n(n=858)"
+        },
+        {
+          "node_number": 5,
+          "text": "Excluded:\n- declined to participate (n=18)\n- did not meet inclusion (n=43)\n- did not complete baseline and\nhad no baseline quit date (n= 120)"
+        },
+        {
+          "node_number": 6,
+          "text": "Excluded:\n- declined to participate (n=12)\n- did not meet inclusion (n=43)\n- did not complete baseline and\nhad no baseline quit date (n=79)"
+        },
+        {
+          "node_number": 7,
+          "text": "Excluded:\n- declined to participate (n=19)\n- did not meet inclusion (n=52)\n- did not complete baseline (n=66)"
+        },
+        {
+          "node_number": 8,
+          "text": "Sample 1 (n= 670)\nSample 2 (n= 294)"
+        },
+        {
+          "node_number": 9,
+          "text": "Sample 1 (n=708)\nSample 2 (n= 447)"
+        },
+        {
+          "node_number": 10,
+          "text": "Sample 1 (n=721)"
+        },
+        {
+          "node_number": 11,
+          "text": "Lost to follow-up:\nSample 1: 238 (35.5%)\nSample 2: 70 (23.8%)"
+        },
+        {
+          "node_number": 12,
+          "text": "Lost to follow-up:\nSample 1: 212 (29.9%)\nSample 2: 97 (21.7%)"
+        },
+        {
+          "node_number": 13,
+          "text": "Lost to follow-up:\nSample 1: 196 (27.2%)"
+        },
+        {
+          "node_number": 14,
+          "text": "Analyzed (n=)\nSample 1: 432 (64.5%)\nSample 2: 224 (76.2%)"
+        },
+        {
+          "node_number": 15,
+          "text": "Analyzed (n=)\nSample 1: 496 (70.1%)\nSample 2: 350 (78.3%)"
+        },
+        {
+          "node_number": 16,
+          "text": "Analyzed (n=)\nSample 1: 525 (72.8%)"
+        }
+      ]
+    }
+  ]
+}

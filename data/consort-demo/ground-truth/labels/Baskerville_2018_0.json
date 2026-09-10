@@ -1,0 +1,92 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "labels": [
+            "Enrollment"
+          ]
+        },
+        {
+          "node_number": 2,
+          "labels": [
+            "Enrollment"
+          ]
+        },
+        {
+          "node_number": 3,
+          "labels": [
+            "Enrollment"
+          ]
+        },
+        {
+          "node_number": 4,
+          "labels": [
+            "Allocation"
+          ]
+        },
+        {
+          "node_number": 5,
+          "labels": [
+            "Allocation"
+          ]
+        },
+        {
+          "node_number": 6,
+          "labels": [
+            "Follow-Up",
+            "T1-\n3 months"
+          ]
+        },
+        {
+          "node_number": 7,
+          "labels": [
+            "Follow-Up",
+            "T1-\n3 months"
+          ]
+        },
+        {
+          "node_number": 8,
+          "labels": [
+            "Follow-Up",
+            "T2-\n6 months"
+          ]
+        },
+        {
+          "node_number": 9,
+          "labels": [
+            "Follow-Up",
+            "T2-\n6 months"
+          ]
+        },
+        {
+          "node_number": 10,
+          "labels": [
+            "Follow-Up",
+            "Telephone follow-Up"
+          ]
+        },
+        {
+          "node_number": 11,
+          "labels": [
+            "Follow-Up",
+            "Telephone follow-Up"
+          ]
+        },
+        {
+          "node_number": 12,
+          "labels": [
+            "Analysis"
+          ]
+        },
+        {
+          "node_number": 13,
+          "labels": [
+            "Analysis"
+          ]
+        }
+      ]
+    }
+  ]
+}

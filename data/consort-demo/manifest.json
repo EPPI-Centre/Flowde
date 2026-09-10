@@ -1,0 +1,452 @@
+{
+  "description": "Six open-access smoking-cessation studies for the Flowde CONSORT demo.",
+  "licence_checked_date": "2026-09-09",
+  "papers": [
+    {
+      "filename": "Aung_2019.pdf",
+      "title": "Effectiveness of a new multi-component smoking cessation service package for patients with hypertension and diabetes in northern Thailand: a randomized controlled trial (ESCAPE study)",
+      "authors": [
+        "Myo Nyein Aung",
+        "Motoyuki Yuasa",
+        "Saiyud Moolphate",
+        "Thaworn Lorga",
+        "Hirohide Yokokawa",
+        "Hiroshi Fukuda",
+        "Tsutomu Kitajima",
+        "Susumu Tanimura",
+        "Yoshimune Hiratsuka",
+        "Koichi Ono",
+        "Payom Thinuan",
+        "Kazuo Minematsu",
+        "Jitladda Deerojanawong",
+        "Yaoyanee Suya",
+        "Eiji Marui"
+      ],
+      "publication_year": 2019,
+      "doi_url": "https://doi.org/10.1186/s13011-019-0197-2",
+      "licences": [
+        "CC-BY-4.0"
+      ],
+      "licence_urls": [
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "pdf_pages": 10,
+      "consort_images": [
+        "Aung_2019_2.png"
+      ],
+      "paddle_images": [
+        "Aung_2019_0.png",
+        "Aung_2019_1.png",
+        "Aung_2019_2.png",
+        "Aung_2019_3.png"
+      ],
+      "licence_notice_pages": [
+        1
+      ],
+      "assets": [
+        {
+          "path": "pdfs/Aung_2019.pdf",
+          "sha256": "47dacad1b0c2b7c749a64995833c89a5a7f2202cfac7f9c34c2ac6febd19a003",
+          "bytes": 2510975
+        },
+        {
+          "path": "paddle-extracted/Aung_2019_0.png",
+          "sha256": "c35ef9b8c158218b316d18045481d9efc3cd75424642469476aa77c657c3b8e4",
+          "bytes": 4813
+        },
+        {
+          "path": "paddle-extracted/Aung_2019_1.png",
+          "sha256": "05a3c4c714c24c90f6bde42345187fa28f22c9470633ac0023da2f3e745634ba",
+          "bytes": 84571
+        },
+        {
+          "path": "paddle-extracted/Aung_2019_2.png",
+          "sha256": "e6bd1ca0e296b7892312bba0e66b1c8b75495ed88165e261e5b06bf41de52219",
+          "bytes": 96175
+        },
+        {
+          "path": "paddle-extracted/Aung_2019_3.png",
+          "sha256": "2cee950662b346df9979c1af5bd210197b6273051c30e3c772e333d0d050062b",
+          "bytes": 334428
+        },
+        {
+          "path": "consort-images/Aung_2019_2.png",
+          "sha256": "4b739fecec4eea4275b9b77e0f5da53b6fa35d85f2dd5cc7b626066e67337eff",
+          "bytes": 96166
+        },
+        {
+          "path": "ground-truth/nodes/Aung_2019_2.json",
+          "sha256": "dcd07f035c5d39684c2f2dc57e65b237b9f133d070f3958208161b0895291d9a",
+          "bytes": 1288
+        },
+        {
+          "path": "ground-truth/labels/Aung_2019_2.json",
+          "sha256": "637f779d60deebda8b009e07b6257d4af954e13fae3df14411e64e6c09844dce",
+          "bytes": 1024
+        },
+        {
+          "path": "ground-truth/flow/Aung_2019_2.json",
+          "sha256": "731701af74d6043bed8f9db0cc7c5286f2086adc05ba88d39604ab5d4c1e88b3",
+          "bytes": 913
+        },
+        {
+          "path": "ground-truth/additional_texts/Aung_2019_2.json",
+          "sha256": "14fca928ceb275b7d418482dbce8f07406d65ddcbd8375a3b49a00da4bfdfde5",
+          "bytes": 63
+        }
+      ]
+    },
+    {
+      "filename": "Baskerville_2018.pdf",
+      "title": "Effect of a Mobile Phone Intervention on Quitting Smoking in a Young Adult Population of Smokers: Randomized Controlled Trial",
+      "authors": [
+        "Neill Bruce Baskerville",
+        "L C Struik",
+        "G. Emmanuel Guindon",
+        "Cameron D. Norman",
+        "Robyn Whittaker",
+        "Catherine M. Burns",
+        "David Hammond",
+        "Darly Dash",
+        "Karen Brown"
+      ],
+      "publication_year": 2018,
+      "doi_url": "https://doi.org/10.2196/10893",
+      "licences": [
+        "CC-BY-4.0"
+      ],
+      "licence_urls": [
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "pdf_pages": 16,
+      "consort_images": [
+        "Baskerville_2018_0.png"
+      ],
+      "paddle_images": [
+        "Baskerville_2018_0.png"
+      ],
+      "licence_notice_pages": [
+        16
+      ],
+      "assets": [
+        {
+          "path": "pdfs/Baskerville_2018.pdf",
+          "sha256": "d629f59f75204d198defa39e23722b9761032982a63e9884424b76916751c71d",
+          "bytes": 729366
+        },
+        {
+          "path": "paddle-extracted/Baskerville_2018_0.png",
+          "sha256": "6ba0cc65c87523b6bd8a71ddc5322947cb831cd4b6153c93aadb1c72aa81ffef",
+          "bytes": 337352
+        },
+        {
+          "path": "consort-images/Baskerville_2018_0.png",
+          "sha256": "6ba0cc65c87523b6bd8a71ddc5322947cb831cd4b6153c93aadb1c72aa81ffef",
+          "bytes": 337352
+        },
+        {
+          "path": "ground-truth/nodes/Baskerville_2018_0.json",
+          "sha256": "417a5fa370110c8fef564a9878d66d8139fd329c5480b660f6479fa0f84e1496",
+          "bytes": 2271
+        },
+        {
+          "path": "ground-truth/labels/Baskerville_2018_0.json",
+          "sha256": "2cf92ad0eff8f9bb27f2e9016d67dc9b1883e355d0fe097ab5c0413bdb275438",
+          "bytes": 1642
+        },
+        {
+          "path": "ground-truth/flow/Baskerville_2018_0.json",
+          "sha256": "416049419f94f517654caef9655814f4adf62f3dd4e74d348ebcf4e42b787b74",
+          "bytes": 1321
+        },
+        {
+          "path": "ground-truth/additional_texts/Baskerville_2018_0.json",
+          "sha256": "14fca928ceb275b7d418482dbce8f07406d65ddcbd8375a3b49a00da4bfdfde5",
+          "bytes": 63
+        }
+      ]
+    },
+    {
+      "filename": "Stanczyk_2016.pdf",
+      "title": "Comparison of Text and Video Computer-Tailored Interventions for Smoking Cessation: Randomized Controlled Trial",
+      "authors": [
+        "Nicola Esther Stanczyk",
+        "Catherine Bolman",
+        "Mathieu van Adrichem",
+        "Math J. J. M. Candel",
+        "Jean Muris",
+        "Hein de Vries"
+      ],
+      "publication_year": 2014,
+      "doi_url": "https://doi.org/10.2196/jmir.3016",
+      "licences": [
+        "CC-BY-2.0"
+      ],
+      "licence_urls": [
+        "https://creativecommons.org/licenses/by/2.0/"
+      ],
+      "pdf_pages": 18,
+      "consort_images": [
+        "Stanczyk_2016_1.png"
+      ],
+      "paddle_images": [
+        "Stanczyk_2016_0.png",
+        "Stanczyk_2016_1.png"
+      ],
+      "licence_notice_pages": [
+        18
+      ],
+      "assets": [
+        {
+          "path": "pdfs/Stanczyk_2016.pdf",
+          "sha256": "ce3d3de12027d5ba79c759a83109d4f52e1ecfda5d0cf5037e5abd54b8f67347",
+          "bytes": 295834
+        },
+        {
+          "path": "paddle-extracted/Stanczyk_2016_0.png",
+          "sha256": "2666bf15580b9bea46a5b220c6f031d3293bfa9579fb4849751d73842defcd5e",
+          "bytes": 474510
+        },
+        {
+          "path": "paddle-extracted/Stanczyk_2016_1.png",
+          "sha256": "aaeb1869e4ce47ef0337430f903b42b5a4cd79d1c846ed55b2b45a3401709f86",
+          "bytes": 341724
+        },
+        {
+          "path": "consort-images/Stanczyk_2016_1.png",
+          "sha256": "aaeb1869e4ce47ef0337430f903b42b5a4cd79d1c846ed55b2b45a3401709f86",
+          "bytes": 341724
+        },
+        {
+          "path": "ground-truth/nodes/Stanczyk_2016_1.json",
+          "sha256": "55e8b9aa868d2479d30592b716e790b6ef521b4d3c10a72ae2042e2473698f75",
+          "bytes": 2149
+        },
+        {
+          "path": "ground-truth/labels/Stanczyk_2016_1.json",
+          "sha256": "9167bfc32a9653630c1fc0c82448b5f81a874d70c084c79f99d141249f51501b",
+          "bytes": 1217
+        },
+        {
+          "path": "ground-truth/flow/Stanczyk_2016_1.json",
+          "sha256": "3bddf49b84785dbec73cecb2d84cd384e22822806fd7ed015f8caf498cad732b",
+          "bytes": 1627
+        },
+        {
+          "path": "ground-truth/additional_texts/Stanczyk_2016_1.json",
+          "sha256": "f1f2ece3f910539d2e42dd0a494cf12db4892da98293f5d2ead561e62d538081",
+          "bytes": 228
+        }
+      ]
+    },
+    {
+      "filename": "Vander_2016.pdf",
+      "title": "An individually-tailored smoking cessation intervention for rural Veterans: a pilot randomized trial",
+      "authors": [
+        "Mark W. Vander Weg",
+        "Ashley J. Cozad",
+        "M. Bryant Howren",
+        "Margaret Cretzmeyer",
+        "Melody Scherubel",
+        "Carolyn Turvey",
+        "Kathleen M. Grant",
+        "Thad E. Abrams",
+        "David A. Katz"
+      ],
+      "publication_year": 2016,
+      "doi_url": "https://doi.org/10.1186/s12889-016-3493-z",
+      "licences": [
+        "CC-BY-4.0"
+      ],
+      "licence_urls": [
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "pdf_pages": 11,
+      "consort_images": [
+        "Vander_2016_0.png"
+      ],
+      "paddle_images": [
+        "Vander_2016_0.png"
+      ],
+      "licence_notice_pages": [
+        1
+      ],
+      "assets": [
+        {
+          "path": "pdfs/Vander_2016.pdf",
+          "sha256": "93bd67acd0e79b41cb0158acb5e66439549b4b697f9855dadf135e4ab9787dc9",
+          "bytes": 597689
+        },
+        {
+          "path": "paddle-extracted/Vander_2016_0.png",
+          "sha256": "531544ee7d982d84302bb9f37203e614a3abc3f5877c12fa1c477f447765b222",
+          "bytes": 106590
+        },
+        {
+          "path": "consort-images/Vander_2016_0.png",
+          "sha256": "531544ee7d982d84302bb9f37203e614a3abc3f5877c12fa1c477f447765b222",
+          "bytes": 106590
+        },
+        {
+          "path": "ground-truth/nodes/Vander_2016_0.json",
+          "sha256": "ca89c309b20304f0cbe2b6aa14ba68d1047fb17a7206d5cb7e5c821f4e2727f7",
+          "bytes": 1819
+        },
+        {
+          "path": "ground-truth/labels/Vander_2016_0.json",
+          "sha256": "16a2c74ac2694b428d52290309d896e436a0eababe6a1462f8832540ba7f200c",
+          "bytes": 998
+        },
+        {
+          "path": "ground-truth/flow/Vander_2016_0.json",
+          "sha256": "3e7a6763a6dc6320076512de9d261d349fb202c8fc3e06ad1e79962447946b7e",
+          "bytes": 1301
+        },
+        {
+          "path": "ground-truth/additional_texts/Vander_2016_0.json",
+          "sha256": "7e209b937b200eb03a7e1ecedd2d1f6c3738554edcfa7897b04bed6a030a0062",
+          "bytes": 112
+        }
+      ]
+    },
+    {
+      "filename": "Young_2008.pdf",
+      "title": "Acceptability and effectiveness of opportunistic referral of smokers to telephone cessation advice from a nurse: a randomised trial in Australian general practice",
+      "authors": [
+        "Jane Young",
+        "Seham Girgis",
+        "Tracey Bruce",
+        "Melissa Hobbs",
+        "Jeanette Ward"
+      ],
+      "publication_year": 2008,
+      "doi_url": "https://doi.org/10.1186/1471-2296-9-16",
+      "licences": [
+        "CC-BY-2.0"
+      ],
+      "licence_urls": [
+        "https://creativecommons.org/licenses/by/2.0/"
+      ],
+      "pdf_pages": 10,
+      "consort_images": [
+        "Young_2008_0.png"
+      ],
+      "paddle_images": [
+        "Young_2008_0.png"
+      ],
+      "licence_notice_pages": [
+        1
+      ],
+      "assets": [
+        {
+          "path": "pdfs/Young_2008.pdf",
+          "sha256": "dded1d27db0e642fdc5604df1ad3cacc2443fea4e79b8afd72397154bd0372c0",
+          "bytes": 300534
+        },
+        {
+          "path": "paddle-extracted/Young_2008_0.png",
+          "sha256": "264a345a6ae9fc448cf67551c21d7f70bfaf33b036b0e3a1790728908aff7c36",
+          "bytes": 109365
+        },
+        {
+          "path": "consort-images/Young_2008_0.png",
+          "sha256": "264a345a6ae9fc448cf67551c21d7f70bfaf33b036b0e3a1790728908aff7c36",
+          "bytes": 109365
+        },
+        {
+          "path": "ground-truth/nodes/Young_2008_0.json",
+          "sha256": "305be63325561aa455be8df8dd68882883a67695c14e64a3f03070ca27840e4e",
+          "bytes": 3230
+        },
+        {
+          "path": "ground-truth/labels/Young_2008_0.json",
+          "sha256": "b77316e718031c0c8ed1979f8f56a87af6e8b5a1423620cda9496575c424f269",
+          "bytes": 1992
+        },
+        {
+          "path": "ground-truth/flow/Young_2008_0.json",
+          "sha256": "e8c921e2660b01ec34546cefe0f69a9488311bee20af71331b8f40c975f95c08",
+          "bytes": 1548
+        },
+        {
+          "path": "ground-truth/additional_texts/Young_2008_0.json",
+          "sha256": "f20b45d7d9cfeabd1c05a84cb2d15742c80593d1137def5dcf164091a463a325",
+          "bytes": 105
+        }
+      ]
+    },
+    {
+      "filename": "Yu_2017.pdf",
+      "title": "mHealth Intervention is Effective in Creating Smoke-Free Homes for Newborns: A Randomized Controlled Trial Study in China",
+      "authors": [
+        "Shaohua Yu",
+        "Zongshuan Duan",
+        "Pamela Redmon",
+        "Michael P. Eriksen",
+        "Jeffrey P. Koplan",
+        "Cheng Huang"
+      ],
+      "publication_year": 2017,
+      "doi_url": "https://doi.org/10.1038/s41598-017-08922-x",
+      "licences": [
+        "CC-BY-4.0"
+      ],
+      "licence_urls": [
+        "https://creativecommons.org/licenses/by/4.0/"
+      ],
+      "pdf_pages": 9,
+      "consort_images": [
+        "Yu_2017_0.png"
+      ],
+      "paddle_images": [
+        "Yu_2017_0.png",
+        "Yu_2017_1.png"
+      ],
+      "licence_notice_pages": [
+        9
+      ],
+      "assets": [
+        {
+          "path": "pdfs/Yu_2017.pdf",
+          "sha256": "bbbff84c0ae1b7de0007bad7c8bc0137f1d83277bd696b5650c043483534da07",
+          "bytes": 1296193
+        },
+        {
+          "path": "paddle-extracted/Yu_2017_0.png",
+          "sha256": "d92a7d785ee5a1f9a3437ca7da56d801c78a5cdd4186ab4299c4734f037660c7",
+          "bytes": 75436
+        },
+        {
+          "path": "paddle-extracted/Yu_2017_1.png",
+          "sha256": "b8b0a0cd43c79f1f7b6c9b1ab27f17f8c3462a721ff48d61fe5aa13d10118e01",
+          "bytes": 2307
+        },
+        {
+          "path": "consort-images/Yu_2017_0.png",
+          "sha256": "d92a7d785ee5a1f9a3437ca7da56d801c78a5cdd4186ab4299c4734f037660c7",
+          "bytes": 75436
+        },
+        {
+          "path": "ground-truth/nodes/Yu_2017_0.json",
+          "sha256": "e9a05bca6927742c4329581488927a27a37ec590c2750374cb4b6fcc3722c15c",
+          "bytes": 2171
+        },
+        {
+          "path": "ground-truth/labels/Yu_2017_0.json",
+          "sha256": "555de1b92bd875a295743f5e3adf8b7400961f98a1c022a601e01a9492eb5e5f",
+          "bytes": 2441
+        },
+        {
+          "path": "ground-truth/flow/Yu_2017_0.json",
+          "sha256": "25dacdc8fef86c95b75b50d071aeac60fd5c25d975c06059e101ba2e7064454e",
+          "bytes": 2209
+        },
+        {
+          "path": "ground-truth/additional_texts/Yu_2017_0.json",
+          "sha256": "14fca928ceb275b7d418482dbce8f07406d65ddcbd8375a3b49a00da4bfdfde5",
+          "bytes": 63
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "342 households were eligible after screening and\nunderwent randomization"
+        },
+        {
+          "node_number": 2,
+          "text": "114 were assigned to\nIntervention Group A"
+        },
+        {
+          "node_number": 3,
+          "text": "114 were assigned to\nIntervention Group B"
+        },
+        {
+          "node_number": 4,
+          "text": "114 were assigned to\nControl Group"
+        },
+        {
+          "node_number": 5,
+          "text": "103 fathers\nremained"
+        },
+        {
+          "node_number": 6,
+          "text": "104 mothers\nremained"
+        },
+        {
+          "node_number": 7,
+          "text": "100 fathers\nremained"
+        },
+        {
+          "node_number": 8,
+          "text": "99 mothers\nremained"
+        },
+        {
+          "node_number": 9,
+          "text": "96 fathers\nremained"
+        },
+        {
+          "node_number": 10,
+          "text": "97 mothers\nremained"
+        },
+        {
+          "node_number": 11,
+          "text": "103 fathers\nremained"
+        },
+        {
+          "node_number": 12,
+          "text": "104 mothers\nremained"
+        },
+        {
+          "node_number": 13,
+          "text": "99 fathers\nremained"
+        },
+        {
+          "node_number": 14,
+          "text": "100 mothers\nremained"
+        },
+        {
+          "node_number": 15,
+          "text": "96 fathers\nremained"
+        },
+        {
+          "node_number": 16,
+          "text": "97 mothers\nremained"
+        },
+        {
+          "node_number": 17,
+          "text": "102 fathers\nremained"
+        },
+        {
+          "node_number": 18,
+          "text": "104 mothers\nremained"
+        },
+        {
+          "node_number": 19,
+          "text": "97 fathers\nremained"
+        },
+        {
+          "node_number": 20,
+          "text": "97 mothers\nremained"
+        },
+        {
+          "node_number": 21,
+          "text": "93 fathers\nremained"
+        },
+        {
+          "node_number": 22,
+          "text": "96 mothers\nremained"
+        }
+      ]
+    }
+  ]
+}

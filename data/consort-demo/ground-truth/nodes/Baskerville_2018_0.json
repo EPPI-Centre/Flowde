@@ -1,0 +1,60 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "text": "Assessed for eligibility (n=4269)"
+        },
+        {
+          "node_number": 2,
+          "text": "Excluded (n=2670)\n\u2022Did not meet inclusion criteria (n = 1346)\n\u2022Did not complete intake (n = 682)\n\u2022Declined to participate/consent (n = 312)\n\u2022Multiple attempts to participate (n = 219)\n\u2022No contact information (n = 111)"
+        },
+        {
+          "node_number": 3,
+          "text": "Consented and randomized\n(n=1599)"
+        },
+        {
+          "node_number": 4,
+          "text": "Allocated to intervention \u2013\n\u201cCrush the Crave\u201d (n=820)"
+        },
+        {
+          "node_number": 5,
+          "text": "Allocated to usual care condition \u2013\n\u201cOn the Road to Quitting\u201d (n=779)"
+        },
+        {
+          "node_number": 6,
+          "text": "Completed 3-month follow-up survey (n=387)\nDid not complete 3-month follow-up (n=403)\nWithdrew from trial (n = 30)"
+        },
+        {
+          "node_number": 7,
+          "text": "Completed 3-month follow-up survey (n=416)\nDid not complete 3-month follow-up (n=334)\nWithdrew from trial (n = 29)"
+        },
+        {
+          "node_number": 8,
+          "text": "Completed 6-month follow-up survey (n=426)\nDid not complete 6-month follow-up (n=392)\nWithdrew from trial (n=2)"
+        },
+        {
+          "node_number": 9,
+          "text": "Completed 6-month follow-up survey (n=425)\nDid not complete 6-month follow-up (n=354)\nNo withdrawals"
+        },
+        {
+          "node_number": 10,
+          "text": "3-month outcome (N=39)\n6-month outcome (N=50)\nBoth 3-month and 6-month outcome (N=17)"
+        },
+        {
+          "node_number": 11,
+          "text": "3-month outcome (N=45)\n6-month outcome (N=35)\nBoth 3-month and 6-month outcome (N=14)"
+        },
+        {
+          "node_number": 12,
+          "text": "Included for intention-to-treat analysis (n=820)\nComplete case analysis (Baseline, T1 and T2)\n(n = 354)"
+        },
+        {
+          "node_number": 13,
+          "text": "Included for intention-to-treat analysis (n=779)\nComplete case analysis (Baseline, T1 and T2)\n(n = 371)"
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,7 @@ repos:
     hooks:
       # Checks if files larger than 500kb added
       - id: check-added-large-files
+        exclude: ^data/consort-demo/
       - id: check-case-conflict
       - id: check-illegal-windows-names
       - id: check-symlinks

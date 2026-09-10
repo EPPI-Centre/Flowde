@@ -954,3 +954,31 @@ def test_rotate_imgs_passes_sorted_paths_to_rotate_imgs_from_paths(
     }
 
     assert set(tmp_path.rglob("*")) == expected_paths
+
+
+@pytest.mark.parametrize(
+    ("angle", "expected"), [(90, [5, 3, 1, 6, 4, 2]), (270, [2, 4, 6, 1, 3, 5])]
+)
+@pytest.mark.parametrize("save_in_place", [False, True])
+def test_rotation_applies_clockwise_correction(
+    tmp_path, angle, expected, save_in_place
+):
+    source = tmp_path / "sideways.png"
+    destination = tmp_path / "upright.png"
+    original = Image.new("L", (2, 3))
+    original.putdata([1, 2, 3, 4, 5, 6])
+    original.save(source)
+
+    rotate_imgs_module.rotate_imgs_from_paths(
+        classify_fn=lambda _: angle,
+        img_paths=[source],
+        save_in_place=save_in_place,
+        save_paths=None if save_in_place else [destination],
+        n_jobs=1,
+    )
+
+    with Image.open(source if save_in_place else destination) as corrected:
+        assert corrected.size == (3, 2)
+        assert [
+            corrected.getpixel((x, y)) for y in range(2) for x in range(3)
+        ] == expected

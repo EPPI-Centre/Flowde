@@ -1,0 +1,58 @@
+{
+  "options": [
+    {
+      "nodes": [
+        {
+          "node_number": 1,
+          "points_to": [
+            2,
+            3
+          ]
+        },
+        {
+          "node_number": 2,
+          "points_to": []
+        },
+        {
+          "node_number": 3,
+          "points_to": [
+            4,
+            5
+          ]
+        },
+        {
+          "node_number": 4,
+          "points_to": [
+            6
+          ]
+        },
+        {
+          "node_number": 5,
+          "points_to": [
+            7
+          ]
+        },
+        {
+          "node_number": 6,
+          "points_to": [
+            8
+          ]
+        },
+        {
+          "node_number": 7,
+          "points_to": [
+            9
+          ]
+        },
+        {
+          "node_number": 8,
+          "points_to": []
+        },
+        {
+          "node_number": 9,
+          "points_to": []
+        }
+      ]
+    }
+  ]
+}
