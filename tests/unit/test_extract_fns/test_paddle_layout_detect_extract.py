@@ -94,7 +94,9 @@ def test_model_is_created_only_when_extraction_starts(
 
     extract(pdf_path, save_dir)
 
-    layout_detection_constructor.assert_called_once_with(device="cpu", cpu_threads=4)
+    layout_detection_constructor.assert_called_once_with(
+        device="cpu", cpu_threads=4, enable_mkldnn=True
+    )
 
 
 def test_model_is_reused_for_subsequent_pdfs(
@@ -107,7 +109,9 @@ def test_model_is_reused_for_subsequent_pdfs(
     extract(pdf_path, save_dir)
     extract(second_pdf, save_dir)
 
-    layout_detection_constructor.assert_called_once_with(device="gpu", cpu_threads=10)
+    layout_detection_constructor.assert_called_once_with(
+        device="gpu", cpu_threads=10, enable_mkldnn=True
+    )
     assert pipeline.predict.call_args_list == [
         call(str(pdf_path), batch_size=1),
         call(str(second_pdf), batch_size=1),
@@ -132,30 +136,33 @@ def test_extractors_share_the_model_when_model_settings_match(
     first_extract(pdf_path, save_dir)
     second_extract(pdf_path, save_dir)
 
-    layout_detection_constructor.assert_called_once_with(device="gpu", cpu_threads=10)
+    layout_detection_constructor.assert_called_once_with(
+        device="gpu", cpu_threads=10, enable_mkldnn=True
+    )
 
 
 @pytest.mark.parametrize(
-    ("device", "cpu_threads"),
+    ("device", "cpu_threads", "enable_mkldnn"),
     [
-        pytest.param("cpu", 10, id="different-device"),
-        pytest.param("gpu", 4, id="different-thread-count"),
+        pytest.param("cpu", 10, True, id="different-device"),
+        pytest.param("gpu", 4, True, id="different-thread-count"),
+        pytest.param("gpu", 10, False, id="disable-mkldnn"),
     ],
 )
 def test_changing_model_settings_creates_a_new_model(
-    layout_detection_constructor, pdf_path, save_dir, device, cpu_threads
+    layout_detection_constructor, pdf_path, save_dir, device, cpu_threads, enable_mkldnn
 ):
     first_extract = make_paddle_layout_extract_fn()
     second_extract = make_paddle_layout_extract_fn(
-        device=device, cpu_threads=cpu_threads
+        device=device, cpu_threads=cpu_threads, enable_mkldnn=enable_mkldnn
     )
 
     first_extract(pdf_path, save_dir)
     second_extract(pdf_path, save_dir)
 
     assert layout_detection_constructor.call_args_list == [
-        call(device="gpu", cpu_threads=10),
-        call(device=device, cpu_threads=cpu_threads),
+        call(device="gpu", cpu_threads=10, enable_mkldnn=True),
+        call(device=device, cpu_threads=cpu_threads, enable_mkldnn=enable_mkldnn),
     ]
 
 
@@ -169,15 +176,17 @@ def test_only_the_most_recent_model_settings_remain_cached(
     gpu_extract(pdf_path, save_dir)
     gpu_extract(pdf_path, save_dir)
 
-    layout_detection_constructor.assert_called_once_with(device="gpu", cpu_threads=10)
+    layout_detection_constructor.assert_called_once_with(
+        device="gpu", cpu_threads=10, enable_mkldnn=True
+    )
 
     # Switching to CPU replaces the cached model; repeated CPU extractions reuse it.
     cpu_extract(pdf_path, save_dir)
     cpu_extract(pdf_path, save_dir)
 
     assert layout_detection_constructor.call_args_list == [
-        call(device="gpu", cpu_threads=10),
-        call(device="cpu", cpu_threads=10),
+        call(device="gpu", cpu_threads=10, enable_mkldnn=True),
+        call(device="cpu", cpu_threads=10, enable_mkldnn=True),
     ]
 
     # Switching back recreates the displaced GPU model, which is then reused.
@@ -185,9 +194,9 @@ def test_only_the_most_recent_model_settings_remain_cached(
     gpu_extract(pdf_path, save_dir)
 
     assert layout_detection_constructor.call_args_list == [
-        call(device="gpu", cpu_threads=10),
-        call(device="cpu", cpu_threads=10),
-        call(device="gpu", cpu_threads=10),
+        call(device="gpu", cpu_threads=10, enable_mkldnn=True),
+        call(device="cpu", cpu_threads=10, enable_mkldnn=True),
+        call(device="gpu", cpu_threads=10, enable_mkldnn=True),
     ]
 
 
