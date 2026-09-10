@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Flowchart parsing - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Flowchart parsing";
+        var mkdocs_page_input_path = "pipeline/parsing.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Flowchart parsing</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#understand-the-flowchart-format">Understand the flowchart format</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#example-1-a-basic-flowchart">Example 1: A Basic Flowchart</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example-2-keeping-branches-separate">Example 2: Keeping branches separate</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example-3-advanced-labels">Example 3: Advanced labels</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#parse-full-or-partial-flowcharts">Parse full or partial flowcharts</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#parsing-options">Parsing options</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowchart-parts">Flowchart parts</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#using-partial-results-as-context">Using partial results as context</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#define-a-parsing-function">Define a parsing function</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#use-a-default-parsing-function">Use a default parsing function</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#bring-your-own-parsing-function">Bring your own parsing function</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#run-parsing">Run parsing</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#parse-images-from-a-directory">Parse images from a directory</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parse-only-part-of-a-flowchart">Parse only part of a flowchart</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parse-using-existing-partial-flowcharts">Parse using existing partial flowcharts</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parse-labels-flow-or-additional-text">Parse labels, flow, or additional text</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parse-a-subset-of-images">Parse a subset of images</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parse-an-explicit-list-of-images">Parse an explicit list of images</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parallelism">Parallelism</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#output-validation">Output validation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#next-step">Next step</a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Flowchart parsing</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/parsing.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="flowchart-parsing">Flowchart parsing</h1>
+<p>Parsing is the final stage of the core pipeline. It takes flowchart images as
+input and extracts structured flowchart data.</p>
+<p>In a typical workflow, we
+<a href="../image-extraction/#image-extraction">extract images</a>,
+<a href="../classification/#image-classification">classify</a> the relevant flowchart
+images, <a href="../rotation/#image-rotation">rotate</a> them into the correct
+orientation, and then parse them into structured data.</p>
+<p>Parsing can be done in one step, or split into smaller parsing tasks. Splitting
+the task can improve performance and is useful when you want to or check
+intermediate outputs.</p>
+<h2 id="understand-the-flowchart-format">Understand the flowchart format</h2>
+<p><code>flowde</code> represents parsed flowcharts using nodes and additional texts.</p>
+<p>A complete parsed flowchart has this structure:</p>
+<pre><code class="language-python">from pydantic import BaseModel
+
+
+class Node(BaseModel):
+    node_number: int
+    text: str
+    labels: list[str]
+    points_to: list[int]
+
+
+class Flowchart(BaseModel):
+    nodes: list[Node]
+    additional_texts: list[str]
+</code></pre>
+<p>Each node represents one box or item in the flowchart.</p>
+<p>The fields have the following meanings:</p>
+<ul>
+<li><code>node_number</code>: a unique id given to each node in the flowchart;</li>
+<li><code>text</code>: the text inside the node;</li>
+<li><code>labels</code>: text labels that apply to the node;</li>
+<li><code>points_to</code>: the node numbers that follow this node in the flow;</li>
+<li><code>additional_texts</code>: text that is not assigned to a specific node.</li>
+</ul>
+<h3 id="example-1-a-basic-flowchart">Example 1: A Basic Flowchart</h3>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD013 -->
+<p><img alt="Example flowchart for demonstrating parsing" class="docs-image" src="../../images/demo-flowchart.webp" /></p>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD013 -->
+
+<p>Is ideally parsed as:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    {
+      &quot;node_number&quot;: 1,
+      &quot;text&quot;: &quot;Assessed for eligibility\n(n = 120)&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [2, 3]
+    },
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;Allocated to intervention\n(n = 60)&quot;,
+      &quot;labels&quot;: [&quot;Allocation&quot;],
+      &quot;points_to&quot;: [4]
+    },
+    {
+      &quot;node_number&quot;: 3,
+      &quot;text&quot;: &quot;Allocated to control\n(n = 60)&quot;,
+      &quot;labels&quot;: [&quot;Allocation&quot;],
+      &quot;points_to&quot;: [5]
+    },
+    {
+      &quot;node_number&quot;: 4,
+      &quot;text&quot;: &quot;Completed follow-up\n(n = 55)&quot;,
+      &quot;labels&quot;: [&quot;Follow-up&quot;],
+      &quot;points_to&quot;: []
+    },
+    {
+      &quot;node_number&quot;: 5,
+      &quot;text&quot;: &quot;Completed follow-up\n(n = 57)&quot;,
+      &quot;labels&quot;: [&quot;Follow-up&quot;],
+      &quot;points_to&quot;: []
+    }
+  ],
+  &quot;additional_texts&quot;: [&quot;Figure 1. Example flowchart for demonstrating parsing.&quot;]
+}
+</code></pre>
+<h3 id="example-2-keeping-branches-separate">Example 2: Keeping branches separate</h3>
+<p>The goal of parsing is to interpret the visual content of an image and convert
+it into a standardised JSON format. This means we may not always want to parse
+the image exactly as it appears.</p>
+<p>Commonly, a flowchart will have two branches that follow the same step; see <code>C</code>
+in the image below. The author may use a single node to describe the step, but
+the branches are still very much consdiered separate. If we parsed this exactly
+as it appears in our JSON format, we would lose track of which branch is which:</p>
+<pre><code class="language-text">A → C → [D, E]
+B → C → [D, E]
+</code></pre>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD013 -->
+<p><img alt="Example flowchart for demonstrating split nodes" class="docs-image" src="../../images/split-node-flowchart.webp" /></p>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD013 -->
+
+<p>To combat this, if a single node is used to describe a step that applies
+separately to each branch, we duplicate the node to keep the branches separate.
+Now we are able to capture the underlying meaning of the image in our JSON
+format:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    {
+      &quot;node_number&quot;: 1,
+      &quot;text&quot;: &quot;A&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [3]
+    },
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;B&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [4]
+    },
+    {
+      &quot;node_number&quot;: 3,
+      &quot;text&quot;: &quot;C&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [5]
+    },
+    {
+      &quot;node_number&quot;: 4,
+      &quot;text&quot;: &quot;C&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [6]
+    },
+    {
+      &quot;node_number&quot;: 5,
+      &quot;text&quot;: &quot;D&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: []
+    },
+    {
+      &quot;node_number&quot;: 6,
+      &quot;text&quot;: &quot;E&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: []
+    }
+  ],
+  &quot;additional_texts&quot;: []
+}
+</code></pre>
+<p>This preserves the two intended branches as:</p>
+<pre><code class="language-text">A → C → D
+B → C → E
+</code></pre>
+<h3 id="example-3-advanced-labels">Example 3: Advanced labels</h3>
+<p>Complicated nodes and labels may require additional processing to convert the
+visual content to JSON.</p>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD013 -->
+<p><img alt="Example flowcharts with advanced labels" class="docs-image" src="../../images/double-label-flowchart2.webp" /></p>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD013 -->
+
+<p>If we parse this exactly as it appears, for the bottom left node, we get
+something like this:</p>
+<pre><code class="language-json">...
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;42\n35&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;26 weeks&quot;,
+        &quot;52 weeks&quot;
+      ],
+      &quot;points_to&quot;: []
+    },
+...
+</code></pre>
+<p>By parsing <code>26 weeks</code> and <code>52 weeks</code> as separate labels, each labels appears to
+apply to the entire node. This is incorrect. In reality, <code>26 weeks</code> applies to
+<code>42</code> and <code>52 weeks</code> applies to <code>35</code>.</p>
+<p>But remember, our goal is to correctly represent the information in the image,
+not to parse the image exactly as it appears.</p>
+<p>For this scenario, where labels appear to apply to separate parts of the node,
+we have a couple of options:</p>
+<div class="indent-section">
+<h4 id="option-1-join-labels">Option 1: Join labels</h4>
+<p>We can join labels that apply to separate parts of a node, into a single label,
+effectively capturing that each part of the label applies to a different part of
+the node.</p>
+<pre><code class="language-json">...
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;42\n35&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;26 weeks\n52 weeks&quot;,
+      ],
+      &quot;points_to&quot;: []
+    },
+...
+</code></pre>
+<p>Now <code>26 weeks\n52 weeks</code> correctly applies to <code>42\n35</code></p>
+<h4 id="option-2-split-nodes">Option 2: Split nodes</h4>
+<p>In cases such as this one, the bottom left node would probably be more
+accurately represented by 2 separate nodes. We can split the nodes like these to
+more accurately capture the information in the image.</p>
+<p>The the bottom left node would become:</p>
+<pre><code class="language-json">...
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;42&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;26 weeks&quot;
+      ],
+      &quot;points_to&quot;: [4]
+    },
+    ...
+    {
+      &quot;node_number&quot;: 4,
+      &quot;text&quot;: &quot;35&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;52 weeks&quot;
+      ],
+      &quot;points_to&quot;: []
+    },
+...
+</code></pre>
+<p>Now we correctly capture that 42 patients attended the 26 weeks follow-up and 35
+patients attended the 52 weeks follow-up.</p>
+</div>
+<h2 id="parse-full-or-partial-flowcharts">Parse full or partial flowcharts</h2>
+<p><code>flowde</code> can parse a flowchart in one call, or split the task into smaller
+parts.</p>
+<h3 id="parsing-options">Parsing options</h3>
+<p>There are three main ways to parse a flowchart:</p>
+<ul>
+<li><strong>Full parsing:</strong> parse the whole flowchart in one step.</li>
+<li><strong>Partial parsing:</strong> parse one part of the flowchart, such as node text or
+  flow.</li>
+<li><strong>Combined partial parsing:</strong> parse several parts together, such as node text
+  and labels.</li>
+</ul>
+<p>Full parsing is simpler. Partial parsing usually gives better performance, but
+it is more expensive because it requires multiple model calls.</p>
+<h3 id="flowchart-parts">Flowchart parts</h3>
+<p>The supported parsing parts are:</p>
+<table>
+<thead>
+<tr>
+<th>Parse type</th>
+<th>Output fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>node_text</code></td>
+<td><code>node_number</code>, <code>text</code></td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td><code>labels</code></td>
+</tr>
+<tr>
+<td><code>flow</code></td>
+<td><code>points_to</code></td>
+</tr>
+<tr>
+<td><code>additional_texts</code></td>
+<td><code>additional_texts</code></td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="#understand-the-flowchart-format">Understand the flowchart format</a> for more
+details on these fields.</p>
+<h3 id="using-partial-results-as-context">Using partial results as context</h3>
+<p>Partial parsing lets you use earlier parsed results as context for later parsing
+steps.</p>
+<p>For example, you might first parse the node text:</p>
+<pre><code class="language-python">parts_to_parse={&quot;node_text&quot;}
+</code></pre>
+<p>Then use those parsed nodes as context when parsing labels or flow:</p>
+<pre><code class="language-python">parts_to_parse={&quot;labels&quot;}
+</code></pre>
+<pre><code class="language-python">parts_to_parse={&quot;flow&quot;}
+</code></pre>
+<p>When parsing <code>labels</code>, <code>flow</code>, or <code>additional_text</code> using existing partial
+results, the corresponding node text files must also be provided. This is
+because node numbers are needed to join the different parsed parts together.</p>
+<h2 id="define-a-parsing-function">Define a parsing function</h2>
+<p>Before running parsing, define the function that will parse each image. This can
+be one of the default LLM-based parsing functions, or a custom function that you
+provide.</p>
+<p>A parsing function takes the path to one image and an optional partial
+flowchart. It returns a Pydantic model containing the parsed result.</p>
+<h3 id="use-a-default-parsing-function">Use a default parsing function</h3>
+<p><code>flowde</code> includes default parsing functions using OpenAI and Gemini models.</p>
+<!-- markdownlint-disable MD046 -->
+<!-- prettier-ignore-start -->
+
+<div class="admonition note">
+<p class="admonition-title">Default parsing with Gemini or OpenAI</p>
+<p>To use either of the default parsing functions, follow the
+<a href="../setup-default-funcs/#setup-default-parsing-and-classification">setup default parsing and classification</a>
+steps.</p>
+</div>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD046 -->
+
+<p>To define an OpenAI parsing function:</p>
+<pre><code class="language-python">from flowde.parsing_fns.openai_parse import make_openai_parse_fn
+
+input_text = &quot;&quot;&quot;
+Parse this flowchart into structured data.
+&quot;&quot;&quot;
+
+parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.4-mini&quot;,
+    effort=&quot;high&quot;,
+)
+</code></pre>
+<p>By default, this parses all supported parts:</p>
+<ul>
+<li><code>node_text</code></li>
+<li><code>labels</code></li>
+<li><code>flow</code></li>
+<li><code>additional_text</code></li>
+</ul>
+<p>To parse only particular parts, pass <code>parts_to_parse</code>:</p>
+<pre><code class="language-python">parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.4-mini&quot;,
+    effort=&quot;high&quot;,
+    parts_to_parse={&quot;node_text&quot;},
+)
+</code></pre>
+<p>To use Gemini instead, use <code>make_gemini_parse_fn</code>:</p>
+<pre><code class="language-python">from flowde.parsing_fns.gemini_parse import make_gemini_parse_fn
+
+parse_fn = make_gemini_parse_fn(
+    input_text=input_text,
+    model=&quot;gemini-3.1-flash-lite&quot;,
+    effort=&quot;high&quot;,
+    parts_to_parse={&quot;node_text&quot;},
+)
+</code></pre>
+<p>See (insert API ref docs here) for details about params.</p>
+<h3 id="bring-your-own-parsing-function">Bring your own parsing function</h3>
+<p>You do not have to use the default OpenAI or Gemini parsing helpers. Any
+function with the same interface can be used.</p>
+<p>A custom parsing function must accept an image path and an optional partial
+flowchart, and return a Pydantic model:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from pydantic import BaseModel
+
+
+def my_parse_fn(
+    img_path: Path,
+    partial_flowchart: BaseModel | None = None,
+) -&gt; BaseModel:
+    ...
+</code></pre>
+<p>The <code>partial_flowchart</code> argument is optional. If no partial flowchart data is
+provided, <code>flowde</code> calls the parsing function with only the image.</p>
+<h2 id="run-parsing">Run parsing</h2>
+<p>After defining <code>parse_fn</code>, pass it to one of the parsing pipeline functions.</p>
+<p>Most users should use <code>parse_imgs</code>. This takes a directory of PNG images, parses
+each image, and saves the parsed JSON outputs to a directory.</p>
+<h3 id="parse-images-from-a-directory">Parse images from a directory</h3>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.parse_imgs import parse_imgs
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-flowcharts&quot;),
+    n_jobs=1,
+)
+</code></pre>
+<p>The input directory should contain the PNG images at the top level. <code>parse_imgs</code>
+searches for files matching <code>*.png</code> directly inside <code>img_dir</code>.</p>
+<p>For example:</p>
+<pre><code class="language-text">data/
+└── rotated-flowchart-images/
+    ├── paper-1_0.png
+    ├── paper-2_0.png
+    └── paper-3_0.png
+</code></pre>
+<p>Parsed outputs are saved as JSON files in <code>save_dir</code>. The output filenames use
+the image stem:</p>
+<pre><code class="language-text">data/
+└── parsed-flowcharts/
+    ├── paper-1_0.json
+    ├── paper-2_0.json
+    └── paper-3_0.json
+</code></pre>
+<p>The returned <code>responses</code> list contains the parsed Pydantic model for each image,
+in sorted path order.</p>
+<h3 id="parse-only-part-of-a-flowchart">Parse only part of a flowchart</h3>
+<p>Use <code>parts_to_parse</code> when creating the parsing function.</p>
+<p>For example, to parse only node text:</p>
+<pre><code class="language-python">from flowde.parsing_fns.openai_parse import make_openai_parse_fn
+from flowde.parse_imgs import parse_imgs
+
+parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.4-mini&quot;,
+    effort=&quot;high&quot;,
+    parts_to_parse={&quot;node_text&quot;},
+)
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-node-text&quot;),
+)
+</code></pre>
+<p>This produces JSON files containing only the requested fields.</p>
+<p>For <code>parts_to_parse={"node_text"}</code>, the output will contain nodes with node
+numbers and text:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    {
+      &quot;node_number&quot;: 1,
+      &quot;text&quot;: &quot;Assessed for eligibility (n = 120)&quot;
+    },
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;Randomised (n = 100)&quot;
+    }
+  ]
+}
+</code></pre>
+<h3 id="parse-using-existing-partial-flowcharts">Parse using existing partial flowcharts</h3>
+<p>You can provide previously parsed parts as context for another parsing step.</p>
+<p>For example, after parsing node text, you can use those node files when parsing
+labels:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.parsing_fns.openai_parse import make_openai_parse_fn
+from flowde.parse_imgs import parse_imgs
+
+parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.4-mini&quot;,
+    effort=&quot;high&quot;,
+    parts_to_parse={&quot;labels&quot;},
+)
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-labels&quot;),
+    nodes_dir=Path(&quot;data/parsed-node-text&quot;),
+)
+</code></pre>
+<p>The files in <code>img_dir</code>, <code>save_dir</code>, and <code>nodes_dir</code> must have matching stems.</p>
+<p>For example:</p>
+<pre><code class="language-text">data/
+├── rotated-flowchart-images/
+│   ├── paper-1_0.png
+│   └── paper-2_0.png
+└── parsed-node-text/
+    ├── paper-1_0.json
+    └── paper-2_0.json
+</code></pre>
+<p>This lets <code>flowde</code> match each image to the corresponding partial flowchart.</p>
+<h3 id="parse-labels-flow-or-additional-text">Parse labels, flow, or additional text</h3>
+<p>You can provide different partial directories depending on what you want to
+parse.</p>
+<p>To parse flow using existing nodes:</p>
+<pre><code class="language-python">parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.4-mini&quot;,
+    effort=&quot;high&quot;,
+    parts_to_parse={&quot;flow&quot;},
+)
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-flow&quot;),
+    nodes_dir=Path(&quot;data/parsed-node-text&quot;),
+)
+</code></pre>
+<p>To parse additional text using existing nodes:</p>
+<pre><code class="language-python">parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.4-mini&quot;,
+    effort=&quot;high&quot;,
+    parts_to_parse={&quot;additional_text&quot;},
+)
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-additional-text&quot;),
+    nodes_dir=Path(&quot;data/parsed-node-text&quot;),
+)
+</code></pre>
+<p>You can also provide multiple existing parts:</p>
+<pre><code class="language-python">responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-flow&quot;),
+    nodes_dir=Path(&quot;data/parsed-node-text&quot;),
+    labels_dir=Path(&quot;data/parsed-labels&quot;),
+    additional_texts_dir=Path(&quot;data/parsed-additional-text&quot;),
+)
+</code></pre>
+<p>If any of <code>labels_dir</code>, <code>additional_texts_dir</code>, or <code>flow_dir</code> are provided,
+<code>nodes_dir</code> must also be provided. This is because node numbers are needed to
+join the different partial flowchart parts together.</p>
+<h3 id="parse-a-subset-of-images">Parse a subset of images</h3>
+<p>Use <code>range_indices</code> to parse only a slice of the images in a directory.</p>
+<pre><code class="language-python">responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-flowcharts&quot;),
+    range_indices=(0, 10),
+)
+</code></pre>
+<p>This parses the images from index <code>0</code> up to, but not including, index <code>10</code> after
+the image paths have been sorted.</p>
+<p>This can be useful for testing a parsing function on a small number of images
+before running it on the full directory.</p>
+<h3 id="parse-an-explicit-list-of-images">Parse an explicit list of images</h3>
+<p>If you do not want to parse every PNG in a directory, use
+<code>parse_imgs_from_paths</code>. This lets you pass the image paths and save paths
+directly.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.parse_imgs import parse_imgs_from_paths
+
+img_paths = [
+    Path(&quot;data/rotated-flowchart-images/paper-1_0.png&quot;),
+    Path(&quot;data/rotated-flowchart-images/paper-2_0.png&quot;),
+]
+
+save_paths = [
+    Path(&quot;data/parsed-flowcharts/paper-1_0.json&quot;),
+    Path(&quot;data/parsed-flowcharts/paper-2_0.json&quot;),
+]
+
+responses = parse_imgs_from_paths(
+    parse_fn=parse_fn,
+    img_paths=img_paths,
+    save_paths=save_paths,
+    n_jobs=1,
+)
+</code></pre>
+<p>You can also provide explicit partial paths:</p>
+<pre><code class="language-python">responses = parse_imgs_from_paths(
+    parse_fn=parse_fn,
+    img_paths=img_paths,
+    save_paths=save_paths,
+    nodes_paths=[
+        Path(&quot;data/parsed-node-text/paper-1_0.json&quot;),
+        Path(&quot;data/parsed-node-text/paper-2_0.json&quot;),
+    ],
+    labels_paths=[
+        Path(&quot;data/parsed-labels/paper-1_0.json&quot;),
+        Path(&quot;data/parsed-labels/paper-2_0.json&quot;),
+    ],
+)
+</code></pre>
+<p>All provided path lists must have the same length and matching stems.</p>
+<h3 id="parallelism">Parallelism</h3>
+<p>Both <code>parse_imgs</code> and <code>parse_imgs_from_paths</code> accept an <code>n_jobs</code> parameter to
+control the number of parallel processes of <code>parse_fn</code> to run.</p>
+<p>By default, they will try to use all CPU cores available. If your <code>parse_fn</code> is
+memory heavy, or if it calls an external API, you may need to manually reduce
+the number of jobs.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.parse_imgs import parse_imgs
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    save_dir=Path(&quot;data/parsed-flowcharts&quot;),
+    n_jobs=1,
+)
+</code></pre>
+<h2 id="output-validation">Output validation</h2>
+<p>The default OpenAI and Gemini parsing helpers build a Pydantic response schema
+from <code>parts_to_parse</code>.</p>
+<p>For example:</p>
+<pre><code class="language-python">parts_to_parse={&quot;node_text&quot;}
+</code></pre>
+<p>requires a response containing only node text fields, while:</p>
+<pre><code class="language-python">parts_to_parse={&quot;node_text&quot;, &quot;labels&quot;, &quot;flow&quot;, &quot;additional_text&quot;}
+</code></pre>
+<p>requires a complete flowchart response.</p>
+<p>Extra fields are not allowed in the parsed output. This helps ensure that each
+parsing step returns only the fields requested for that step.</p>
+<h2 id="next-step">Next step</h2>
+<p>After parsing, use the benchmarking tools to compare parsed flowcharts against
+ground-truth flowchart data.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../rotation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../benchmarking/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

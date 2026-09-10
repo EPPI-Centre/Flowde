@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Image rotation - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Image rotation";
+        var mkdocs_page_input_path = "pipeline/rotation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Image rotation</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#define-a-rotation-classification-function">Define a rotation classification function</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#use-a-default-llm-classification-function">Use a default LLM classification function</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#bring-your-own-rotation-classification-function">Bring your own rotation classification function</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#run-rotation">Run rotation</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#rotate-images-from-a-directory">Rotate images from a directory</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#save-rotation-labels-to-json">Save rotation labels to JSON</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#save-rotated-images-to-a-new-directory">Save rotated images to a new directory</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rotate-images-in-place">Rotate images in place</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#predict-rotation-without-saving-images">Predict rotation without saving images</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rotate-an-explicit-list-of-images">Rotate an explicit list of images</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parallelism">Parallelism</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#next-step">Next step</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Image rotation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/rotation.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="image-rotation">Image rotation</h1>
+<p>Rotation is the third stage of the core pipeline. It takes images as input,
+predicts the clockwise rotation needed to orient each image correctly, and then
+optionally saves the rotated images.</p>
+<p>In a typical workflow, we
+<a href="../classification/#image-classification">classify images</a> to keep only the
+relevant flowchart images, then use rotation to correct their orientation before
+parsing. Of course, the order of rotation and classification is interchangeable.</p>
+<h2 id="define-a-rotation-classification-function">Define a rotation classification function</h2>
+<p>Before running rotation, define the function that will predict the rotation
+angle for each image.</p>
+<p>A rotation classification function takes the path to one image and returns one
+of the following labels: <code>0</code>, <code>90</code>, <code>180</code>, <code>270</code>. These labels represent the
+<strong>clockwise angle</strong> used to rotate the image into the correct orientation.</p>
+<p>Rotation uses the same classification-function pattern as
+<a href="../classification/#image-classification">image classification</a>. The difference
+is that the output label is always a rotation angle.</p>
+<h3 id="use-a-default-llm-classification-function">Use a default LLM classification function</h3>
+<!-- markdownlint-disable MD046 -->
+<!-- prettier-ignore-start -->
+
+<div class="admonition note">
+<p class="admonition-title">Default classification with Gemini or OpenAI</p>
+<p>To use the default OpenAI or Gemini helpers, follow the
+<a href="../setup-default-funcs/#setup-default-parsing-and-classification">setup default parsing and classification</a>
+steps.</p>
+</div>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD046 -->
+
+<p>For example, to define an OpenAI rotation classification function:</p>
+<pre><code class="language-python">from pydantic import BaseModel
+
+from flowde.classify_fns.classify_types import RotationLabel
+from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+
+
+class RotationClassification(BaseModel):
+    label: RotationLabel # RotationLabel = Literal[0, 90, 180, 270]
+
+input_text = &quot;&quot;&quot;
+Return the clockwise angle required to correctly orient the image,
+such that the majority of text reads left to right, top to bottom.
+&quot;&quot;&quot;
+
+classify_fn = make_openai_classify_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.4-mini&quot;,
+    result_structure=RotationClassification,
+    effort=&quot;high&quot;,
+)
+</code></pre>
+<p>To use Gemini instead, use <code>make_gemini_classify_fn</code>:</p>
+<pre><code class="language-python">from flowde.classify_fns.gemini_classify_fn import make_gemini_classify_fn
+
+classify_fn = make_gemini_classify_fn(
+    input_text=input_text,
+    model=&quot;gemini-3.1-flash-lite&quot;,
+    result_structure=RotationClassification,
+    effort=&quot;high&quot;,
+)
+</code></pre>
+<p>See (insert API ref docs here) for details about params.</p>
+<h3 id="bring-your-own-rotation-classification-function">Bring your own rotation classification function</h3>
+<p>A custom rotation classification function must accept an image path and return
+one of <code>0</code>, <code>90</code>, <code>180</code>, or <code>270</code>:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.classify_fns.classify_types import RotationLabel
+
+
+def classify_rotation(img_path: Path) -&gt; RotationLabel:
+    ...
+</code></pre>
+<h2 id="run-rotation">Run rotation</h2>
+<p>After defining <code>classify_fn</code>, pass it to one of the rotation pipeline functions.</p>
+<p>Most users should use <code>rotate_imgs</code>. This takes a directory of PNG images,
+predicts the rotation angle for each image, and optionally saves the rotated
+images.</p>
+<h3 id="rotate-images-from-a-directory">Rotate images from a directory</h3>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.rotate_imgs import rotate_imgs
+
+rotation_labels = rotate_imgs(
+    classify_fn=classify_fn,
+    img_dir=Path(&quot;data/flowchart-images&quot;),
+    save_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+)
+</code></pre>
+<p>The input directory should contain the PNG images at the top level.
+<code>rotate_imgs</code> searches for files matching <code>*.png</code> directly inside <code>img_dir</code>.</p>
+<p>For example:</p>
+<pre><code class="language-text">data/
+└── flowchart-images/
+    ├── paper-1_0.png
+    ├── paper-2_0.png
+    └── paper-3_0.png
+</code></pre>
+<p>When <code>save_dir</code> is provided, rotated images are saved to that directory using
+the same filenames:</p>
+<pre><code class="language-text">data/
+└── rotated-flowchart-images/
+    ├── paper-1_0.png
+    ├── paper-2_0.png
+    └── paper-3_0.png
+</code></pre>
+<h3 id="save-rotation-labels-to-json">Save rotation labels to JSON</h3>
+<p>Pass <code>json_path</code> to save the predicted rotation labels:</p>
+<pre><code class="language-python">rotation_labels = rotate_imgs(
+    classify_fn=classify_fn,
+    img_dir=Path(&quot;data/flowchart-images&quot;),
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+)
+</code></pre>
+<p>The JSON file contains the image path and predicted rotation label for each
+image:</p>
+<pre><code class="language-json">[
+  {
+    &quot;img_path&quot;: &quot;data/flowchart-images/paper-1_0.png&quot;,
+    &quot;label&quot;: 0
+  },
+  {
+    &quot;img_path&quot;: &quot;data/flowchart-images/paper-2_0.png&quot;,
+    &quot;label&quot;: 90
+  }
+]
+</code></pre>
+<h3 id="save-rotated-images-to-a-new-directory">Save rotated images to a new directory</h3>
+<p>To save rotated images without modifying the original images, pass <code>save_dir</code>:</p>
+<pre><code class="language-python">rotation_labels = rotate_imgs(
+    classify_fn=classify_fn,
+    img_dir=Path(&quot;data/flowchart-images&quot;),
+    save_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+)
+</code></pre>
+<p>This is usually the safest option because it keeps the original extracted images
+unchanged.</p>
+<h3 id="rotate-images-in-place">Rotate images in place</h3>
+<p>If you want to overwrite the original image files, pass <code>save_in_place=True</code>:</p>
+<pre><code class="language-python">rotation_labels = rotate_imgs(
+    classify_fn=classify_fn,
+    img_dir=Path(&quot;data/flowchart-images&quot;),
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+    save_in_place=True,
+)
+</code></pre>
+<p>When <code>save_in_place=True</code>, you cannot also provide <code>save_dir</code>.</p>
+<!-- markdownlint-disable MD046 -->
+<!-- prettier-ignore-start -->
+
+<div class="admonition warning">
+<p class="admonition-title">Rotating in place overwrites the original files</p>
+<p>Use <code>save_in_place=True</code> only if you are sure you do not need to keep the
+original image orientation.</p>
+</div>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD046 -->
+
+<h3 id="predict-rotation-without-saving-images">Predict rotation without saving images</h3>
+<p>If you only want the predicted rotation labels, omit both <code>save_dir</code> and
+<code>save_in_place</code>:</p>
+<pre><code class="language-python">rotation_labels = rotate_imgs(
+    classify_fn=classify_fn,
+    img_dir=Path(&quot;data/flowchart-images&quot;),
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+)
+</code></pre>
+<p>This classifies the rotation angle for each image and optionally saves the
+labels to JSON, but does not write rotated image files.</p>
+<h3 id="rotate-an-explicit-list-of-images">Rotate an explicit list of images</h3>
+<p>If you do not want to process every PNG in a directory, use
+<code>rotate_imgs_from_paths</code>. This lets you pass the image paths directly.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.rotate_imgs import rotate_imgs_from_paths
+
+img_paths = [
+    Path(&quot;data/flowchart-images/paper-1_0.png&quot;),
+    Path(&quot;data/flowchart-images/paper-2_0.png&quot;),
+]
+
+save_paths = [
+    Path(&quot;data/rotated-flowchart-images/paper-1_0.png&quot;),
+    Path(&quot;data/rotated-flowchart-images/paper-2_0.png&quot;),
+]
+
+rotation_labels = rotate_imgs_from_paths(
+    classify_fn=classify_fn,
+    img_paths=img_paths,
+    save_paths=save_paths,
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+)
+</code></pre>
+<p><code>img_paths</code> and <code>save_paths</code> must have the same length. Each input image is
+rotated and saved to the corresponding save path.</p>
+<p>You can also rotate the explicit paths in place:</p>
+<pre><code class="language-python">rotation_labels = rotate_imgs_from_paths(
+    classify_fn=classify_fn,
+    img_paths=img_paths,
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+    save_in_place=True,
+)
+</code></pre>
+<p>When <code>save_in_place=True</code>, you cannot also provide <code>save_paths</code>.</p>
+<h3 id="parallelism">Parallelism</h3>
+<p>Both <code>rotate_imgs</code> and <code>rotate_imgs_from_paths</code> accept an <code>n_jobs</code> parameter to
+control the number of parallel processes used when predicting rotation labels.
+By default, they will try to use all CPU cores available.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.rotate_imgs import rotate_imgs
+
+rotation_labels = rotate_imgs(
+    classify_fn=classify_fn,
+    img_dir=Path(&quot;data/flowchart-images&quot;),
+    save_dir=Path(&quot;data/rotated-flowchart-images&quot;),
+    json_path=Path(&quot;data/rotation-labels.json&quot;),
+    n_jobs=1,
+)
+</code></pre>
+<h2 id="next-step">Next step</h2>
+<p>After rotation, use the parsing stage to extract structured data from the
+correctly oriented flowchart images.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../classification/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../parsing/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

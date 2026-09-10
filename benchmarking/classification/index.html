@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Classification - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Classification";
+        var mkdocs_page_input_path = "benchmarking/classification.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/parsing/">Flowchart parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Benchmarking</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Classification</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#input-format">Input format</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#binary-classification-benchmark">Binary classification benchmark</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#binary-benchmark-results">Binary benchmark results</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multiclass-classification-benchmark">Multiclass classification benchmark</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#multiclass-benchmark-results">Multiclass benchmark results</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Benchmarking</li>
+      <li class="breadcrumb-item active">Classification</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/benchmarking/classification.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="classification-benchmarking">Classification benchmarking</h1>
+<p>Classification benchmarking evaluates how well a classification function has
+performed against a set of ground-truth labels.</p>
+<p>In a typical workflow, you will first run
+<a href="../../pipeline/classification/#image-classification">classification</a> and save
+the predictions to JSON. You can then compare those predictions against a
+separate JSON file containing the true labels.</p>
+<h2 id="input-format">Input format</h2>
+<p>Classification benchmarks compare two JSON files:</p>
+<ul>
+<li>a ground-truth file containing the true labels;</li>
+<li>a prediction file containing the predicted labels.</li>
+</ul>
+<p>The prediction file can be created automatically by passing <code>json_path</code> to
+<code>classify_imgs</code> or <code>classify_imgs_from_paths</code>.</p>
+<p>Both files should contain a list of objects with the following keys:</p>
+<pre><code class="language-json">[
+  {
+    &quot;img_path&quot;: &quot;data/extracted-images/paper-1_0.png&quot;,
+    &quot;label&quot;: 1
+  },
+  {
+    &quot;img_path&quot;: &quot;data/extracted-images/paper-1_1.png&quot;,
+    &quot;label&quot;: 0
+  }
+]
+</code></pre>
+<p>The benchmark expects the true and predicted files to contain the same images in
+the same order. The parent directories do not have to match, but the image
+filenames must match.</p>
+<p>For example, this is valid:</p>
+<pre><code class="language-text">true: data/ground-truth/paper-1_0.png
+pred: data/predictions/paper-1_0.png
+</code></pre>
+<p>This is not valid:</p>
+<pre><code class="language-text">true: data/ground-truth/paper-1_0.png
+pred: data/predictions/paper-2_0.png
+</code></pre>
+<h2 id="binary-classification-benchmark">Binary classification benchmark</h2>
+<p>You will most likely want to benchmark a binary classification task; meaning
+your classification function has outputted the following labels:</p>
+<pre><code class="language-text">0 = negative
+1 = positive
+</code></pre>
+<p>For example, you most likely want to evaluate whether your classification
+function is correctly classifying images as flowcharts.</p>
+<p>Use <code>BinaryClassificationBenchmark</code> for this case:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.benchmarks.classification.classification_benchmark import (
+    BinaryClassificationBenchmark,
+)
+
+benchmark = BinaryClassificationBenchmark(
+    true_path=Path(&quot;data/true-classifications.json&quot;),
+    pred_path=Path(&quot;data/pred-classifications.json&quot;),
+)
+</code></pre>
+<p>The benchmark loads both JSON files, checks that they are valid, and compares
+the predicted labels with the true labels.</p>
+<h3 id="binary-benchmark-results">Binary benchmark results</h3>
+<p>After creating the benchmark object, you can inspect the results through its
+properties.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>len(benchmark)</code></td>
+<td>Number of classified images in the benchmark.</td>
+</tr>
+<tr>
+<td><code>benchmark.result_list</code></td>
+<td>All classification results, one per image.</td>
+</tr>
+<tr>
+<td><code>benchmark.correct_predictions</code></td>
+<td>Results where <code>pred</code> matches <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.incorrect_predictions</code></td>
+<td>Results where <code>pred</code> does not match <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.accuracy</code></td>
+<td>Proportion of images where the predicted label matches the true label.</td>
+</tr>
+<tr>
+<td><code>benchmark.img_paths</code></td>
+<td>Image paths used in the benchmark.</td>
+</tr>
+<tr>
+<td><code>benchmark.trues</code></td>
+<td>True labels, in benchmark order.</td>
+</tr>
+<tr>
+<td><code>benchmark.preds</code></td>
+<td>Predicted labels, in benchmark order.</td>
+</tr>
+<tr>
+<td><code>benchmark.tp</code></td>
+<td>True positives: predicted <code>1</code>, true label <code>1</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.fp</code></td>
+<td>False positives: predicted <code>1</code>, true label <code>0</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.fn</code></td>
+<td>False negatives: predicted <code>0</code>, true label <code>1</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.tn</code></td>
+<td>True negatives: predicted <code>0</code>, true label <code>0</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.num_tp</code></td>
+<td>Number of true positives.</td>
+</tr>
+<tr>
+<td><code>benchmark.num_fp</code></td>
+<td>Number of false positives.</td>
+</tr>
+<tr>
+<td><code>benchmark.num_fn</code></td>
+<td>Number of false negatives.</td>
+</tr>
+<tr>
+<td><code>benchmark.num_tn</code></td>
+<td>Number of true negatives.</td>
+</tr>
+<tr>
+<td><code>benchmark.precision</code></td>
+<td>Of the images predicted positive, the proportion that were truly positive.</td>
+</tr>
+<tr>
+<td><code>benchmark.recall</code></td>
+<td>Of the truly positive images, the proportion predicted positive.</td>
+</tr>
+<tr>
+<td><code>benchmark.f1_score</code></td>
+<td>Harmonic mean of precision and recall.</td>
+</tr>
+<tr>
+<td><code>benchmark.tpr</code></td>
+<td>True positive rate. This is the same as <code>recall</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.fpr</code></td>
+<td>False positive rate: proportion of true negatives incorrectly predicted positive.</td>
+</tr>
+<tr>
+<td><code>benchmark.specificity</code></td>
+<td>True negative rate: proportion of true negatives correctly predicted negative.</td>
+</tr>
+<tr>
+<td><code>benchmark.tnr</code></td>
+<td>True negative rate. This is the same as <code>specificity</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>For example, you can print the main benchmark metrics:</p>
+<pre><code class="language-python">print(f&quot;Accuracy: {benchmark.accuracy:.3f}&quot;)
+print(f&quot;Precision: {benchmark.precision:.3f}&quot;)
+print(f&quot;Recall: {benchmark.recall:.3f}&quot;)
+print(f&quot;F1 score: {benchmark.f1_score:.3f}&quot;)
+</code></pre>
+<p>You can also inspect the individual incorrect predictions:</p>
+<pre><code class="language-python">for result in benchmark.incorrect_predictions:
+    print(result.img_path)
+    print(f&quot;true: {result.true}&quot;)
+    print(f&quot;pred: {result.pred}&quot;)
+</code></pre>
+<p>Each item in <code>result_list</code>, <code>correct_predictions</code>, <code>incorrect_predictions</code>,
+<code>tp</code>, <code>fp</code>, <code>fn</code>, and <code>tn</code> is a <code>SingleClassificationResult</code> with:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>img_path</code></td>
+<td>Path to the classified image.</td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td>Ground-truth label.</td>
+</tr>
+<tr>
+<td><code>pred</code></td>
+<td>Predicted label.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="multiclass-classification-benchmark">Multiclass classification benchmark</h2>
+<p>Use <code>MulticlassClassificationBenchmark</code> when each image belongs to exactly one
+of more than two possible classes.</p>
+<p>For example, you might classify extracted images as:</p>
+<pre><code class="language-text">consort_flowchart
+other_flowchart
+table
+graph
+other
+</code></pre>
+<p>In this case, you need to pass the full set of possible labels to the benchmark.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.benchmarks.classification.classification_benchmark import (
+    MulticlassClassificationBenchmark,
+)
+
+benchmark = MulticlassClassificationBenchmark(
+    true_path=Path(&quot;data/true-classifications.json&quot;),
+    pred_path=Path(&quot;data/pred-classifications.json&quot;),
+    labels=(
+        &quot;consort_flowchart&quot;,
+        &quot;other_flowchart&quot;,
+        &quot;table&quot;,
+        &quot;graph&quot;,
+        &quot;other&quot;,
+    ),
+)
+</code></pre>
+<p>Passing <code>labels</code> ensures that all possible classes are included in the
+benchmark, even if one of the classes does not appear in a particular evaluation
+set.</p>
+<h3 id="multiclass-benchmark-results">Multiclass benchmark results</h3>
+<p>After creating the benchmark object, you can inspect the results through its
+properties.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>len(benchmark)</code></td>
+<td>Number of classified images in the benchmark.</td>
+</tr>
+<tr>
+<td><code>benchmark.result_list</code></td>
+<td>All classification results, one per image.</td>
+</tr>
+<tr>
+<td><code>benchmark.correct_predictions</code></td>
+<td>Results where <code>pred</code> matches <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.incorrect_predictions</code></td>
+<td>Results where <code>pred</code> does not match <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>benchmark.accuracy</code></td>
+<td>Proportion of images where the predicted label matches the true label.</td>
+</tr>
+<tr>
+<td><code>benchmark.img_paths</code></td>
+<td>Image paths used in the benchmark.</td>
+</tr>
+<tr>
+<td><code>benchmark.trues</code></td>
+<td>True labels, in benchmark order.</td>
+</tr>
+<tr>
+<td><code>benchmark.preds</code></td>
+<td>Predicted labels, in benchmark order.</td>
+</tr>
+<tr>
+<td><code>benchmark.labels</code></td>
+<td>Full set of possible labels passed to the benchmark.</td>
+</tr>
+<tr>
+<td><code>benchmark.confusion_matrix</code></td>
+<td>Nested dictionary where rows are true labels and columns are predicted labels.</td>
+</tr>
+<tr>
+<td><code>benchmark.num_per_true_class</code></td>
+<td>Number of examples for each true class.</td>
+</tr>
+<tr>
+<td><code>benchmark.num_per_pred_class</code></td>
+<td>Number of predictions made for each class.</td>
+</tr>
+<tr>
+<td><code>benchmark.per_class_accuracy</code></td>
+<td>For each true class, the proportion of examples classified correctly.</td>
+</tr>
+</tbody>
+</table>
+<p>For example, you can print the overall accuracy and class-level summaries:</p>
+<pre><code class="language-python">print(f&quot;Accuracy: {benchmark.accuracy:.3f}&quot;)
+print(benchmark.num_per_true_class)
+print(benchmark.num_per_pred_class)
+print(benchmark.per_class_accuracy)
+</code></pre>
+<p>The confusion matrix shows which classes are being confused with each other:</p>
+<pre><code class="language-python">print(benchmark.confusion_matrix)
+</code></pre>
+<p>This returns a nested dictionary where the outer keys are true labels and the
+inner keys are predicted labels:</p>
+<pre><code class="language-python">{
+    &quot;consort_flowchart&quot;: {
+        &quot;consort_flowchart&quot;: 10,
+        &quot;other_flowchart&quot;: 2,
+        &quot;table&quot;: 0,
+        &quot;graph&quot;: 0,
+        &quot;other&quot;: 1,
+    },
+    &quot;other_flowchart&quot;: {
+        &quot;consort_flowchart&quot;: 1,
+        &quot;other_flowchart&quot;: 8,
+        &quot;table&quot;: 0,
+        &quot;graph&quot;: 0,
+        &quot;other&quot;: 0,
+    },
+}
+</code></pre>
+<p>You can also inspect the individual incorrect predictions:</p>
+<pre><code class="language-python">for result in benchmark.incorrect_predictions:
+    print(result.img_path)
+    print(f&quot;true: {result.true}&quot;)
+    print(f&quot;pred: {result.pred}&quot;)
+</code></pre>
+<p>Each item in <code>result_list</code>, <code>correct_predictions</code>, and <code>incorrect_predictions</code>
+is a <code>SingleClassificationResult</code> with:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>img_path</code></td>
+<td>Path to the classified image.</td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td>Ground-truth label.</td>
+</tr>
+<tr>
+<td><code>pred</code></td>
+<td>Predicted label.</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../rotation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
