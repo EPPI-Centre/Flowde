@@ -48,7 +48,17 @@ def create_openai_vision_file(file_path: Path, client: OpenAI) -> str:
 
 
 def image_path_to_data_url(img_path: Path) -> str:
-    mime_type = mimetypes.guess_type(img_path)[0] or "image/png"
+    # Keep supported image types consistent across operating systems.
+    image_types = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".webp": "image/webp",
+        ".gif": "image/gif",
+    }
+    mime_type = image_types.get(img_path.suffix.lower())
+    if mime_type is None:
+        mime_type = mimetypes.guess_type(img_path)[0] or "image/png"
 
     with img_path.open("rb") as file_content:
         encoded = base64.b64encode(file_content.read()).decode("utf-8")
