@@ -1,15 +1,15 @@
 # CONSORT conference dataset
 
-Six studies with their original PDFs, Paddle-extracted figures, reference CONSORT
+Four studies with their original PDFs, Paddle-extracted figures, reference CONSORT
 images, and manually annotated parsing answers. The notebook runs live inference;
 these reference files are used to evaluate the results.
 
 ## Files
 
-- `pdfs/`: the six unchanged article PDFs.
-- `paddle-extracted/`: all eleven stored Paddle image crops, before orientation
+- `pdfs/`: the four unchanged article PDFs, totalling 40 pages.
+- `paddle-extracted/`: all eight stored Paddle image crops, before orientation
   correction.
-- `consort-images/`: the six curated CONSORT reference images; some were cropped or
+- `consort-images/`: the four curated CONSORT reference images; some were cropped or
   rotated during annotation.
 - `ground-truth/`: the reference nodes, labels, flow and additional text, in four
   same-stem JSON files per diagram.
@@ -36,26 +36,6 @@ Payom Thinuan, Kazuo Minematsu, Jitladda Deerojanawong, Yaoyanee Suya, Eiji Maru
 (2019).
 
 [Article](https://doi.org/10.1186/s13011-019-0197-2) · [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)
-
-### Baskerville_2018.pdf
-
-Effect of a Mobile Phone Intervention on Quitting Smoking in a Young Adult Population of
-Smokers: Randomized Controlled Trial
-
-Neill Bruce Baskerville, L C Struik, G. Emmanuel Guindon, Cameron D. Norman, Robyn
-Whittaker, Catherine M. Burns, David Hammond, Darly Dash, Karen Brown (2018).
-
-[Article](https://doi.org/10.2196/10893) · [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)
-
-### Stanczyk_2016.pdf
-
-Comparison of Text and Video Computer-Tailored Interventions for Smoking Cessation:
-Randomized Controlled Trial
-
-Nicola Esther Stanczyk, Catherine Bolman, Mathieu van Adrichem, Math J. J. M. Candel,
-Jean Muris, Hein de Vries (2014).
-
-[Article](https://doi.org/10.2196/jmir.3016) · [CC-BY-2.0](https://creativecommons.org/licenses/by/2.0/)
 
 ### Vander_2016.pdf
 
@@ -85,9 +65,6 @@ Shaohua Yu, Zongshuan Duan, Pamela Redmon, Michael P. Eriksen, Jeffrey P. Koplan
 Huang (2017).
 
 [Article](https://doi.org/10.1038/s41598-017-08922-x) · [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)
-
-The original filename `Stanczyk_2016.pdf` is retained to match the annotations.
-The article itself was published in 2014.
 
 The ground truths can include several accepted interpretations. The four files
 for each diagram have aligned `options` lists. Reference annotations are inputs to

@@ -13,7 +13,7 @@ diagrams in PDF files reporting randomized trials.
 
 [![Open demo in Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EPPI-Centre/Flowde/blob/main/notebooks/CONSORT_demo.ipynb)
 
-Follow six open-access studies from PDFs to extracted images, orientation
+Follow four open-access studies from PDFs to extracted images, orientation
 correction, CONSORT classification, structured parsing and evaluation against
 manual annotations. Requires a Google account and the workshop's Azure endpoint
 and API key. The notebook runs in Google Colab; no installation on your computer
