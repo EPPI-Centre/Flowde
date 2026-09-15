@@ -1,4 +1,7 @@
+import json
+import time
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import Mock, call
 
 import pymupdf
@@ -9,6 +12,7 @@ import flowde.extract_fns.paddle_layout_detect_extraction as paddle_extract
 from flowde.extract_fns.paddle_layout_detect_extraction import (
     make_paddle_layout_extract_fn,
 )
+from flowde.extract_imgs import extract_imgs_pdf_list
 
 
 class PaddleResult(dict):
@@ -494,3 +498,60 @@ def test_malformed_boxes_raise_naturally_and_the_pdf_is_closed(
         extract(pdf_path, save_dir)
 
     assert opened_pdf.is_closed
+
+
+@pytest.mark.parametrize(
+    "changed_settings",
+    [
+        {"device": "cpu"},
+        {"cpu_threads": 1},
+        {"batch_size": 3},
+        {"dpi": 72},
+        {"padding": 0},
+    ],
+)
+def test_factory_settings_control_resume_before_paddle_runs(
+    pipeline, pdf_path, save_dir, changed_settings
+):
+    fn = make_paddle_layout_extract_fn()
+    extract_imgs_pdf_list([pdf_path], save_dir, fn)
+    pipeline.predict.reset_mock()
+    extract_imgs_pdf_list(
+        [pdf_path], save_dir, make_paddle_layout_extract_fn(), on_existing="resume"
+    )
+    pipeline.predict.assert_not_called()
+    with pytest.raises(ValueError, match="Run settings have changed"):
+        extract_imgs_pdf_list(
+            [pdf_path],
+            save_dir,
+            make_paddle_layout_extract_fn(**changed_settings),
+            on_existing="resume",
+        )
+    pipeline.predict.assert_not_called()
+
+
+def test_demo_extraction_cell_can_be_run_twice(pipeline, pdf_path, tmp_path):
+    pipeline.predict.return_value = [
+        PaddleResult(
+            size=(100, 100),
+            boxes=[{"label": "image", "coordinate": [0, 0, 100, 100]}],
+        )
+    ]
+    notebook_path = (
+        Path(__file__).resolve().parents[3] / "notebooks" / "CONSORT_demo.ipynb"
+    )
+    notebook = json.loads(notebook_path.read_text())
+    cell = next(c for c in notebook["cells"] if c.get("id") == "consort-demo-08")
+    source = compile("".join(cell["source"]), str(notebook_path), "exec")
+    namespace = {
+        "PDF_DIR": pdf_path.parent,
+        "RUN_DIR": tmp_path / "run",
+        "time": time,
+    }
+    for _ in range(2):
+        exec(source, namespace)  # noqa: S102 - Execute the checked-in notebook cell with a fake Paddle predictor.
+        extracted = namespace["EXTRACTED_DIR"]
+        assert sorted(p.name for p in extracted.glob("*.png")) == ["paper_0.png"]
+        with Image.open(extracted / "paper_0.png") as image:
+            assert image.size == (200, 200)
+    assert pipeline.predict.call_count == 2

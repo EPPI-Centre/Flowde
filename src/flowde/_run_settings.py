@@ -51,7 +51,8 @@ def model_function(
     Parameters
     ----------
     fn
-        Classification or parsing callable. Its arguments and behavior are unchanged.
+        Extraction, classification, rotation, or parsing callable. Its arguments
+        and behavior are unchanged.
     result_structure
         Pydantic result class. Required by parsing batches unless already attached
         to `fn`; optional for custom classifiers.

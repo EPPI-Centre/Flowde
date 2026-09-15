@@ -29,16 +29,17 @@ class _ForcedStop(BaseException):
 
 
 class _Stop:
-    def __init__(self) -> None:
+    def __init__(self, item_name: str = "images") -> None:
         self.error: BaseException | None = None
         self.interrupted = False
+        self.item_name = item_name
 
     def interrupt(self, _signum: int, _frame: FrameType | None) -> None:
         if self.interrupted:
             raise _ForcedStop
         self.interrupted = True
         tqdm.write(
-            "Stopping after active images finish saving. "
+            f"Stopping after active {self.item_name} finish saving. "
             "Press Ctrl+C again to force stop.",
             file=sys.stderr,
         )
@@ -49,8 +50,8 @@ class _Stop:
 
 
 @contextmanager
-def _controlled_interrupt() -> Iterator[_Stop]:
-    stop = _Stop()
+def _controlled_interrupt(item_name: str = "images") -> Iterator[_Stop]:
+    stop = _Stop(item_name)
     previous = None
     if current_thread() is main_thread():
         previous = signal.signal(signal.SIGINT, stop.interrupt)
@@ -172,11 +173,13 @@ def run_batch(
     n_jobs: int,
     show_usage: bool,
     on_existing: ExistingRun,
+    state_factory: Callable[..., RunState] = RunState,
 ) -> list[Any]:
     protect_inputs(save_dir, referenced_files(settings))
     workers = effective_n_jobs(n_jobs)
-    with output_lock(save_dir), _controlled_interrupt() as stop:
-        state = RunState(save_dir, kind, settings, on_existing)
+    item_name = "PDFs" if kind == "extraction" else "images"
+    with output_lock(save_dir), _controlled_interrupt(item_name) as stop:
+        state = state_factory(save_dir, kind, settings, on_existing)
         state.prepare(
             [
                 {key: value for key, value in item.items() if key != "kwargs"}
@@ -187,7 +190,7 @@ def run_batch(
         results = {}
         for item in inputs:
             record = state.items[item["key"]]
-            if record["has_result"]:
+            if state.can_restore(item["key"]):
                 results[item["key"]] = decode(record["result"])
                 state.publish(item["key"])
         indices = {key: index for index, key in enumerate(state.items)}
@@ -195,6 +198,7 @@ def run_batch(
             "classification": "Classifying images...",
             "parsing": "Parsing images...",
             "rotation": "Rotating images...",
+            "extraction": "Extracting images from PDFs",
         }[kind]
         display = UsageProgress(
             len(state.items), description, show_usage, totals=state.totals()
@@ -256,6 +260,6 @@ def run_batch(
         if stop.error is not None:
             raise stop.error
         if stop.interrupted:
-            msg = "Stopped after saving active images; the run can be resumed."
+            msg = f"Stopped after saving active {item_name}; the run can be resumed."
             raise KeyboardInterrupt(msg)
         return [results[item["key"]] for item in inputs]

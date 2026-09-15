@@ -1,9 +1,11 @@
 from functools import lru_cache
+from importlib.metadata import version
 from pathlib import Path
 
 import pymupdf
 from paddleocr import LayoutDetection
 
+from flowde._run_settings import model_function
 from flowde.extract_fns.extract_types import ExtractImgsFunction
 
 
@@ -71,4 +73,14 @@ def make_paddle_layout_extract_fn(
         finally:
             doc.close()
 
-    return extract_imgs
+    return model_function(
+        extract_imgs,
+        extractor="paddle_layout_detection",
+        paddleocr_version=version("paddleocr"),
+        paddlex_version=version("paddlex"),
+        device=device,
+        cpu_threads=cpu_threads,
+        batch_size=batch_size,
+        dpi=dpi,
+        padding=padding,
+    )

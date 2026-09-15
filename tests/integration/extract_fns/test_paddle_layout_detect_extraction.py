@@ -5,6 +5,7 @@ import pytest
 from PIL import Image
 
 import flowde.extract_fns.paddle_layout_detect_extraction as paddle_extract_module
+from flowde.extract_imgs import extract_imgs_pdf_list
 
 pytestmark = pytest.mark.integration
 
@@ -39,24 +40,28 @@ def test_paddle_layout_extract_fn_exactly_matches_expected_extracted_images(tmp_
     expected_paths = sorted(EXPECTED_DIR.glob(f"{pdf_path.stem}_*.png"))
 
     if not pdf_path.exists():
-        raise AssertionError(f"Test fixture PDF does not exist: {pdf_path}")
+        msg = f"Test fixture PDF does not exist: {pdf_path}"
+        raise AssertionError(msg)
 
     if len(expected_paths) == 0:
-        raise AssertionError(
+        msg = (
             f"No expected extracted PNG fixtures found in {EXPECTED_DIR} "
             f"for PDF stem {pdf_path.stem}."
         )
+        raise AssertionError(msg)
 
     save_dir = tmp_path / "extracted"
     save_dir.mkdir()
 
-    extract_imgs = paddle_extract_module.make_paddle_layout_extract_fn(
+    extract_fn = paddle_extract_module.make_paddle_layout_extract_fn(
         device="cpu",
         cpu_threads=2,
         batch_size=1,
     )
 
-    result = extract_imgs(pdf_path=pdf_path, save_dir=save_dir)
+    result = extract_imgs_pdf_list(
+        pdf_paths=[pdf_path], save_dir=save_dir, extract_fn=extract_fn
+    )
 
     assert result is None
 

@@ -1,4 +1,4 @@
-"""Persist one classification, rotation, or parsing run in its output directory."""
+"""Persist one pipeline run in its output directory."""
 
 import json
 import os
@@ -163,7 +163,8 @@ class RunState:
         if (
             not isinstance(previous, dict)
             or previous.get("version") != 1
-            or previous.get("kind") not in ("classification", "parsing", "rotation")
+            or previous.get("kind")
+            not in ("classification", "parsing", "rotation", "extraction")
             or not isinstance(previous.get("settings"), dict)
             or not isinstance(previous.get("items"), dict)
             or not isinstance(previous.get("artifacts"), dict)
@@ -186,7 +187,19 @@ class RunState:
                 or not isinstance(record.get("has_result"), bool)
             ):
                 raise ValueError(msg)
-            if record["has_result"]:
+            if previous["kind"] == "extraction":
+                names = record.get("outputs", [])
+                if not isinstance(names, list) or any(
+                    not isinstance(output, str)
+                    or Path(output).name != output
+                    or "/" in output
+                    or "\\" in output
+                    or not output.endswith(".png")
+                    for output in names
+                ):
+                    raise ValueError(msg)
+                expected.update(names)
+            elif record["has_result"]:
                 if previous["kind"] == "parsing":
                     expected.add(name)
                 elif previous["kind"] == "rotation":
@@ -246,6 +259,7 @@ class RunState:
         atomic_write(self.path, json_bytes(self.data))
 
     def prepare(self, inputs: list[dict[str, Any]]) -> None:
+        input_name = "PDF" if self.data["kind"] == "extraction" else "image"
         outputs = {record["output"]: key for key, record in self.items.items()}
         for item in inputs:
             key = item["key"]
@@ -253,7 +267,7 @@ class RunState:
             if item["output"] in outputs and outputs[item["output"]] != key:
                 msg = (
                     f"Output {item['output']} is already associated "
-                    "with a different image."
+                    f"with a different {input_name}."
                 )
                 raise ValueError(msg)
             outputs[item["output"]] = key
@@ -262,10 +276,10 @@ class RunState:
                     previous["input"] != item["input"]
                     or previous["output"] != item["output"]
                 ):
-                    msg = (
-                        "Previously processed image or partial flowchart has changed: "
-                        f"{item['path']}."
+                    subject = (
+                        "PDF" if input_name == "PDF" else "image or partial flowchart"
                     )
+                    msg = f"Previously processed {subject} has changed: {item['path']}."
                     raise ValueError(msg)
             else:
                 self.items[key] = {
@@ -286,6 +300,10 @@ class RunState:
             if record["completed"]:
                 totals.finished_items.add(index)
         return totals
+
+    def can_restore(self, key: str) -> bool:
+        """Whether the saved result can be reused without executing the function."""
+        return bool(self.items[key]["has_result"])
 
     def add_usage(self, key: str, usage: RequestUsage) -> None:
         self.items[key]["usage"].append(asdict(usage))
