@@ -191,9 +191,11 @@ def run_batch(
                 results[item["key"]] = decode(record["result"])
                 state.publish(item["key"])
         indices = {key: index for index, key in enumerate(state.items)}
-        description = (
-            "Classifying images..." if kind == "classification" else "Parsing images..."
-        )
+        description = {
+            "classification": "Classifying images...",
+            "parsing": "Parsing images...",
+            "rotation": "Rotating images...",
+        }[kind]
         display = UsageProgress(
             len(state.items), description, show_usage, totals=state.totals()
         )

@@ -12,11 +12,13 @@ import pytest
 from google.genai.errors import ClientError
 from joblib.externals.loky.backend.context import get_context
 from openai import BadRequestError
+from PIL import Image
 from pydantic import BaseModel, ConfigDict
 
 from flowde import _batch, _run_state, model_function
 from flowde.classify_imgs import classify_imgs
 from flowde.parse_imgs import parse_imgs
+from flowde.rotate_imgs import rotate_imgs
 from flowde.usage import RequestUsage, report_usage
 
 
@@ -24,9 +26,14 @@ class Answer(BaseModel):
     name: str
 
 
-@pytest.fixture(params=["classification", "parsing"])
+@pytest.fixture(params=["classification", "parsing", "rotation"])
 def task(request):
     return request.param
+
+
+def create_image(path, value=0):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", (2, 3), (value, 0, 0)).save(path)
 
 
 @pytest.fixture
@@ -34,7 +41,7 @@ def images(tmp_path):
     directory = tmp_path / "images"
     directory.mkdir()
     for name in ("a", "b", "c"):
-        (directory / f"{name}.png").write_text(name)
+        create_image(directory / f"{name}.png", ord(name))
     return directory
 
 
@@ -42,6 +49,8 @@ def make_function(task, action=None):
     def process(img_path):
         if action is not None:
             action(img_path)
+        if task == "rotation":
+            return {"a": 0, "b": 90, "c": 180, "d": 270}[img_path.stem]
         return img_path.stem if task == "classification" else Answer(name=img_path.stem)
 
     return model_function(
@@ -50,15 +59,26 @@ def make_function(task, action=None):
 
 
 def run(task, fn, images, output, **options):
-    api = classify_imgs if task == "classification" else parse_imgs
+    api = {
+        "classification": classify_imgs,
+        "parsing": parse_imgs,
+        "rotation": rotate_imgs,
+    }[task]
     return api(fn, images, output, **{"n_jobs": 1, **options})
 
 
 def names(task, results):
+    if task == "rotation":
+        return [{0: "a", 90: "b", 180: "c", 270: "d"}[angle] for angle in results]
     return results if task == "classification" else [result.name for result in results]
 
 
 def saved_names(task, output):
+    if task == "rotation":
+        entries = json.loads((output / "rotations.json").read_text())
+        for entry in entries:
+            assert (output / "rotated_images" / Path(entry["img_path"]).name).is_file()
+        return [Path(entry["img_path"]).stem for entry in entries]
     if task == "classification":
         return [
             entry["label"]
@@ -220,20 +240,42 @@ def test_overwrite_removes_old_outputs_when_the_input_images_change(
     options = {"positive_classes": {"a", "b", "c"}} if task == "classification" else {}
     run(task, make_function(task), images, output, **options)
     # Missing or edited recorded outputs should not prevent explicit overwrite.
-    old_output = output / "positive_images" / "c.png" if options else output / "c.json"
+    old_output = (
+        output
+        / {
+            "classification": "positive_images/c.png",
+            "parsing": "c.json",
+            "rotation": "rotated_images/c.png",
+        }[task]
+    )
     old_output.unlink()
-    old_json = output / ("classifications.json" if options else "a.json")
+    old_json = (
+        output
+        / {
+            "classification": "classifications.json",
+            "parsing": "a.json",
+            "rotation": "rotations.json",
+        }[task]
+    )
     old_json.write_text("edited output")
 
     new_images = tmp_path / "new-images"
     new_images.mkdir()
-    (new_images / "d.png").write_text("d")
+    create_image(new_images / "d.png", ord("d"))
     result = run(task, make_function(task), new_images, output, on_existing="overwrite")
 
     assert names(task, result) == ["d"]
     assert saved_names(task, output) == ["d"]
-    expected_json = "classifications.json" if task == "classification" else "d.json"
-    assert {path.name for path in output.iterdir()} == {".flowde", expected_json}
+    expected_outputs = {
+        "classification": {"classifications.json"},
+        "parsing": {"d.json"},
+        "rotation": {"rotations.json", "rotated_images"},
+    }[task]
+    assert {path.name for path in output.iterdir()} == {".flowde", *expected_outputs}
+    if task == "rotation":
+        assert sorted(p.name for p in (output / "rotated_images").iterdir()) == [
+            "d.png"
+        ]
     state = json.loads((output / ".flowde" / "run.state").read_text())
     assert set(state["items"]) == {str((new_images / "d.png").resolve())}
 
@@ -434,15 +476,17 @@ def test_resume_rejects_a_different_image_with_the_same_output_name(
 def test_failed_inputs_can_be_fixed_and_new_images_can_be_added(task, images, tmp_path):
     output = tmp_path / "output"
 
+    broken = (images / "b.png").read_bytes()
+
     def check_image(path):
-        if path.read_text() == "b":
+        if path.read_bytes() == broken:
             msg = "broken image"
             raise ValueError(msg)
 
     with pytest.raises(ValueError, match="broken image"):
         run(task, make_function(task, check_image), images, output)
-    (images / "b.png").write_text("repaired")
-    (images / "d.png").write_text("new")
+    create_image(images / "b.png", 1)
+    create_image(images / "d.png", ord("d"))
 
     result = run(
         task, make_function(task, check_image), images, output, on_existing="resume"
@@ -587,9 +631,10 @@ def test_second_interrupt_escapes_the_current_function(task, images, tmp_path):
 
 
 def test_overwrite_cannot_delete_source_images(task, images):
+    original = (images / "a.png").read_bytes()
     with pytest.raises(ValueError, match="contains an input file"):
         run(task, make_function(task), images, images, on_existing="overwrite")
-    assert (images / "a.png").read_text() == "a"
+    assert (images / "a.png").read_bytes() == original
 
 
 def test_a_second_writer_cannot_open_the_same_run(tmp_path):

@@ -287,8 +287,9 @@ def test_classification_script_runs(tmp_path: Path) -> None:
 
 def test_rotation_script_runs(tmp_path: Path) -> None:
     image_dir = make_fixture_image_dir(tmp_path)
-    result_path = tmp_path / "rotation" / "results.json"
-    rotated_image_dir = tmp_path / "rotation" / "rotated_images"
+    save_dir = tmp_path / "rotation"
+    result_path = save_dir / "rotations.json"
+    rotated_image_dir = save_dir / "rotated_images"
 
     run_script(
         SCRIPTS_ROOT / "inference" / "rotation" / "rotate_template.py",
@@ -299,12 +300,8 @@ def test_rotation_script_runs(tmp_path: Path) -> None:
             TEST_THINKING_LEVEL,
             "--img-dir",
             str(image_dir),
-            "--json-path",
-            str(result_path),
             "--save-dir",
-            str(rotated_image_dir),
-            "--save-in-place",
-            "false",
+            str(save_dir),
             "--n-jobs",
             "1",
         ],
@@ -316,6 +313,7 @@ def test_rotation_script_runs(tmp_path: Path) -> None:
     assert len(result) == 1
     assert result[0]["img_path"] == str(image_dir / FIXTURE_NAME)
     assert result[0]["label"] == 0
+    assert (rotated_image_dir / FIXTURE_NAME).is_file()
 
 
 def test_parse_nodes_script_runs(tmp_path: Path) -> None:

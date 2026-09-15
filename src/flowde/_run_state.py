@@ -1,4 +1,4 @@
-"""Persist one classification or parsing run inside its dedicated output directory."""
+"""Persist one classification, rotation, or parsing run in its output directory."""
 
 import json
 import os
@@ -7,9 +7,13 @@ import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict
+from hashlib import sha256
+from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Literal
+
+from PIL import Image
 
 from flowde._run_settings import file_digest
 from flowde.usage import RequestUsage, UsageTotals
@@ -159,7 +163,7 @@ class RunState:
         if (
             not isinstance(previous, dict)
             or previous.get("version") != 1
-            or previous.get("kind") not in ("classification", "parsing")
+            or previous.get("kind") not in ("classification", "parsing", "rotation")
             or not isinstance(previous.get("settings"), dict)
             or not isinstance(previous.get("items"), dict)
             or not isinstance(previous.get("artifacts"), dict)
@@ -185,6 +189,8 @@ class RunState:
             if record["has_result"]:
                 if previous["kind"] == "parsing":
                     expected.add(name)
+                elif previous["kind"] == "rotation":
+                    expected.update(("rotations.json", f"rotated_images/{name}"))
                 else:
                     expected.update(("classifications.json", f"positive_images/{name}"))
 
@@ -324,13 +330,34 @@ class RunState:
                 for _, entry in sorted(self.items.items())
                 if entry["has_result"]
             ]
-            self.write_artifact("classifications.json", json_bytes(classifications))
-            positives = self.data["settings"]["positive_classes"]
-            if positives is not None and record["result"] in positives:
-                image = Path(key)
-                if file_digest(image) != record["input"]["image"]:
-                    msg = f"Input image changed before copying: {image}."
-                    raise ValueError(msg)
-                self.write_artifact(f"positive_images/{image.name}", image.read_bytes())
+            if self.data["kind"] == "rotation":
+                self.write_artifact("rotations.json", json_bytes(classifications))
+                self._publish_rotation(key)
+            else:
+                self.write_artifact("classifications.json", json_bytes(classifications))
+                positives = self.data["settings"]["positive_classes"]
+                if positives is not None and record["result"] in positives:
+                    image = Path(key)
+                    if file_digest(image) != record["input"]["image"]:
+                        msg = f"Input image changed before copying: {image}."
+                        raise ValueError(msg)
+                    self.write_artifact(
+                        f"positive_images/{image.name}", image.read_bytes()
+                    )
         record.update(completed=True, error=None)
         self.save()
+
+    def _publish_rotation(self, key: str) -> None:
+        record = self.items[key]
+        image = Path(key)
+        content = image.read_bytes()
+        if sha256(content).hexdigest() != record["input"]["image"]:
+            msg = f"Input image changed before rotating: {image}."
+            raise ValueError(msg)
+        # Always derive the copy from the unchanged source, including on resume.
+        # Encode fully before atomic replacement so an interrupted save cannot
+        # leave a half-written image at the public output path.
+        with Image.open(BytesIO(content)) as original, BytesIO() as buffer:
+            corrected = original.rotate(-record["result"], expand=True)
+            corrected.save(buffer, format=original.format)
+            self.write_artifact(f"rotated_images/{record['output']}", buffer.getvalue())

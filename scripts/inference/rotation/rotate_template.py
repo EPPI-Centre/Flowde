@@ -7,16 +7,13 @@ from flowde.classify_fns.gemini_classify_fn import make_gemini_classify_fn
 
 # from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
 from flowde.rotate_imgs import INPUT_TEXT, rotate_imgs
-from flowde.utils import parse_bool
 
 MODEL = "gemini-3.1-flash-lite-preview"
 THINKING_LEVEL = "low"
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DATASET_DIR = REPO_ROOT / "data" / "training-smoking-cessation"
 IMG_DIR = DATASET_DIR / "extraction" / "paddle_layout_detect_p3"
-JSON_PATH = DATASET_DIR / "rotation" / "pred_gemini_3.1_rotation.json"
-SAVE_DIR = None
-SAVE_IN_PLACE = False
+SAVE_DIR = DATASET_DIR / "rotation" / "template_example"
 N_JOBS = 1
 
 
@@ -39,25 +36,16 @@ def main(argv: Sequence[str] | None = None) -> None:
         help=f"Directory containing PNG images (default: {IMG_DIR}).",
     )
     parser.add_argument(
-        "--json-path",
-        type=Path,
-        default=JSON_PATH,
-        help=f"Path for the JSON results (default: {JSON_PATH}).",
-    )
-    parser.add_argument(
         "--save-dir",
         type=Path,
         default=SAVE_DIR,
-        help="Optional directory in which to save rotated images.",
+        help=f"Dedicated rotation output directory (default: {SAVE_DIR}).",
     )
     parser.add_argument(
-        "--save-in-place",
-        type=parse_bool,
-        default=SAVE_IN_PLACE,
-        help=(
-            "Rotate non-zero-angle images in the input directory "
-            f"(default: {SAVE_IN_PLACE})."
-        ),
+        "--on-existing",
+        choices=("error", "resume", "overwrite"),
+        default="error",
+        help="How to handle an output directory containing previous work.",
     )
     parser.add_argument(
         "--n-jobs",
@@ -88,8 +76,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         classify_fn=classify_fn,
         img_dir=args.img_dir,
         save_dir=args.save_dir,
-        json_path=args.json_path,
-        save_in_place=args.save_in_place,
+        on_existing=args.on_existing,
         n_jobs=args.n_jobs,
     )
 

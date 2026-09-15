@@ -1,984 +1,292 @@
 import json
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from PIL import Image
 
-import flowde.rotate_imgs as rotate_imgs_module
+from flowde import _run_state, model_function
+from flowde.rotate_imgs import rotate_imgs, rotate_imgs_from_paths
 
 
-def create_test_img(path: Path, size: tuple[int, int] = (10, 20)) -> None:
+def create_image(path):
     path.parent.mkdir(parents=True, exist_ok=True)
-    Image.new("RGB", size).save(path)
+    image = Image.new("L", (2, 3))
+    image.putdata([1, 2, 3, 4, 5, 6])
+    image.save(path)
+    return path
 
 
-def create_test_file(path: Path, content: str = "not an image") -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content)
+def classifier():
+    return model_function(lambda path: int(path.stem), version=1)
 
 
-def classify_angle_from_filename(img_path: Path) -> int:
-    return {
-        "angle_0.png": 0,
-        "angle_90.png": 90,
-        "angle_180.png": 180,
-        "angle_270.png": 270,
-        "invalid_45.png": 45,
-    }[img_path.name]
+def labels(output):
+    return json.loads((output / "rotations.json").read_text())
 
 
-def classify_should_not_be_called(img_path: Path) -> int:
-    raise AssertionError("classify_fn should not be called")
+@pytest.mark.parametrize("n_jobs", [1, 2])
+def test_explicit_paths_preserve_order_and_always_save_copies(tmp_path, n_jobs):
+    sources = [
+        create_image(tmp_path / "inputs" / f"{a}.png") for a in (270, 0, 90, 180)
+    ]
+    originals = [p.read_bytes() for p in sources]
+    output = tmp_path / "output"
+
+    result = rotate_imgs_from_paths(classifier(), sources, output, n_jobs=n_jobs)
+
+    assert result == [270, 0, 90, 180]
+    assert {p.name for p in output.iterdir()} == {
+        "rotations.json",
+        "rotated_images",
+        ".flowde",
+    }
+    assert sorted(p.name for p in (output / "rotated_images").iterdir()) == [
+        "0.png",
+        "180.png",
+        "270.png",
+        "90.png",
+    ]
+    assert labels(output) == [
+        {"img_path": str(p), "label": int(p.stem)} for p in sorted(sources)
+    ]
+    assert [p.read_bytes() for p in sources] == originals
 
 
-def save_paths_and_save_in_place_by_save_mode(
-    save_mode: str,
-    img_paths: list[Path],
-    tmp_path: Path,
-) -> tuple[list[Path] | None, bool]:
-    save_paths = (
-        [tmp_path / "outputs" / img_path.name for img_path in img_paths]
-        if save_mode == "save_paths"
-        else None
-    )
-
-    save_in_place = save_mode == "save_in_place"
-
-    return save_paths, save_in_place
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize("json_mode", [True, False], ids=["json", "no-json"])
 @pytest.mark.parametrize(
-    "save_mode",
-    ["save_paths", "save_in_place", "no_save"],
-    ids=["save-paths", "save-in-place", "no-save"],
-)
-def test_rotate_imgs_from_paths_returns_classification_responses(
-    tmp_path: Path,
-    n_jobs: int,
-    json_mode: bool,
-    save_mode: str,
-) -> None:
-    img_paths = [
-        tmp_path / "angle_0.png",
-        tmp_path / "angle_90.png",
-        tmp_path / "angle_180.png",
-        tmp_path / "angle_270.png",
-    ]
-
-    for img_path in img_paths:
-        create_test_img(img_path)
-
-    json_path = tmp_path / "results" / "rotations.json" if json_mode else None
-    save_paths, save_in_place = save_paths_and_save_in_place_by_save_mode(
-        save_mode=save_mode,
-        img_paths=img_paths,
-        tmp_path=tmp_path,
-    )
-
-    responses = rotate_imgs_module.rotate_imgs_from_paths(
-        classify_fn=classify_angle_from_filename,
-        img_paths=img_paths,
-        json_path=json_path,
-        save_paths=save_paths,
-        save_in_place=save_in_place,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 90, 180, 270]
-
-    expected_paths = {
-        tmp_path / "angle_0.png",
-        tmp_path / "angle_90.png",
-        tmp_path / "angle_180.png",
-        tmp_path / "angle_270.png",
-    }
-
-    if json_path is not None:
-        expected_paths.update(
-            {
-                json_path.parent,
-                json_path,
-            }
-        )
-
-    if save_paths is not None:
-        expected_paths.update(
-            {
-                tmp_path / "outputs",
-                tmp_path / "outputs" / "angle_0.png",
-                tmp_path / "outputs" / "angle_90.png",
-                tmp_path / "outputs" / "angle_180.png",
-                tmp_path / "outputs" / "angle_270.png",
-            }
-        )
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize(
-    "save_mode",
-    ["save_paths", "save_in_place", "no_save"],
-    ids=["save-paths", "save-in-place", "no-save"],
-)
-def test_rotate_imgs_from_paths_changes_json(
-    tmp_path: Path,
-    n_jobs: int,
-    save_mode: str,
-) -> None:
-    img_0 = tmp_path / "angle_0.png"
-    img_90 = tmp_path / "angle_90.png"
-    img_paths = [img_0, img_90]
-
-    json_path = tmp_path / "results" / "rotations.json"
-
-    for img_path in img_paths:
-        create_test_img(img_path)
-
-    save_paths, save_in_place = save_paths_and_save_in_place_by_save_mode(
-        save_mode=save_mode,
-        img_paths=img_paths,
-        tmp_path=tmp_path,
-    )
-
-    responses = rotate_imgs_module.rotate_imgs_from_paths(
-        classify_fn=classify_angle_from_filename,
-        img_paths=img_paths,
-        json_path=json_path,
-        save_paths=save_paths,
-        save_in_place=save_in_place,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 90]
-    assert json_path.exists()
-    assert json.loads(json_path.read_text("utf-8")) == [
-        {"img_path": str(img_0), "label": 0},
-        {"img_path": str(img_90), "label": 90},
-    ]
-
-    expected_paths = {
-        img_0,
-        img_90,
-        json_path.parent,
-        json_path,
-    }
-
-    if save_paths is not None:
-        expected_paths.update(
-            {
-                tmp_path / "outputs",
-                tmp_path / "outputs" / "angle_0.png",
-                tmp_path / "outputs" / "angle_90.png",
-            }
-        )
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize("json_mode", [True, False], ids=["json", "no-json"])
-def test_rotate_imgs_from_paths_save_paths_saves_rotated_images(
-    tmp_path: Path,
-    n_jobs: int,
-    json_mode: bool,
-) -> None:
-    img_paths = [
-        tmp_path / "inputs" / "angle_0.png",
-        tmp_path / "inputs" / "angle_90.png",
-        tmp_path / "inputs" / "angle_180.png",
-        tmp_path / "inputs" / "angle_270.png",
-    ]
-    save_paths = [
-        tmp_path / "outputs" / "angle_0.png",
-        tmp_path / "outputs" / "angle_90.png",
-        tmp_path / "outputs" / "angle_180.png",
-        tmp_path / "outputs" / "angle_270.png",
-    ]
-
-    json_path = tmp_path / "results" / "rotations.json" if json_mode else None
-
-    for img_path in img_paths:
-        create_test_img(img_path, size=(10, 20))
-
-    responses = rotate_imgs_module.rotate_imgs_from_paths(
-        classify_fn=classify_angle_from_filename,
-        img_paths=img_paths,
-        json_path=json_path,
-        save_paths=save_paths,
-        save_in_place=False,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 90, 180, 270]
-
-    expected_sizes = [
-        (10, 20),
-        (20, 10),
-        (10, 20),
-        (20, 10),
-    ]
-
-    for img_path, save_path, expected_size in zip(
-        img_paths,
-        save_paths,
-        expected_sizes,
-        strict=True,
-    ):
-        assert save_path.exists()
-
-        with Image.open(save_path) as rotated_img:
-            assert rotated_img.size == expected_size
-
-        with Image.open(img_path) as original_img:
-            assert original_img.size == (10, 20)
-
-    expected_paths = {
-        tmp_path / "inputs",
-        tmp_path / "inputs" / "angle_0.png",
-        tmp_path / "inputs" / "angle_90.png",
-        tmp_path / "inputs" / "angle_180.png",
-        tmp_path / "inputs" / "angle_270.png",
-        tmp_path / "outputs",
-        tmp_path / "outputs" / "angle_0.png",
-        tmp_path / "outputs" / "angle_90.png",
-        tmp_path / "outputs" / "angle_180.png",
-        tmp_path / "outputs" / "angle_270.png",
-    }
-
-    if json_path is not None:
-        expected_paths.update(
-            {
-                json_path.parent,
-                json_path,
-            }
-        )
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize("json_mode", [True, False], ids=["json", "no-json"])
-def test_rotate_imgs_from_paths_save_in_place_rotates_original_images(
-    tmp_path: Path,
-    n_jobs: int,
-    json_mode: bool,
-) -> None:
-    img_paths = [
-        tmp_path / "angle_0.png",
-        tmp_path / "angle_90.png",
-        tmp_path / "angle_180.png",
-        tmp_path / "angle_270.png",
-    ]
-
-    json_path = tmp_path / "results" / "rotations.json" if json_mode else None
-
-    for img_path in img_paths:
-        create_test_img(img_path, size=(10, 20))
-
-    responses = rotate_imgs_module.rotate_imgs_from_paths(
-        classify_fn=classify_angle_from_filename,
-        img_paths=img_paths,
-        json_path=json_path,
-        save_paths=None,
-        save_in_place=True,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 90, 180, 270]
-
-    expected_sizes = [
-        (10, 20),
-        (20, 10),
-        (10, 20),
-        (20, 10),
-    ]
-
-    for img_path, expected_size in zip(img_paths, expected_sizes, strict=True):
-        with Image.open(img_path) as img:
-            assert img.size == expected_size
-
-    expected_paths = {
-        tmp_path / "angle_0.png",
-        tmp_path / "angle_90.png",
-        tmp_path / "angle_180.png",
-        tmp_path / "angle_270.png",
-    }
-
-    if json_path is not None:
-        expected_paths.update(
-            {
-                json_path.parent,
-                json_path,
-            }
-        )
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize("json_mode", [True, False], ids=["json", "no-json"])
-def test_rotate_imgs_from_paths_does_not_modify_images_if_no_save_option_given(
-    tmp_path: Path,
-    n_jobs: int,
-    json_mode: bool,
-) -> None:
-    img_path = tmp_path / "angle_90.png"
-    create_test_img(img_path, size=(10, 20))
-
-    json_path = tmp_path / "results" / "rotations.json" if json_mode else None
-
-    responses = rotate_imgs_module.rotate_imgs_from_paths(
-        classify_fn=classify_angle_from_filename,
-        img_paths=[img_path],
-        json_path=json_path,
-        save_paths=None,
-        save_in_place=False,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [90]
-
-    with Image.open(img_path) as img:
-        assert img.size == (10, 20)
-
-    assert not (tmp_path / "outputs").exists()
-
-    expected_paths = {
-        img_path,
-    }
-
-    if json_path is not None:
-        expected_paths.update(
-            {
-                json_path.parent,
-                json_path,
-            }
-        )
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize(
-    (
-        "img_filenames",
-        "save_filenames",
-        "save_in_place",
-        "classify_fn",
-        "expected_msg_parts",
-    ),
+    ("angle", "size", "pixels"),
     [
-        pytest.param(
-            ["angle_90.png"],
-            ["rotated.png"],
-            True,
-            classify_should_not_be_called,
-            ["Cannot specify save_paths if save_in_place is True."],
-            id="save-in-place-and-save-paths",
-        ),
-        pytest.param(
-            ["angle_0.png", "angle_90.png"],
-            ["angle_0.png"],
-            False,
-            classify_should_not_be_called,
-            ["Length of save_paths must match length of img_paths."],
-            id="mismatched-save-paths",
-        ),
-        pytest.param(
-            [],
-            [],
-            False,
-            classify_should_not_be_called,
-            ["img_paths cannot be empty."],
-            id="empty-img-paths",
-        ),
-        pytest.param(
-            ["invalid_45.png"],
-            ["invalid_45.png"],
-            False,
-            classify_angle_from_filename,
-            [
-                "Invalid angle 45 for image",
-                "Angle must be one of the following: 0, 90, 180, or 270 degrees.",
-            ],
-            id="invalid-angle-save-paths",
-        ),
-        pytest.param(
-            ["invalid_45.png"],
-            None,
-            True,
-            classify_angle_from_filename,
-            [
-                "Invalid angle 45 for image",
-                "Angle must be one of the following: 0, 90, 180, or 270 degrees.",
-            ],
-            id="invalid-angle-save-in-place",
-        ),
-        pytest.param(
-            ["invalid_45.png"],
-            None,
-            False,
-            classify_angle_from_filename,
-            [
-                "Invalid angle 45 for image",
-                "Angle must be one of the following: 0, 90, 180, or 270 degrees.",
-            ],
-            id="invalid-angle-no-save",
-        ),
+        (0, (2, 3), [1, 2, 3, 4, 5, 6]),
+        (90, (3, 2), [5, 3, 1, 6, 4, 2]),
+        (180, (2, 3), [6, 5, 4, 3, 2, 1]),
+        (270, (3, 2), [2, 4, 6, 1, 3, 5]),
     ],
 )
-def test_rotate_imgs_from_paths_validation_errors_and_unmodified_outputs(
-    tmp_path: Path,
-    n_jobs: int,
-    img_filenames: list[str],
-    save_filenames: list[str] | None,
-    save_in_place: bool,
-    classify_fn,
-    expected_msg_parts: list[str],
-) -> None:
-    img_paths = [tmp_path / "inputs" / filename for filename in img_filenames]
-    save_paths = (
-        None
-        if save_filenames is None
-        else [tmp_path / "outputs" / filename for filename in save_filenames]
-    )
-    json_path = tmp_path / "results" / "rotations.json"
+def test_clockwise_correction_and_resume_leave_originals_unchanged(
+    tmp_path, angle, size, pixels
+):
+    source = create_image(tmp_path / "source.png")
+    original = source.read_bytes()
+    output = tmp_path / "output"
+    fn = model_function(Mock(spec=[], return_value=angle), version=1)
+    assert rotate_imgs_from_paths(fn, [source], output, n_jobs=1) == [angle]
+    fn.reset_mock()
 
-    for img_path in img_paths:
-        create_test_img(img_path, size=(10, 20))
+    assert rotate_imgs_from_paths(
+        fn, [source], output, n_jobs=1, on_existing="resume"
+    ) == [angle]
 
-    with pytest.raises(ValueError) as exc_info:
-        rotate_imgs_module.rotate_imgs_from_paths(
-            classify_fn=classify_fn,
-            img_paths=img_paths,
-            json_path=json_path,
-            save_paths=save_paths,
-            save_in_place=save_in_place,
-            n_jobs=n_jobs,
-        )
-
-    msg = str(exc_info.value)
-
-    for expected_msg_part in expected_msg_parts:
-        assert expected_msg_part in msg
-
-    assert not json_path.exists()
-    assert not json_path.parent.exists()
-
-    if save_paths is not None:
-        for save_path in save_paths:
-            assert not save_path.exists()
-        assert not (tmp_path / "outputs").exists()
-
-    for img_path in img_paths:
-        with Image.open(img_path) as img:
-            assert img.size == (10, 20)
-
-    expected_paths = set()
-
-    if img_paths:
-        expected_paths.add(tmp_path / "inputs")
-        expected_paths.update(img_paths)
-
-    assert set(tmp_path.rglob("*")) == expected_paths
+    fn.assert_not_called()
+    assert source.read_bytes() == original
+    with Image.open(output / "rotated_images" / source.name) as corrected:
+        assert corrected.size == size
+        assert [
+            corrected.getpixel((x, y)) for y in range(size[1]) for x in range(size[0])
+        ] == pixels
 
 
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-def test_rotate_imgs_returns_classification_responses_from_img_dir(
-    tmp_path: Path,
-    n_jobs: int,
-) -> None:
-    img_dir = tmp_path / "inputs"
+@pytest.mark.parametrize("n_jobs", [1, 2])
+def test_directory_sorts_top_level_pngs_and_resumes_overlapping_slices(
+    tmp_path, n_jobs
+):
+    inputs = tmp_path / "inputs"
+    for angle in (90, 0, 270, 180):
+        create_image(inputs / f"{angle}.png")
+    create_image(inputs / "nested" / "unexpected.png")
+    (inputs / "ignore.txt").write_text("not an image")
+    output = tmp_path / "output"
 
-    create_test_img(img_dir / "angle_270.png")
-    create_test_img(img_dir / "angle_0.png")
-    create_test_img(img_dir / "angle_90.png")
-    create_test_img(img_dir / "angle_180.png")
-
-    responses = rotate_imgs_module.rotate_imgs(
-        classify_fn=classify_angle_from_filename,
-        img_dir=img_dir,
-        save_dir=None,
-        json_path=None,
-        save_in_place=False,
+    assert rotate_imgs(
+        classifier(), inputs, output, range_indices=(0, 2), n_jobs=n_jobs
+    ) == [0, 180]
+    assert rotate_imgs(
+        classifier(),
+        inputs,
+        output,
+        range_indices=(1, None),
         n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 180, 270, 90]
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-def test_rotate_imgs_saves_json_from_img_dir(
-    tmp_path: Path,
-    n_jobs: int,
-) -> None:
-    img_dir = tmp_path / "inputs"
-    json_path = tmp_path / "results" / "rotations.json"
-
-    create_test_img(img_dir / "angle_90.png")
-    create_test_img(img_dir / "angle_0.png")
-
-    responses = rotate_imgs_module.rotate_imgs(
-        classify_fn=classify_angle_from_filename,
-        img_dir=img_dir,
-        save_dir=None,
-        json_path=json_path,
-        save_in_place=False,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 90]
-    assert json_path.exists()
-    assert json.loads(json_path.read_text("utf-8")) == [
-        {"img_path": str(img_dir / "angle_0.png"), "label": 0},
-        {"img_path": str(img_dir / "angle_90.png"), "label": 90},
-    ]
-
-    expected_paths = {
-        img_dir,
-        img_dir / "angle_0.png",
-        img_dir / "angle_90.png",
-        json_path.parent,
-        json_path,
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize("json_mode", [True, False], ids=["json", "no-json"])
-def test_rotate_imgs_save_dir_saves_rotated_images_from_img_dir(
-    tmp_path: Path,
-    n_jobs: int,
-    json_mode: bool,
-) -> None:
-    img_dir = tmp_path / "inputs"
-    save_dir = tmp_path / "outputs"
-
-    create_test_img(img_dir / "angle_90.png", size=(10, 20))
-    create_test_img(img_dir / "angle_0.png", size=(10, 20))
-    create_test_img(img_dir / "angle_270.png", size=(10, 20))
-
-    json_path = tmp_path / "results" / "rotations.json" if json_mode else None
-
-    responses = rotate_imgs_module.rotate_imgs(
-        classify_fn=classify_angle_from_filename,
-        img_dir=img_dir,
-        save_dir=save_dir,
-        json_path=json_path,
-        save_in_place=False,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 270, 90]
-
-    output_paths = sorted(save_dir.glob("*.png"))
-    assert output_paths == [
-        save_dir / "angle_0.png",
-        save_dir / "angle_270.png",
-        save_dir / "angle_90.png",
-    ]
-
-    expected_sizes_by_filename = {
-        "angle_0.png": (10, 20),
-        "angle_270.png": (20, 10),
-        "angle_90.png": (20, 10),
-    }
-
-    for output_path in output_paths:
-        with Image.open(output_path) as img:
-            assert img.size == expected_sizes_by_filename[output_path.name]
-
-    for input_path in sorted(img_dir.glob("*.png")):
-        with Image.open(input_path) as img:
-            assert img.size == (10, 20)
-
-    expected_paths = {
-        img_dir,
-        img_dir / "angle_0.png",
-        img_dir / "angle_270.png",
-        img_dir / "angle_90.png",
-        save_dir,
-        save_dir / "angle_0.png",
-        save_dir / "angle_270.png",
-        save_dir / "angle_90.png",
-    }
-
-    if json_path is not None:
-        expected_paths.update(
-            {
-                json_path.parent,
-                json_path,
-            }
-        )
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-@pytest.mark.parametrize("json_mode", [True, False], ids=["json", "no-json"])
-def test_rotate_imgs_save_in_place_rotates_images_from_img_dir(
-    tmp_path: Path,
-    n_jobs: int,
-    json_mode: bool,
-) -> None:
-    img_dir = tmp_path / "inputs"
-
-    create_test_img(img_dir / "angle_90.png", size=(10, 20))
-    create_test_img(img_dir / "angle_0.png", size=(10, 20))
-    create_test_img(img_dir / "angle_270.png", size=(10, 20))
-
-    json_path = tmp_path / "results" / "rotations.json" if json_mode else None
-
-    responses = rotate_imgs_module.rotate_imgs(
-        classify_fn=classify_angle_from_filename,
-        img_dir=img_dir,
-        save_dir=None,
-        json_path=json_path,
-        save_in_place=True,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 270, 90]
-
-    expected_sizes_by_filename = {
-        "angle_0.png": (10, 20),
-        "angle_270.png": (20, 10),
-        "angle_90.png": (20, 10),
-    }
-
-    for img_path in sorted(img_dir.glob("*.png")):
-        with Image.open(img_path) as img:
-            assert img.size == expected_sizes_by_filename[img_path.name]
-
-    expected_paths = {
-        img_dir,
-        img_dir / "angle_0.png",
-        img_dir / "angle_270.png",
-        img_dir / "angle_90.png",
-    }
-
-    if json_path is not None:
-        expected_paths.update(
-            {
-                json_path.parent,
-                json_path,
-            }
-        )
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-def test_rotate_imgs_does_not_modify_images_if_no_save_option_given(
-    tmp_path: Path,
-    n_jobs: int,
-) -> None:
-    img_dir = tmp_path / "inputs"
-
-    create_test_img(img_dir / "angle_90.png", size=(10, 20))
-    create_test_img(img_dir / "angle_0.png", size=(10, 20))
-
-    responses = rotate_imgs_module.rotate_imgs(
-        classify_fn=classify_angle_from_filename,
-        img_dir=img_dir,
-        save_dir=None,
-        json_path=None,
-        save_in_place=False,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [0, 90]
-
-    for img_path in sorted(img_dir.glob("*.png")):
-        with Image.open(img_path) as img:
-            assert img.size == (10, 20)
-
-    assert not (tmp_path / "outputs").exists()
-    assert not (tmp_path / "results").exists()
-
-    expected_paths = {
-        img_dir,
-        img_dir / "angle_0.png",
-        img_dir / "angle_90.png",
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
-def test_rotate_imgs_ignores_non_png_files(
-    tmp_path: Path,
-    n_jobs: int,
-) -> None:
-    img_dir = tmp_path / "inputs"
-    json_path = tmp_path / "results" / "rotations.json"
-
-    create_test_img(img_dir / "angle_90.png", size=(10, 20))
-    create_test_file(img_dir / "not_an_image.txt")
-    create_test_file(img_dir / "fake_jpg.jpg")
-
-    responses = rotate_imgs_module.rotate_imgs(
-        classify_fn=classify_angle_from_filename,
-        img_dir=img_dir,
-        save_dir=None,
-        json_path=json_path,
-        save_in_place=False,
-        n_jobs=n_jobs,
-    )
-
-    assert responses == [90]
-
-    assert json.loads(json_path.read_text("utf-8")) == [
-        {"img_path": str(img_dir / "angle_90.png"), "label": 90},
-    ]
-
-    expected_paths = {
-        img_dir,
-        img_dir / "angle_90.png",
-        img_dir / "not_an_image.txt",
-        img_dir / "fake_jpg.jpg",
-        json_path.parent,
-        json_path,
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-def test_rotate_imgs_raises_if_img_dir_does_not_exist(tmp_path: Path) -> None:
-    img_dir = tmp_path / "missing_inputs"
-    json_path = tmp_path / "results" / "rotations.json"
-
-    with pytest.raises(ValueError) as exc_info:
-        rotate_imgs_module.rotate_imgs(
-            classify_fn=classify_should_not_be_called,
-            img_dir=img_dir,
-            save_dir=None,
-            json_path=json_path,
-            save_in_place=False,
-        )
-
-    assert str(exc_info.value) == (
-        f"Image directory {img_dir} does not exist or is not a directory."
-    )
-
-    assert not json_path.exists()
-    assert not json_path.parent.exists()
-
-    assert set(tmp_path.rglob("*")) == set()
-
-
-def test_rotate_imgs_raises_if_img_dir_is_not_a_directory(tmp_path: Path) -> None:
-    img_dir = tmp_path / "inputs.png"
-    json_path = tmp_path / "results" / "rotations.json"
-
-    create_test_file(img_dir, content="not a directory")
-
-    with pytest.raises(ValueError) as exc_info:
-        rotate_imgs_module.rotate_imgs(
-            classify_fn=classify_should_not_be_called,
-            img_dir=img_dir,
-            save_dir=None,
-            json_path=json_path,
-            save_in_place=False,
-        )
-
-    assert str(exc_info.value) == (
-        f"Image directory {img_dir} does not exist or is not a directory."
-    )
-
-    assert not json_path.exists()
-    assert not json_path.parent.exists()
-
-    expected_paths = {
-        img_dir,
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-def test_rotate_imgs_raises_if_no_pngs_found(tmp_path: Path) -> None:
-    img_dir = tmp_path / "inputs"
-    json_path = tmp_path / "results" / "rotations.json"
-
-    create_test_file(img_dir / "not_an_image.txt")
-    create_test_file(img_dir / "fake_jpg.jpg")
-
-    with pytest.raises(ValueError) as exc_info:
-        rotate_imgs_module.rotate_imgs(
-            classify_fn=classify_should_not_be_called,
-            img_dir=img_dir,
-            save_dir=None,
-            json_path=json_path,
-            save_in_place=False,
-        )
-
-    assert str(exc_info.value) == f"No PNG image files found in directory {img_dir}."
-
-    assert not json_path.exists()
-    assert not json_path.parent.exists()
-
-    expected_paths = {
-        img_dir,
-        img_dir / "not_an_image.txt",
-        img_dir / "fake_jpg.jpg",
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-def test_rotate_imgs_raises_if_img_dir_empty(tmp_path: Path) -> None:
-    img_dir = tmp_path / "inputs"
-    img_dir.mkdir(parents=True)
-
-    json_path = tmp_path / "results" / "rotations.json"
-
-    with pytest.raises(ValueError) as exc_info:
-        rotate_imgs_module.rotate_imgs(
-            classify_fn=classify_should_not_be_called,
-            img_dir=img_dir,
-            save_dir=None,
-            json_path=json_path,
-            save_in_place=False,
-        )
-
-    assert str(exc_info.value) == f"No PNG image files found in directory {img_dir}."
-
-    assert not json_path.exists()
-    assert not json_path.parent.exists()
-
-    expected_paths = {
-        img_dir,
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-def test_rotate_imgs_raises_if_save_dir_and_save_in_place_are_both_given(
-    tmp_path: Path,
-) -> None:
-    img_dir = tmp_path / "inputs"
-    save_dir = tmp_path / "outputs"
-    json_path = tmp_path / "results" / "rotations.json"
-
-    create_test_img(img_dir / "angle_90.png")
-
-    with pytest.raises(ValueError) as exc_info:
-        rotate_imgs_module.rotate_imgs(
-            classify_fn=classify_should_not_be_called,
-            img_dir=img_dir,
-            save_dir=save_dir,
-            json_path=json_path,
-            save_in_place=True,
-        )
-
-    assert str(exc_info.value) == "Cannot specify save_dir if save_in_place is True."
-
-    assert not save_dir.exists()
-    assert not json_path.exists()
-    assert not json_path.parent.exists()
-
-    with Image.open(img_dir / "angle_90.png") as img:
-        assert img.size == (10, 20)
-
-    expected_paths = {
-        img_dir,
-        img_dir / "angle_90.png",
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
-
-
-def test_rotate_imgs_passes_sorted_paths_to_rotate_imgs_from_paths(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    img_dir = tmp_path / "inputs"
-    save_dir = tmp_path / "outputs"
-    json_path = tmp_path / "results" / "rotations.json"
-
-    create_test_img(img_dir / "angle_90.png")
-    create_test_img(img_dir / "angle_0.png")
-    create_test_img(img_dir / "angle_270.png")
-
-    captured_kwargs = {}
-
-    def fake_rotate_imgs_from_paths(**kwargs):
-        captured_kwargs.update(kwargs)
-        return [0, 270, 90]
-
-    monkeypatch.setattr(
-        rotate_imgs_module,
-        "rotate_imgs_from_paths",
-        fake_rotate_imgs_from_paths,
-    )
-
-    responses = rotate_imgs_module.rotate_imgs(
-        classify_fn=classify_should_not_be_called,
-        img_dir=img_dir,
-        save_dir=save_dir,
-        json_path=json_path,
-        save_in_place=False,
-        n_jobs=3,
-    )
-
-    expected_img_paths = [
-        img_dir / "angle_0.png",
-        img_dir / "angle_270.png",
-        img_dir / "angle_90.png",
-    ]
-
-    assert responses == [0, 270, 90]
-
-    assert captured_kwargs == {
-        "classify_fn": classify_should_not_be_called,
-        "img_paths": expected_img_paths,
-        "json_path": json_path,
-        "save_paths": [
-            save_dir / "angle_0.png",
-            save_dir / "angle_270.png",
-            save_dir / "angle_90.png",
-        ],
-        "save_in_place": False,
-        "n_jobs": 3,
-    }
-
-    expected_paths = {
-        img_dir,
-        img_dir / "angle_0.png",
-        img_dir / "angle_270.png",
-        img_dir / "angle_90.png",
-    }
-
-    assert set(tmp_path.rglob("*")) == expected_paths
+        on_existing="resume",
+    ) == [180, 270, 90]
+    assert [entry["label"] for entry in labels(output)] == [0, 180, 270, 90]
+    assert len(list((output / "rotated_images").glob("*.png"))) == 4
+
+
+@pytest.mark.parametrize("invalid", [45, -90, 360, "90", None])
+def test_invalid_angle_preserves_previous_copy_and_stops_new_images(tmp_path, invalid):
+    inputs = tmp_path / "inputs"
+    for name in ("a", "b", "c"):
+        create_image(inputs / f"{name}.png")
+    calls = []
+
+    def process(path):
+        calls.append(path.stem)
+        return invalid if path.stem == "b" else 90
+
+    output = tmp_path / "output"
+    with pytest.raises((ValueError, TypeError)):
+        rotate_imgs(model_function(process), inputs, output, n_jobs=1)
+
+    assert calls == ["a", "b"]
+    assert labels(output) == [{"img_path": str(inputs / "a.png"), "label": 90}]
+    assert sorted(p.name for p in (output / "rotated_images").iterdir()) == ["a.png"]
 
 
 @pytest.mark.parametrize(
-    ("angle", "expected"), [(90, [5, 3, 1, 6, 4, 2]), (270, [2, 4, 6, 1, 3, 5])]
+    "stage", ["encode-image", "replace-image", "record-completion"]
 )
-@pytest.mark.parametrize("save_in_place", [False, True])
-def test_rotation_applies_clockwise_correction(
-    tmp_path, angle, expected, save_in_place
+def test_failed_image_publication_resumes_without_repeating_or_rotating_twice(
+    tmp_path, monkeypatch, stage
 ):
-    source = tmp_path / "sideways.png"
-    destination = tmp_path / "upright.png"
-    original = Image.new("L", (2, 3))
-    original.putdata([1, 2, 3, 4, 5, 6])
-    original.save(source)
+    source = create_image(tmp_path / "source.png")
+    original = source.read_bytes()
+    output = tmp_path / "output"
+    fn = model_function(Mock(spec=[], return_value=90), version=1)
+    save_image = Image.Image.save
+    replace = Path.replace
+    save_state = _run_state.RunState.save
 
-    rotate_imgs_module.rotate_imgs_from_paths(
-        classify_fn=lambda _: angle,
-        img_paths=[source],
-        save_in_place=save_in_place,
-        save_paths=None if save_in_place else [destination],
-        n_jobs=1,
-    )
+    def broken_image_save(image, *args, **kwargs):
+        msg = "image encoding failed"
+        raise OSError(msg)
 
-    with Image.open(source if save_in_place else destination) as corrected:
+    def broken_replace(path, target):
+        if Path(target).suffix == ".png":
+            msg = "image replacement failed"
+            raise OSError(msg)
+        return replace(path, target)
+
+    def broken_completion(state):
+        if any(record["completed"] for record in state.items.values()):
+            msg = "completion save failed"
+            raise OSError(msg)
+        save_state(state)
+
+    if stage == "encode-image":
+        monkeypatch.setattr(Image.Image, "save", broken_image_save)
+    elif stage == "replace-image":
+        monkeypatch.setattr(Path, "replace", broken_replace)
+    else:
+        monkeypatch.setattr(_run_state.RunState, "save", broken_completion)
+
+    with pytest.raises(OSError, match="failed"):
+        rotate_imgs_from_paths(fn, [source], output, n_jobs=1)
+    fn.assert_called_once()
+    fn.reset_mock()
+    state = json.loads((output / ".flowde" / "run.state").read_text())
+    record = state["items"][str(source.resolve())]
+    assert record["has_result"]
+    assert not record["completed"]
+    assert record["result"] == 90
+    corrected_path = output / "rotated_images" / source.name
+    assert corrected_path.exists() == (stage == "record-completion")
+    assert not list(output.rglob(".flowde-*"))
+
+    monkeypatch.setattr(Image.Image, "save", save_image)
+    monkeypatch.setattr(Path, "replace", replace)
+    monkeypatch.setattr(_run_state.RunState, "save", save_state)
+    assert rotate_imgs_from_paths(
+        fn, [source], output, n_jobs=1, on_existing="resume"
+    ) == [90]
+
+    fn.assert_not_called()
+    assert source.read_bytes() == original
+    with Image.open(corrected_path) as corrected:
         assert corrected.size == (3, 2)
-        assert [
-            corrected.getpixel((x, y)) for y in range(2) for x in range(3)
-        ] == expected
+        assert [corrected.getpixel((x, y)) for y in range(2) for x in range(3)] == [
+            5,
+            3,
+            1,
+            6,
+            4,
+            2,
+        ]
+
+
+def test_missing_copy_is_recreated_but_modified_copy_is_rejected(tmp_path):
+    source = create_image(tmp_path / "source.png")
+    output = tmp_path / "output"
+    fn = model_function(Mock(spec=[], return_value=90))
+    rotate_imgs_from_paths(fn, [source], output, n_jobs=1)
+    corrected = output / "rotated_images" / source.name
+    original_copy = corrected.read_bytes()
+    corrected.unlink()
+    fn.reset_mock()
+
+    rotate_imgs_from_paths(fn, [source], output, n_jobs=1, on_existing="resume")
+    assert corrected.read_bytes() == original_copy
+    fn.assert_not_called()
+
+    corrected.write_bytes(b"user edited copy")
+    with pytest.raises(ValueError, match="Saved output has been modified"):
+        rotate_imgs_from_paths(fn, [source], output, n_jobs=1, on_existing="resume")
+    assert corrected.read_bytes() == b"user edited copy"
+    fn.assert_not_called()
+
+
+@pytest.mark.parametrize("on_existing", ["error", "overwrite"])
+def test_can_start_in_empty_directory(tmp_path, on_existing):
+    source = create_image(tmp_path / "0.png")
+    output = tmp_path / "output"
+    output.mkdir()
+    assert rotate_imgs_from_paths(
+        classifier(), [source], output, n_jobs=1, on_existing=on_existing
+    ) == [0]
+
+
+@pytest.mark.parametrize("extra", ["notes.txt", "rotated_images/notes.txt"])
+def test_overwrite_preserves_unrecorded_files(tmp_path, extra):
+    source = create_image(tmp_path / "0.png")
+    output = tmp_path / "output"
+    rotate_imgs_from_paths(classifier(), [source], output, n_jobs=1)
+    (output / extra).write_text("keep this")
+    before = {str(p): p.read_bytes() for p in output.rglob("*") if p.is_file()}
+
+    with pytest.raises(ValueError, match="unexpected file or directory"):
+        rotate_imgs_from_paths(
+            classifier(), [source], output, n_jobs=1, on_existing="overwrite"
+        )
+
+    assert {str(p): p.read_bytes() for p in output.rglob("*") if p.is_file()} == before
+
+
+def test_source_changed_during_model_request_is_not_rotated(tmp_path):
+    source = create_image(tmp_path / "source.png")
+    output = tmp_path / "output"
+
+    def change_source(path):
+        Image.new("L", (4, 5)).save(path)
+        return 90
+
+    with pytest.raises(ValueError, match="Input image changed before rotating"):
+        rotate_imgs_from_paths(
+            model_function(change_source), [source], output, n_jobs=1
+        )
+    assert not (output / "rotated_images" / source.name).exists()
+
+
+@pytest.mark.parametrize("case", ["missing", "file", "empty", "nested-only"])
+def test_invalid_input_directory_makes_no_requests(tmp_path, case):
+    inputs = tmp_path / "inputs"
+    if case == "file":
+        inputs.write_text("not a directory")
+    elif case in ("empty", "nested-only"):
+        inputs.mkdir()
+        if case == "nested-only":
+            create_image(inputs / "nested" / "0.png")
+    fn = model_function(Mock(spec=[], return_value=0))
+    with pytest.raises(ValueError, match=r"Image directory|No PNG image files"):
+        rotate_imgs(fn, inputs, tmp_path / "output", n_jobs=1)
+    fn.assert_not_called()
+    assert not (tmp_path / "output").exists()
+
+
+def test_empty_list_and_duplicate_stems_make_no_requests(tmp_path):
+    fn = model_function(Mock(spec=[], return_value=0))
+    output = tmp_path / "output"
+    with pytest.raises(ValueError, match="cannot be empty"):
+        rotate_imgs_from_paths(fn, [], output, n_jobs=1)
+    sources = [create_image(tmp_path / folder / "same.png") for folder in ("a", "b")]
+    with pytest.raises(ValueError, match=r"[Dd]uplicate"):
+        rotate_imgs_from_paths(fn, sources, output, n_jobs=1)
+    fn.assert_not_called()
+    assert not output.exists()
