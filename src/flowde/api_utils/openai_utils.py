@@ -2,10 +2,12 @@ import base64
 import json
 import mimetypes
 import os
+from http import HTTPStatus
 from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import InternalServerError, OpenAI
+from openai.types.shared import ReasoningEffort
 from pydantic import BaseModel
 
 from flowde.exponential_backoff import retry_with_exponential_backoff
@@ -19,6 +21,80 @@ from flowde.usage import (
 from flowde.utils import VISION_FEW_SHOT_INSTRUCTIONS, VisionFewShotExample
 
 # TODO: should we really be using the upload file in deployment?
+
+
+def check_openai_connection(
+    model: str,
+    effort: ReasoningEffort = "high",
+    from_azure: bool = False,
+    *,
+    timeout: float = 15.0,
+) -> None:
+    """
+    Check credentials, endpoint, and model access with a short text request.
+
+    Parameters
+    ----------
+    model : str
+        OpenAI model ID, or the deployment name when using Azure.
+    effort : str, optional
+        Reasoning effort sent to the model, by default "high".
+    from_azure : bool, optional
+        Use `AZURE_API_KEY` and `AZURE_API_BASE` instead of `OPENAI_API_KEY`,
+        by default False. Settings are also loaded from `.env`.
+    timeout : float, optional
+        HTTP request timeout in seconds, by default 30.
+
+    Raises
+    ------
+    ValueError
+        A required credential or Azure endpoint is missing.
+    openai.OpenAIError
+        The API rejects the request, or the connection fails or times out.
+    RuntimeError
+        The HTTP status is not 200, or the response contains no completed
+        text reply.
+
+    Notes
+    -----
+    Makes one billable request without automatic retries. Returns None and
+    prints nothing on success. This checks text generation; image inputs and
+    structured outputs are not exercised.
+
+    """
+    load_dotenv()
+    key_name = "AZURE_API_KEY" if from_azure else "OPENAI_API_KEY"
+    api_key = os.getenv(key_name)
+    if not api_key:
+        msg = f"{key_name} must be set before checking the connection."
+        raise ValueError(msg)
+    base_url = os.getenv("AZURE_API_BASE") if from_azure else None
+    if from_azure and not base_url:
+        msg = "AZURE_API_BASE must be set before checking the Azure connection."
+        raise ValueError(msg)
+
+    with OpenAI(
+        api_key=api_key,
+        base_url=base_url,
+        timeout=timeout,
+        max_retries=0,
+    ) as client:
+        response = client.responses.with_raw_response.create(
+            model=model,
+            input="Reply with only the word OK.",
+            reasoning={"effort": effort},
+            background=False,
+        )
+        if response.status_code != HTTPStatus.OK:
+            msg = f"Unexpected HTTP status: {response.status_code}"
+            raise RuntimeError(msg)
+        result = response.parse()
+        if result.status != "completed" or not result.output_text.strip():
+            msg = (
+                "The API accepted the request, but the model did not finish "
+                f"a text reply. Response status: {result.status}"
+            )
+            raise RuntimeError(msg)
 
 
 @retry_with_exponential_backoff(errors=(InternalServerError,))

@@ -1,8 +1,12 @@
 import json
+from functools import partial
 from pathlib import Path
 from unittest.mock import Mock
 
+import httpx
 import pytest
+from dotenv import load_dotenv
+from openai import APIConnectionError, APIStatusError, APITimeoutError, OpenAI
 from openai.types.responses import ResponseInputParam
 from pydantic import BaseModel, TypeAdapter
 
@@ -487,3 +491,158 @@ def test_few_shot_request_raises_instead_of_skipping_an_invalid_example(
         )
     if from_azure:
         vision_upload.assert_not_called()
+
+
+@pytest.fixture
+def connection_env(monkeypatch, tmp_path):
+    """Read dummy settings from a temporary .env, never the user's credentials."""
+    settings = {
+        "OPENAI_API_KEY": "fake-openai-key",
+        "OPENAI_BASE_URL": "https://openai.example/v1/",
+        "AZURE_API_KEY": "fake-azure-key",
+        "AZURE_API_BASE": "https://azure.example/openai/v1/",
+    }
+    for name in settings:
+        monkeypatch.delenv(name, raising=False)
+    path = tmp_path / ".env"
+    path.write_text(
+        "\n".join(f"{name}={value}" for name, value in settings.items()),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(openai_utils, "load_dotenv", partial(load_dotenv, path))
+    return path
+
+
+@pytest.fixture
+def connection_http(monkeypatch, connection_env):
+    """Keep the real SDK and replace only the HTTP transport, per test."""
+    body = {
+        "id": "resp-check",
+        "object": "response",
+        "created_at": 0,
+        "model": "workshop-deployment",
+        "status": "completed",
+        "error": None,
+        "incomplete_details": None,
+        "output": [
+            {
+                "id": "msg-check",
+                "type": "message",
+                "role": "assistant",
+                "status": "completed",
+                "content": [{"type": "output_text", "text": "OK", "annotations": []}],
+            }
+        ],
+    }
+    handler = Mock(return_value=httpx.Response(200, json=body))
+    with httpx.Client(transport=httpx.MockTransport(handler)) as http_client:
+        monkeypatch.setattr(
+            openai_utils, "OpenAI", partial(OpenAI, http_client=http_client)
+        )
+        yield handler
+
+
+@pytest.mark.parametrize(
+    ("from_azure", "url", "key"),
+    [
+        (False, "https://openai.example/v1/responses", "fake-openai-key"),
+        (True, "https://azure.example/openai/v1/responses", "fake-azure-key"),
+    ],
+    ids=["openai", "azure"],
+)
+def test_connection_check_uses_dotenv_settings_and_selected_model(
+    connection_http, capsys, from_azure, url, key
+):
+    result = openai_utils.check_openai_connection(
+        model="workshop-deployment", effort="medium", from_azure=from_azure, timeout=5
+    )
+
+    assert result is None
+    connection_http.assert_called_once()
+    request = connection_http.call_args.args[0]
+    assert request.method == "POST"
+    assert str(request.url) == url
+    assert request.headers["Authorization"] == f"Bearer {key}"
+    body = json.loads(request.content)
+    assert body["model"] == "workshop-deployment"
+    assert body["reasoning"] == {"effort": "medium"}
+    assert body["background"] is False
+    assert request.extensions["timeout"]["read"] == 5
+    assert capsys.readouterr().out == ""
+
+
+@pytest.mark.parametrize("status", [400, 401, 404, 429, 500])
+def test_connection_check_preserves_api_errors_without_retrying(
+    connection_http, status
+):
+    connection_http.return_value = httpx.Response(
+        status, json={"error": {"message": "Simulated API failure"}}
+    )
+
+    with pytest.raises(APIStatusError, match="Simulated API failure") as error:
+        openai_utils.check_openai_connection("workshop-deployment", from_azure=True)
+
+    assert error.value.status_code == status
+    connection_http.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    ("http_error", "sdk_error"),
+    [(httpx.ConnectError, APIConnectionError), (httpx.ReadTimeout, APITimeoutError)],
+    ids=["connection-failure", "timeout"],
+)
+def test_connection_check_preserves_network_errors_without_retrying(
+    connection_http, http_error, sdk_error
+):
+    connection_http.side_effect = http_error("Simulated network failure")
+
+    with pytest.raises(sdk_error):
+        openai_utils.check_openai_connection("workshop-deployment")
+
+    connection_http.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    ("status", "text"),
+    [("incomplete", "OK"), ("failed", "OK"), ("completed", ""), ("completed", "  ")],
+    ids=["incomplete", "failed", "empty-reply", "blank-reply"],
+)
+def test_connection_check_rejects_200_without_a_completed_text_reply(
+    connection_http, status, text
+):
+    body = connection_http.return_value.json()
+    body["status"] = status
+    body["output"][0]["content"][0]["text"] = text
+    connection_http.return_value = httpx.Response(200, json=body)
+
+    with pytest.raises(RuntimeError, match="did not finish a text reply"):
+        openai_utils.check_openai_connection("workshop-deployment")
+
+
+def test_connection_check_requires_http_200(connection_http):
+    body = connection_http.return_value.json()
+    connection_http.return_value = httpx.Response(202, json=body)
+
+    with pytest.raises(RuntimeError, match="Unexpected HTTP status: 202"):
+        openai_utils.check_openai_connection("workshop-deployment")
+
+
+@pytest.mark.parametrize(
+    ("from_azure", "missing"),
+    [(False, "OPENAI_API_KEY"), (True, "AZURE_API_KEY"), (True, "AZURE_API_BASE")],
+)
+def test_connection_check_rejects_missing_settings_before_sending(
+    connection_env, connection_http, from_azure, missing
+):
+    lines = connection_env.read_text(encoding="utf-8").splitlines()
+    connection_env.write_text(
+        "\n".join(line for line in lines if not line.startswith(f"{missing}=")),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match=missing):
+        openai_utils.check_openai_connection(
+            "workshop-deployment", from_azure=from_azure
+        )
+
+    connection_http.assert_not_called()
