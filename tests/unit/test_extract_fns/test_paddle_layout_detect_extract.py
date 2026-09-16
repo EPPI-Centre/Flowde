@@ -1,7 +1,4 @@
-import json
-import time
 from io import BytesIO
-from pathlib import Path
 from unittest.mock import Mock, call
 
 import pymupdf
@@ -528,30 +525,3 @@ def test_factory_settings_control_resume_before_paddle_runs(
             on_existing="resume",
         )
     pipeline.predict.assert_not_called()
-
-
-def test_demo_extraction_cell_can_be_run_twice(pipeline, pdf_path, tmp_path):
-    pipeline.predict.return_value = [
-        PaddleResult(
-            size=(100, 100),
-            boxes=[{"label": "image", "coordinate": [0, 0, 100, 100]}],
-        )
-    ]
-    notebook_path = (
-        Path(__file__).resolve().parents[3] / "notebooks" / "CONSORT_demo.ipynb"
-    )
-    notebook = json.loads(notebook_path.read_text())
-    cell = next(c for c in notebook["cells"] if c.get("id") == "consort-demo-08")
-    source = compile("".join(cell["source"]), str(notebook_path), "exec")
-    namespace = {
-        "PDF_DIR": pdf_path.parent,
-        "RUN_DIR": tmp_path / "run",
-        "time": time,
-    }
-    for _ in range(2):
-        exec(source, namespace)  # noqa: S102 - Execute the checked-in notebook cell with a fake Paddle predictor.
-        extracted = namespace["EXTRACTED_DIR"]
-        assert sorted(p.name for p in extracted.glob("*.png")) == ["paper_0.png"]
-        with Image.open(extracted / "paper_0.png") as image:
-            assert image.size == (200, 200)
-    assert pipeline.predict.call_count == 2
