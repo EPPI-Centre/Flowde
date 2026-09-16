@@ -3,7 +3,7 @@
 [![Tests](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml?query=branch%3Amain)
 [![Pre-commit](https://github.com/EPPI-Centre/Flowde/actions/workflows/pre-commit.yml/badge.svg?branch=main)](https://github.com/EPPI-Centre/Flowde/actions/workflows/pre-commit.yml?query=branch%3Amain)
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml)
-[![Coverage](https://eppi-centre.github.io/Flowde/badges/coverage.svg)](https://github.com/EPPI-Centre/Flowde/actions)
+[![Coverage](https://raw.githubusercontent.com/EPPI-Centre/Flowde/badges/coverage.svg)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml?query=branch%3Amain)
 [![License](https://img.shields.io/github/license/EPPI-Centre/Flowde.svg?label=License)](https://github.com/EPPI-Centre/Flowde/blob/main/LICENSE)
 
 This repo contains the code for extracting structured data from CONSORT flow

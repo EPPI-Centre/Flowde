@@ -39,7 +39,6 @@ jobs:
             .github
             src
             tests
-            badges
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -61,8 +60,8 @@ jobs:
           -m pytest
           --cov-report=json
 
-      # TODO: Change this back to the default branch condition later.
-      - name: Update Coverage Badge
+      - name: Generate coverage badge
+        id: coverage-badge
         if: >
           github.ref == format(
             'refs/heads/{0}',
@@ -70,4 +69,22 @@ jobs:
           ) &&
           matrix.os == 'ubuntu-latest' &&
           matrix.python-version == '3.13'
-        uses: we-cli/coverage-badge-action@main
+        shell: bash
+        run: |
+          mkdir -p badge-output
+          coverage=$(node -p \
+            "require('./coverage.json').totals.percent_covered_display")
+          color=$(node -p "$coverage >= 95 ? 'green' : 'orange'")
+          npx --yes badgen-cli@0.2.0 \
+            -j coverage -s "$coverage%" -c "$color" \
+            > badge-output/coverage.svg
+
+      # Keep generated badges separate from the documentation on gh-pages.
+      - name: Publish coverage badge
+        if: steps.coverage-badge.outcome == 'success'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: badges
+          folder: badge-output
+          force: false
+          commit-message: Update coverage badge
