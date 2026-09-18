@@ -54,21 +54,7 @@ pred: data/predictions/paper-2_0.png
 
 ## Binary classification benchmark
 
-You will most likely want to benchmark a binary classification task; meaning
-your classification function has returned the following labels:
-
-```text
-0 = negative
-1 = positive
-```
-
-Use integer `0` and `1` labels. Strings such as `"1"` and boolean labels are
-not accepted by `BinaryClassificationBenchmark`.
-
-For example, you most likely want to evaluate whether your classification
-function is correctly classifying images as flowcharts.
-
-Use `BinaryClassificationBenchmark` for this case:
+You will most likely want to benchmark a binary classification task:
 
 ```python
 from pathlib import Path
@@ -93,7 +79,7 @@ properties.
 
 | Property                                                                 | Description                                                                       |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| [`len(benchmark)`](https://docs.python.org/3/library/functions.html#len) | Number of classified images in the benchmark.                                     |
+| `len(benchmark)`                                                         | Number of classified images in the benchmark.                                     |
 | `benchmark.result_list`                                                  | All classification results, one per image.                                        |
 | `benchmark.correct_predictions`                                          | Results where `pred` matches `true`.                                              |
 | `benchmark.incorrect_predictions`                                        | Results where `pred` does not match `true`.                                       |
@@ -136,7 +122,9 @@ for result in benchmark.incorrect_predictions:
 ```
 
 Each item in `result_list`, `correct_predictions`, `incorrect_predictions`,
-`tp`, `fp`, `fn`, and `tn` is a `SingleClassificationResult` with:
+`tp`, `fp`, `fn`, and `tn` is a
+[`SingleClassificationResult`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)
+with:
 
 | Attribute  | Description                   |
 | ---------- | ----------------------------- |
@@ -144,50 +132,11 @@ Each item in `result_list`, `correct_predictions`, `incorrect_predictions`,
 | `true`     | Ground-truth label.           |
 | `pred`     | Predicted label.              |
 
-## Worked binary example
-
-Suppose ten images produce the following counts:
-
-| Ground truth | Predicted positive    | Predicted negative     |
-| ------------ | --------------------- | ---------------------- |
-| Positive     | 3 true positives (TP) | 2 false negatives (FN) |
-| Negative     | 1 false positive (FP) | 4 true negatives (TN)  |
-
-The reported metrics are:
-
-| Metric            | Calculation                                     | Result  |
-| ----------------- | ----------------------------------------------- | ------- |
-| Accuracy          | `(TP + TN) / total = 7 / 10`                    | `0.700` |
-| Precision         | `TP / (TP + FP) = 3 / 4`                        | `0.750` |
-| Recall / TPR      | `TP / (TP + FN) = 3 / 5`                        | `0.600` |
-| F1                | `2 × precision × recall / (precision + recall)` | `0.667` |
-| FPR               | `FP / (FP + TN) = 1 / 5`                        | `0.200` |
-| Specificity / TNR | `TN / (TN + FP) = 4 / 5`                        | `0.800` |
-
-For example, precision answers: of the four images selected as flowcharts, how
-many were flowcharts? Recall answers: of the five actual flowcharts, how many
-did the classifier select?
-
-Flowde returns `0.0` for a metric whose denominator is zero. For example, no
-positive predictions gives precision `0.0`. Check the counts alongside a zero
-score to distinguish an empty category from incorrect predictions.
-
 ## Multiclass classification benchmark
 
-Use `MulticlassClassificationBenchmark` when each image belongs to exactly one
-of more than two possible classes.
-
-For example, you might classify extracted images as:
-
-```text
-consort_flowchart
-other_flowchart
-table
-graph
-other
-```
-
-In this case, you need to pass the full set of possible labels to the benchmark.
+For classifications where each image belongs to one of more than two possible
+classes, you can use
+[`MulticlassClassificationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_benchmark.MulticlassClassificationBenchmark):
 
 ```python
 from pathlib import Path
@@ -209,9 +158,12 @@ benchmark = MulticlassClassificationBenchmark(
 )
 ```
 
-Passing `labels` ensures that all possible classes are included in the
-benchmark, even if one of the classes does not appear in a particular evaluation
-set.
+The benchmark loads both JSON files, checks that they are valid, and compares
+the predicted labels with the true labels.
+
+The `labels` tuple declares the possible classes and must include every label
+in the ground-truth and prediction files. The benchmark includes every declared
+class in its counts and confusion matrix, even when no image has that label.
 
 ### Multiclass benchmark results
 
@@ -220,7 +172,7 @@ properties.
 
 | Property                                                                 | Description                                                                    |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| [`len(benchmark)`](https://docs.python.org/3/library/functions.html#len) | Number of classified images in the benchmark.                                  |
+| `len(benchmark)`                                                         | Number of classified images in the benchmark.                                  |
 | `benchmark.result_list`                                                  | All classification results, one per image.                                     |
 | `benchmark.correct_predictions`                                          | Results where `pred` matches `true`.                                           |
 | `benchmark.incorrect_predictions`                                        | Results where `pred` does not match `true`.                                    |
@@ -228,48 +180,26 @@ properties.
 | `benchmark.img_paths`                                                    | Image paths used in the benchmark.                                             |
 | `benchmark.trues`                                                        | True labels, in benchmark order.                                               |
 | `benchmark.preds`                                                        | Predicted labels, in benchmark order.                                          |
-| `benchmark.labels`                                                       | Full set of possible labels passed to the benchmark.                           |
-| `benchmark.confusion_matrix`                                             | Nested dictionary where rows are true labels and columns are predicted labels. |
-| `benchmark.num_per_true_class`                                           | Number of examples for each true class.                                        |
-| `benchmark.num_per_pred_class`                                           | Number of predictions made for each class.                                     |
-| `benchmark.per_class_accuracy`                                           | For each true class, the proportion of examples classified correctly.          |
+| `benchmark.labels`                                                       | Class labels supplied through `labels`.                                       |
+| `benchmark.confusion_matrix`                                             | Number of images for each true-label and predicted-label pair.                 |
+| `benchmark.num_per_true_class`                                           | Number of images with each ground-truth label.                                 |
+| `benchmark.num_per_pred_class`                                           | Number of images assigned each predicted label.                               |
+| `benchmark.per_class_accuracy`                                           | For each ground-truth class, the proportion of images classified correctly.    |
 
 For example, you can print the overall accuracy and class-level summaries:
 
 ```python
 print(f"Accuracy: {benchmark.accuracy:.3f}")
+print(benchmark.confusion_matrix)
 print(benchmark.num_per_true_class)
 print(benchmark.num_per_pred_class)
 print(benchmark.per_class_accuracy)
 ```
 
-The confusion matrix shows which classes are being confused with each other:
-
-```python
-print(benchmark.confusion_matrix)
-```
-
-This returns a nested dictionary where the outer keys are true labels and the
-inner keys are predicted labels:
-
-```python
-{
-    "consort_flowchart": {
-        "consort_flowchart": 10,
-        "other_flowchart": 2,
-        "table": 0,
-        "graph": 0,
-        "other": 1,
-    },
-    "other_flowchart": {
-        "consort_flowchart": 1,
-        "other_flowchart": 8,
-        "table": 0,
-        "graph": 0,
-        "other": 0,
-    },
-}
-```
+The confusion matrix is a nested dictionary indexed by true label, then
+predicted label. For example,
+`benchmark.confusion_matrix["consort_flowchart"]["table"]` counts CONSORT
+flowcharts incorrectly classified as tables.
 
 You can also inspect the individual incorrect predictions:
 
@@ -281,7 +211,9 @@ for result in benchmark.incorrect_predictions:
 ```
 
 Each item in `result_list`, `correct_predictions`, and `incorrect_predictions`
-is a `SingleClassificationResult` with:
+is a
+[`SingleClassificationResult`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)
+with:
 
 | Attribute  | Description                   |
 | ---------- | ----------------------------- |
@@ -289,24 +221,6 @@ is a `SingleClassificationResult` with:
 | `true`     | Ground-truth label.           |
 | `pred`     | Predicted label.              |
 
-## Worked multiclass example
-
-For four images, suppose the true labels are `flowchart, flowchart, table,
-graph`, and the predicted labels are `flowchart, table, table, flowchart`.
-
-| True class | Predicted flowchart | Predicted table | Predicted graph |
-| ---------- | ------------------- | --------------- | --------------- |
-| flowchart  | 1                   | 1               | 0               |
-| table      | 0                   | 1               | 0               |
-| graph      | 1                   | 0               | 0               |
-
-Two of four predictions are correct, so accuracy is `0.5`. The true class counts
-are `{flowchart: 2, table: 1, graph: 1}` and predicted counts are
-`{flowchart: 2, table: 2, graph: 0}`.
-
-`per_class_accuracy` uses each true class as its denominator: flowchart is
-`1 / 2 = 0.5`, table is `1 / 1 = 1.0`, and graph is `0 / 1 = 0.0`.
-A declared class with no true examples receives `0.0`.
-
-See the [benchmark reference](../reference/benchmarks.md#classification-and-rotation)
-for constructor parameters and shared result types.
+See the
+[`MulticlassClassificationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_benchmark.MulticlassClassificationBenchmark)
+API reference for full details of the parameters and results.

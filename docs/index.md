@@ -36,7 +36,7 @@ The notebook uses Azure OpenAI and asks for the endpoint and API key.
 | [Classification](pipeline/classification.md)     | Images                                       | Labels and selected image copies             |
 | [Rotation](pipeline/rotation.md)                 | Images                                       | Correction angles and corrected image copies |
 | [Parsing](pipeline/parsing.md)                   | Images, optionally with earlier parsed parts | Structured JSON                              |
-| [Benchmarking](benchmarking/index.md)            | Predictions and ground truth                 | Scores and detailed matches                  |
+| [Benchmarking](benchmarking/classification.md)  | Predictions and ground truth                 | Scores and detailed matches                  |
 
 If you already have flowchart images, start with rotation or parsing.
 Classification and rotation can be performed in either order.

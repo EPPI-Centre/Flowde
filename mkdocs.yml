@@ -66,9 +66,8 @@ nav:
           - Stopping and resuming: pipeline/resuming.md
           - Tokens and costs: pipeline/usage.md
           - Few-shot examples: pipeline/few-shot.md
-          - Custom functions: pipeline/custom-functions.md
+      - Custom functions: pipeline/custom-functions.md
       - Benchmarking:
-          - Overview: benchmarking/index.md
           - Classification: benchmarking/classification.md
           - Rotation: benchmarking/rotation.md
           - Parsing: benchmarking/parsing.md
