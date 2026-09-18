@@ -1,8 +1,8 @@
 # Benchmarks
 
 Benchmarks read saved JSONs and run locally. Constructing or evaluating a
-benchmark does not call an LLM. For input formats and worked examples, see the
-[benchmarking guide](../benchmarking/index.md).
+benchmark does not call an LLM. See the stage-specific benchmarking guides for
+input formats.
 
 ## Classification and rotation
 
@@ -27,6 +27,10 @@ Pass `true_path` and `pred_path` as keyword arguments pointing to JSON lists of
 images. `BinaryClassificationBenchmark` requires integer labels `0` and `1`.
 `MulticlassClassificationBenchmark` also requires a `labels` tuple containing the
 allowed classes. `RotationBenchmark` uses `(0, 90, 180, 270)` automatically.
+
+### Individual classification results
+
+::: flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult
 
 ### Shared properties
 
@@ -54,8 +58,7 @@ The two lists must put images in the same order. At each position, the filenames
 | `fpr`                                  | FP / (FP + TN)                                                                |
 | `specificity`, `tnr`                   | TN / (TN + FP)                                                                |
 
-Ratios with zero denominators return `0`. See the
-[worked binary example](../benchmarking/classification.md#worked-binary-example).
+Ratios with zero denominators return `0`.
 
 ### Multiclass and rotation properties
 

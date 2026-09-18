@@ -190,6 +190,4 @@ for a correction that is 90 degrees away from the required angle. The ground
 truth must describe the correction required by the original images whose
 predictions are in `rotations.json`, rather than their already-corrected copies.
 
-The [classification guide](classification.md#worked-multiclass-example) explains
-how class counts and per-class accuracy are calculated. Empty true classes
-receive `0.0`.
+Empty true classes receive `0.0`.
