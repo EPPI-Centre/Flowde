@@ -6,11 +6,63 @@ from dataclasses import dataclass
 @dataclass(frozen=True, kw_only=True)
 class TokenPrices:
     """
-    Prices per million tokens, optionally with a higher long-context rate.
+    Store token prices for estimating the cost of a model request.
 
-    `input` applies to uncached tokens; cache reads/writes replace that rate.
-    Above `long_context_threshold`, input and cache rates double and output
-    increases by 50%, matching the tiered models in the bundled tables.
+    Parameters
+    ----------
+    input : float
+        Price in USD per million uncached input tokens.
+    output : float
+        Price in USD per million output tokens.
+    cached_input : float | None, optional
+        Price in USD per million input tokens read from a cache. This rate
+        replaces the ordinary `input` rate for those tokens. Defaults to `None`,
+        meaning the cache-read rate is unknown. A value of `0` means cache reads
+        are free. An unknown rate prevents a cost estimate only when the
+        request includes cache-read tokens.
+    cache_write : float | None, optional
+        Price in USD per million input tokens written to a cache. This rate
+        replaces the ordinary `input` rate for those tokens. Defaults to `None`,
+        meaning the cache-write rate is unknown. A value of `0` means cache
+        writes are free. An unknown rate prevents a cost estimate only when
+        the request includes cache-write tokens.
+    long_context_threshold : int | None, optional
+        Input-token count above which higher rates apply. Defaults to `None`,
+        meaning the same rates apply at every request length. When a request's
+        total input-token count is strictly greater than this threshold, all
+        input rates, including cache reads and writes, are multiplied by `2`,
+        and the output rate is multiplied by `1.5`. The higher rates apply to
+        the entire request, not just tokens beyond the threshold. These
+        multipliers are fixed; this option is suitable only for prices that
+        follow that rule.
+
+    Notes
+    -----
+    Constructor arguments must be passed by name. The dataclass is frozen, so
+    its fields cannot be reassigned after construction. Rates and the threshold
+    are stored as supplied, without numeric-range validation or a provider
+    price lookup.
+
+    You can pass an instance as `token_prices` to an OpenAI or Gemini model
+    factory to override Flowde's bundled prices for cost reporting. The
+    override changes estimates, not provider billing or model requests.
+    [`estimate()`][flowde.pricing.TokenPrices.estimate] can also calculate a
+    cost directly from token counts. Creating a `TokenPrices` instance or
+    calculating a cost makes no API request.
+
+    Examples
+    --------
+    Define illustrative rates of $2 per million uncached input tokens,
+    $8 per million output tokens and $0.50 per million cached input tokens:
+
+    ```python
+    from flowde.pricing import TokenPrices
+
+    prices = TokenPrices(input=2.0, output=8.0, cached_input=0.5)
+    ```
+
+    These are example rates, not prices for a particular model.
+
     """
 
     input: float
@@ -27,6 +79,75 @@ class TokenPrices:
         cached_tokens: int = 0,
         cache_write_tokens: int = 0,
     ) -> float | None:
+        """
+        Estimate one request's cost from its input, output and cache token counts.
+
+        Parameters
+        ----------
+        input_tokens : int | None
+            Total input tokens, including the tokens counted in `cached_tokens`
+            and `cache_write_tokens`. `None` means the count is unknown and
+            prevents a cost estimate. This total determines whether the
+            long-context threshold is exceeded.
+        output_tokens : int | None
+            Total output tokens to price at the `output` rate. Include any
+            reasoning or thinking tokens charged as output. `None` means the
+            count is unknown and prevents a cost estimate.
+        cached_tokens : int, optional
+            Input tokens read from a cache, priced at `cached_input` instead
+            of `input`. Defaults to `0`. These tokens must already be included
+            in `input_tokens` and must not also count as cache-write tokens.
+        cache_write_tokens : int, optional
+            Input tokens written to a cache, priced at `cache_write` instead
+            of `input`. Defaults to `0`. These tokens must already be included
+            in `input_tokens` and must not also count as cache-read tokens.
+
+        Returns
+        -------
+        float | None
+            Estimated cost in USD. Returns `None` if either total token count
+            is unknown, a nonzero cache count has no corresponding price, or
+            the two cache counts together exceed `input_tokens`. Known zero
+            counts or zero prices can produce a cost of `0.0`.
+
+        Notes
+        -----
+        Uncached input tokens are calculated as
+        `input_tokens - cached_tokens - cache_write_tokens`. Each input group
+        is multiplied by its own per-million-token rate; output tokens are
+        multiplied by the output rate. The sum is divided by `1_000_000`.
+
+        When `input_tokens` exceeds a configured `long_context_threshold`, the combined
+        input cost is doubled and the output cost is multiplied by `1.5`
+        before summing. At exactly the threshold, the original rates apply.
+        Output tokens do not contribute to the threshold comparison.
+
+        Counts are expected to be nonnegative integers. Apart from the checks
+        described under Returns, counts and prices are used as supplied.
+        The method does not validate every numeric range, contact a provider,
+        round the estimate or include charges unrelated to these token counts.
+
+        Examples
+        --------
+        Calculate a cost using illustrative rates and 1,000 input tokens,
+        of which 400 were read from a cache, plus 200 output tokens:
+
+        ```python
+        from flowde.pricing import TokenPrices
+
+        prices = TokenPrices(input=2.0, output=8.0, cached_input=0.5)
+        cost = prices.estimate(
+            input_tokens=1_000,
+            output_tokens=200,
+            cached_tokens=400,
+        )
+        ```
+
+        The estimated cost is `$0.003`: `$0.0012` for the 600 uncached input
+        tokens, `$0.0002` for the 400 cached input tokens and `$0.0016` for the
+        200 output tokens.
+
+        """
         if input_tokens is None or output_tokens is None:
             return None
         if cached_tokens and self.cached_input is None:

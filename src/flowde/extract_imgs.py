@@ -110,12 +110,13 @@ def extract_imgs(
     save_dir : Path
         Dedicated output directory containing PNGs and `.flowde` run metadata.
     extract_fn : ExtractImgsFunction
-        Extractor created by a built-in factory or declared with `model_function()`.
+        Extractor created by a built-in factory or declared with
+        [`model_function()`][flowde.model_function].
     n_jobs : int, optional
         Number of PDFs processed concurrently. Defaults to `1`.
     on_existing : {"error", "resume", "overwrite"}, optional
-        How to handle existing work. Defaults to `"error"`. See
-        `extract_imgs_pdf_list()` for the recovery rules.
+        Defaults to `"error"`. Resume skips completed PDFs and restarts unfinished
+        PDFs. Missing PNGs trigger re-extraction; edited PNGs cause an error.
 
     Returns
     -------

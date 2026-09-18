@@ -104,7 +104,93 @@ def classify_imgs(
     show_usage: bool = True,
     on_existing: ExistingRun = "error",
 ) -> list[LabelType]:
-    """Classify sorted top-level PNGs; resume or overwrite only when requested."""
+    """
+    Classify PNG images in a directory and save their labels in a resumable run.
+
+    Parameters
+    ----------
+    classify_fn : ClassificationFunction[LabelType]
+        Function accepting one image path and returning a string, integer or
+        boolean label. The function returns the label itself, not a dictionary
+        or Pydantic model. Built-in factories declare their settings;
+        custom functions must declare their settings with
+        [`model_function()`][flowde.model_function]. If the classifier exposes
+        a `result_structure`, returned labels are validated against that schema.
+    img_dir : Path
+        Directory containing the input `*.png` files. Subdirectories are not
+        searched. Image paths are sorted before applying `range_indices`.
+    save_dir : Path
+        Dedicated output directory, created if needed. Labels are saved in
+        `classifications.json`, run metadata in `.flowde/run.state`, and optional
+        image copies in `positive_images`. Input images and files referenced by
+        the classifier's declared settings must be outside this directory.
+    positive_classes : set[ClassificationLabel] | None, optional
+        Labels whose images are copied into `save_dir / "positive_images"`,
+        preserving filenames and leaving the original images unchanged.
+        For example, `{1}` copies images labelled `1`. Defaults to `None`,
+        which saves labels without copying images. Must remain unchanged when
+        resuming the run.
+    range_indices : tuple[int | None, int | None] | None, optional
+        A `(start, stop)` slice of the sorted image paths. `start` is included
+        and `stop` is excluded; `(0, 10)` selects up to the first ten images.
+        Either bound can be `None`, and negative indices follow Python slicing
+        rules. Defaults to `None`, which selects all matching images. An empty
+        selection raises an error.
+    n_jobs : int, optional
+        Number of images that can be classified concurrently. Defaults to the
+        number of CPU cores. `1` processes images sequentially in the calling
+        process; larger values use worker processes. This value can change
+        when resuming a run.
+    show_usage : bool, optional
+        Whether to display token usage and estimated costs reported by the
+        classifier. Defaults to `True`. `False` hides those figures while
+        retaining the progress display and saved usage reports. This value
+        can change when resuming a run.
+    on_existing : {"error", "resume", "overwrite"}, optional
+        How to handle an existing run in `save_dir`. Defaults to `"error"`.
+
+        - `"error"`: start in a new or empty directory; reject existing work.
+        - `"resume"`: require a saved classification run with matching classifier
+          settings and `positive_classes`. Reuse saved labels for unchanged
+          inputs and classify selected images without saved labels.
+        - `"overwrite"`: remove the previous run's tracked outputs and saved state,
+          then start a new run. Also works in a new or empty directory.
+          Unrelated files in an existing output directory cause an error.
+
+    Returns
+    -------
+    list[LabelType]
+        One label per image selected by this call, in sorted image-path order.
+        Includes labels restored from a previous run. With `range_indices`, the
+        returned list covers only the selected slice; labels for earlier slices
+        remain saved in `classifications.json`.
+
+    Raises
+    ------
+    FileExistsError
+        If `save_dir` contains existing work and `on_existing="error"`.
+    ValueError
+        If `img_dir` is missing or is not a directory, no PNGs are selected,
+        inputs are inside `save_dir`, or the saved run fails compatibility or
+        integrity checks.
+    TypeError
+        If the classifier returns a label that is not a string, integer or
+        boolean, including `None`.
+    RuntimeError
+        If another Flowde call is already using the same `save_dir`.
+
+    Notes
+    -----
+    `classifications.json` contains objects with `img_path` and `label` fields.
+    The JSON file accumulates labels across resumed calls and orders entries
+    by resolved input paths. Run metadata records classifier settings, labels
+    and file fingerprints so resume can detect changed inputs or saved outputs.
+
+    On resume, missing `classifications.json` or selected `positive_images`
+    copies are recreated from saved labels and unchanged input images without
+    calling the classifier again. Manually edited saved outputs raise an error.
+
+    """
     if not img_dir.is_dir():
         msg = f"Image directory {img_dir} does not exist or is not a directory."
         raise ValueError(msg)

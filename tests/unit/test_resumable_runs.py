@@ -369,6 +369,20 @@ def test_overwrite_refuses_unrecorded_contents_before_deleting_anything(
     assert directory_contents(output) == before
 
 
+def test_overwrite_refuses_unrecorded_json_for_every_stage(task, images, tmp_path):
+    output = tmp_path / "output"
+    run(task, make_function(task), images, output)
+    (output / "notes.json").write_text('{"notes": "User-owned data"}')
+    before = directory_contents(output)
+    calls = Mock()
+
+    with pytest.raises(ValueError, match=r"unexpected file or directory notes\.json"):
+        run(task, make_function(task, calls), images, output, on_existing="overwrite")
+
+    calls.assert_not_called()
+    assert directory_contents(output) == before
+
+
 @pytest.mark.parametrize(
     "absolute", [False, True], ids=["parent-path", "absolute-path"]
 )

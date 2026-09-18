@@ -43,7 +43,7 @@ def check_openai_connection(
         Use `AZURE_API_KEY` and `AZURE_API_BASE` instead of `OPENAI_API_KEY`,
         by default False. Settings are also loaded from `.env`.
     timeout : float, optional
-        HTTP request timeout in seconds, by default 30.
+        HTTP request timeout in seconds, by default 15.
 
     Raises
     ------

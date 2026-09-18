@@ -228,7 +228,9 @@ def test_overwrite_removes_old_outputs_and_accepts_new_settings(api, pdf_dir, tm
     assert image_names(output) == ["b_0.png", "c_0.png"]
 
 
-@pytest.mark.parametrize("extra", ["notes.txt", ".flowde/notes.txt", "unrelated"])
+@pytest.mark.parametrize(
+    "extra", ["notes.json", "notes.txt", ".flowde/notes.txt", "unrelated"]
+)
 def test_overwrite_preserves_unrecorded_files(api, pdf_dir, tmp_path, extra):
     output = tmp_path / "output"
     run(api, pdf_dir, output)

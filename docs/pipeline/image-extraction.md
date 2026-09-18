@@ -3,33 +3,18 @@
 Image extraction is the first stage of the core pipeline. It takes PDFs as input
 and saves candidate flowchart images as PNG files.
 
-This stage only extracts images from PDFs. It does not decide whether an
-extracted image is a flowchart. Use the classification stage to classify the
-extracted images.
-
-<!-- markdownlint-disable MD046 -->
-<!-- prettier-ignore-start -->
-
-!!! note "Default PaddleOCR extraction"
-    `flowde` includes a default extraction function based on PaddleOCR layout
-    detection. This method detects image regions in each PDF page and saves the
-    cropped images to a directory.
-
-    You can use this default function or provide your own image extraction
-    function.
-
-    To use the default method, follow the
-    [setup default image extraction](./setup-default-funcs.md#setup-default-image-extraction)
-    steps.
-
-<!-- prettier-ignore-end -->
-
-<!-- markdownlint-enable MD046 -->
+The default PaddleOCR extractor detects regions labelled as images. These crops
+can include figures that are not flowcharts. Use the
+[classification stage](classification.md) to select the images you want to keep.
 
 ## Extract images from a directory of PDFs
 
-Most users should use `extract_imgs`. This takes a directory of PDFs and saves
-the extracted images into a single output directory.
+[`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)
+takes a directory of PDFs and saves the extracted images into
+one dedicated output directory.
+
+First complete the [PaddleOCR setup](setup-default-funcs.md#set-up-image-extraction).
+Then run:
 
 ```python
 from pathlib import Path
@@ -40,12 +25,9 @@ from flowde.extract_fns.paddle_layout_detect_extraction import (
 from flowde.extract_imgs import extract_imgs
 
 pdf_dir = Path("data/pdfs")
-save_dir = Path("data/extracted-images")
+save_dir = Path("results/extraction")
 
-extract_fn = make_paddle_layout_extract_fn(device="cpu")
-
-# Use gpu if you have installed gpu support:
-# extract_fn = make_paddle_layout_extract_fn(device="gpu")
+extract_fn = make_paddle_layout_extract_fn(device="cpu", cpu_threads=1)
 
 extract_imgs(
     pdf_dir=pdf_dir,
@@ -55,120 +37,78 @@ extract_imgs(
 )
 ```
 
-The input directory should contain only the PDFs you want to process, and those
-PDFs should be at the top level of the directory. `extract_imgs` searches for
-files matching `*.pdf` directly inside `pdf_dir`.
+[`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)
+searches for `*.pdf` files directly inside `pdf_dir`, sorts the
+paths and processes those PDFs. Subdirectories are not searched.
 
-For example:
+See the
+[`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)
+and
+[`make_paddle_layout_extract_fn()`](../reference/helpers.md#flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn)
+API references for full details of all parameters.
+
+## Saved images
+
+The PaddleOCR extractor names each PNG using the PDF stem and an image counter
+starting at zero. The counter runs across all detected images in that PDF; it
+is not a page number.
 
 ```text
-data/
-└── pdfs/
-    ├── paper-1.pdf
-    ├── paper-2.pdf
-    └── paper-3.pdf
-```
-
-Extracted images are saved as PNG files in `save_dir`. The output filenames use
-the PDF stem and an image counter:
-
-```text
-data/
-└── extracted-images/
+results/
+└── extraction/
     ├── paper-1_0.png
     ├── paper-1_1.png
     ├── paper-2_0.png
-    └── paper-3_0.png
+    ├── paper-3_0.png
+    └── .flowde/
+        ├── run.state
+        └── run.lock
 ```
 
-## Extract from an explicit list of PDFs
+`.flowde/run.state` stores run metadata, including extraction settings, completed
+PDFs and file fingerprints. Flowde uses this metadata to resume the run and
+detect changes to the input PDFs or saved PNGs.
 
-If you do not want to process every PDF in a directory, use
-`extract_imgs_pdf_list`. This lets you pass the PDF paths and output directories
-directly.
+## Resume extraction
+
+Repeat the call with the same settings and `on_existing="resume"`:
 
 ```python
-from pathlib import Path
-
-from flowde.extract_fns.paddle_layout_detect_extraction import (
-    make_paddle_layout_extract_fn,
-)
-from flowde.extract_imgs import extract_imgs_pdf_list
-
-pdf_paths = [
-    Path("data/pdfs/paper-1.pdf"),
-    Path("data/pdfs/paper-2.pdf"),
-]
-
-save_dirs = [
-    Path("data/extracted-images/paper-1"),
-    Path("data/extracted-images/paper-2"),
-]
-
-extract_fn = make_paddle_layout_extract_fn(device="cpu")
-
-extract_imgs_pdf_list(
-    pdf_paths=pdf_paths,
-    save_dirs=save_dirs,
+extract_imgs(
+    pdf_dir=pdf_dir,
+    save_dir=save_dir,
     extract_fn=extract_fn,
     n_jobs=1,
+    on_existing="resume",
 )
 ```
 
-`pdf_paths` and `save_dirs` must have the same length. Each PDF is processed
-with the corresponding output directory.
+Completed PDFs with all their unchanged PNGs are skipped. An unfinished PDF is
+extracted again from its first page. If a completed PDF's saved PNG is missing,
+Flowde also extracts that entire PDF again.
+
+If a PNG in `save_dir` has been edited, resume raises an error. It does not
+silently replace the edited PNG. Use a new output directory or explicitly
+choose `on_existing="overwrite"` to start the extraction again.
+
+See [managing runs](resuming.md) for interruption handling, settings checks and
+what overwrite removes.
+
+## Configure the PaddleOCR extractor
+
+See the
+[`make_paddle_layout_extract_fn()`](../reference/helpers.md#flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn)
+API reference for all parameters, defaults and configuration details.
 
 ## Bring your own extraction function
 
-You do not have to use the default PaddleOCR extraction function. Any function
-with the same interface can be used.
-
-An extraction function must accept a `pdf_path` and a `save_dir`, and save any
-extracted images into `save_dir`.
-
-```python
-from pathlib import Path
-
-
-def my_extract_fn(*, pdf_path: Path, save_dir: Path) -> None:
-    ...
-```
-
-You can then pass it to `extract_imgs`:
-
-```python
-from pathlib import Path
-
-from flowde.extract_imgs import extract_imgs
-
-extract_imgs(
-    pdf_dir=Path("data/pdfs"),
-    save_dir=Path("data/extracted-images"),
-    extract_fn=my_extract_fn,
-)
-```
-
-### Parallelism
-
-Both `extract_imgs` and `extract_imgs_from_paths` accept an `n_jobs` parameter
-to control the number of parallel processes of `extract_fn` to run. Image
-extraction functions tend to be memory heavy and better parallelised internally;
-we reccommend keeping `n_jobs=1` for most users.
-
-```python
-from pathlib import Path
-
-from flowde.extract_imgs import extract_imgs
-
-labels = extract_imgs(
-    extract_fn=extract_fn,
-    img_dir=Path("data/extracted-images"),
-    json_path=Path("data/classifications.json"),
-    n_jobs=3,
-)
+You can write your own extractor and pass it to
+[`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)
+as `extract_fn`.
+See the [custom extraction tutorial](custom-functions.md#an-extraction-function)
+for the requirements your function must meet and a complete working example.
 
 ## Next step
 
-After extracting images, classify the images as flowcharts or a specific type of
-flowchart.
-```
+[Classify the extracted images](classification.md) to select flowcharts or a
+particular type of flowchart.
