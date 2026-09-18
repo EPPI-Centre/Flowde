@@ -8,7 +8,7 @@ from flowde.parse_imgs import parse_imgs
 from flowde.parsing_fns.openai_parse import make_openai_parse_fn
 
 # MODEL = "gemini-3.1-flash-lite-preview"
-MODEL = "gpt-5.4-mini"
+MODEL = "gpt-5.6-luna"
 THINKING_LEVEL = "low"
 PARTS_TO_PARSE = {"labels"}
 

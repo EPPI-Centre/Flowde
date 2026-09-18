@@ -15,8 +15,9 @@ Rotation benchmarks compare two JSON files:
 - a ground-truth file containing the true rotation labels;
 - a prediction file containing the predicted rotation labels.
 
-The prediction file can be created automatically by passing `json_path` to
-`rotate_imgs` or `rotate_imgs_from_paths`.
+Rotation saves predictions automatically to `save_dir / "rotations.json"`.
+Pass that file to the benchmark as `pred_path`. The benchmark reads saved JSON
+and makes no model requests.
 
 Both files should contain a list of objects with the following keys:
 
@@ -84,21 +85,21 @@ the predicted rotation labels with the true rotation labels.
 After creating the benchmark object, you can inspect the results through its
 properties.
 
-| Property                          | Description                                                                          |
-| --------------------------------- | ------------------------------------------------------------------------------------ |
-| `len(benchmark)`                  | Number of images in the benchmark.                                                   |
-| `benchmark.result_list`           | All rotation results, one per image.                                                 |
-| `benchmark.correct_predictions`   | Results where `pred` matches `true`.                                                 |
-| `benchmark.incorrect_predictions` | Results where `pred` does not match `true`.                                          |
-| `benchmark.accuracy`              | Proportion of images where the predicted rotation matches the true rotation.         |
-| `benchmark.img_paths`             | Image paths used in the benchmark.                                                   |
-| `benchmark.trues`                 | True rotation labels, in benchmark order.                                            |
-| `benchmark.preds`                 | Predicted rotation labels, in benchmark order.                                       |
-| `benchmark.labels`                | The supported rotation labels: `0`, `90`, `180`, and `270`.                          |
-| `benchmark.confusion_matrix`      | Nested dictionary where rows are true rotations and columns are predicted rotations. |
-| `benchmark.num_per_true_class`    | Number of examples for each true rotation.                                           |
-| `benchmark.num_per_pred_class`    | Number of predictions made for each rotation.                                        |
-| `benchmark.per_class_accuracy`    | For each true rotation, the proportion of examples classified correctly.             |
+| Property                                                                 | Description                                                                          |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| [`len(benchmark)`](https://docs.python.org/3/library/functions.html#len) | Number of images in the benchmark.                                                   |
+| `benchmark.result_list`                                                  | All rotation results, one per image.                                                 |
+| `benchmark.correct_predictions`                                          | Results where `pred` matches `true`.                                                 |
+| `benchmark.incorrect_predictions`                                        | Results where `pred` does not match `true`.                                          |
+| `benchmark.accuracy`                                                     | Proportion of images where the predicted rotation matches the true rotation.         |
+| `benchmark.img_paths`                                                    | Image paths used in the benchmark.                                                   |
+| `benchmark.trues`                                                        | True rotation labels, in benchmark order.                                            |
+| `benchmark.preds`                                                        | Predicted rotation labels, in benchmark order.                                       |
+| `benchmark.labels`                                                       | The supported rotation labels: `0`, `90`, `180`, and `270`.                          |
+| `benchmark.confusion_matrix`                                             | Nested dictionary where rows are true rotations and columns are predicted rotations. |
+| `benchmark.num_per_true_class`                                           | Number of examples for each true rotation.                                           |
+| `benchmark.num_per_pred_class`                                           | Number of predictions made for each rotation.                                        |
+| `benchmark.per_class_accuracy`                                           | For each true rotation, the proportion of examples classified correctly.             |
 
 For example, you can print the overall accuracy and class-level summaries:
 
@@ -164,3 +165,31 @@ is a `SingleClassificationResult` with:
 | `img_path` | Path to the rotated image.   |
 | `true`     | Ground-truth rotation label. |
 | `pred`     | Predicted rotation label.    |
+
+## Worked example
+
+Suppose the true corrections are `[0, 90, 180, 270]`, and the predictions are
+`[0, 0, 180, 90]` for the same four images in the same order.
+
+Two corrections are right, so `accuracy` is `2 / 4 = 0.5`. The confusion matrix
+has these nonzero entries:
+
+| True correction | Predicted correction | Count |
+| --------------- | -------------------- | ----- |
+| 0               | 0                    | 1     |
+| 90              | 0                    | 1     |
+| 180             | 180                  | 1     |
+| 270             | 90                   | 1     |
+
+The true-class counts are one per angle; predicted counts are two for `0`, one
+for `90`, one for `180`, and zero for `270`. Per-class accuracy is `1.0` for
+`0` and `180`, and `0.0` for `90` and `270`.
+
+Accuracy requires an exact match. This benchmark does not give partial credit
+for a correction that is 90 degrees away from the required angle. The ground
+truth must describe the correction required by the original images whose
+predictions are in `rotations.json`, rather than their already-corrected copies.
+
+The [classification guide](classification.md#worked-multiclass-example) explains
+how class counts and per-class accuracy are calculated. Empty true classes
+receive `0.0`.

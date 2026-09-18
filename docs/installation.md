@@ -1,107 +1,91 @@
 # Installation
 
-`flowde` requires Python 3.11 or later.
+Flowde requires Python 3.11 or later.
 
-## Before installation: GPU support {#gpu-support}
+## Full installation {#full-installation}
 
-<!-- markdownlint-disable MD046 -->
-<!-- prettier-ignore-start -->
-
-!!! note "GPU PaddlePaddle is optional"
-    You can skip this step if:
-
-    - you are using CPU-only image extraction; or
-    - you are bringing your own image extraction function.
-
-<!-- prettier-ignore-end -->
-
-<!-- markdownlint-disable MD046 -->
-
-The default image extraction method uses PaddleOCR. To use this method with a
-GPU, you need to install the appropriate GPU-enabled PaddlePaddle package.
-
-The PaddlePaddle GPU installation depends on your operating system, CUDA
-version, and hardware. Follow the
-[PaddlePaddle installation guide](https://www.paddlepaddle.org.cn/en/install) to
-select the correct installation command.
-
-## Install flowde
-
-### Full installation <span class="heading-note">(recommended)</span> {#full-installation}
-
-For most users, the easiest option is to install `flowde` with all optional
-runtime features enabled.
-
-Create and activate a virtual environment with `uv`:
+For CPU extraction and access to all the documented features, install:
 
 ```bash
-uv venv
-source .venv/bin/activate
+python -m pip install "flowde[all] @ git+https://github.com/EPPI-Centre/Flowde.git"
 ```
 
-`flowde` is currently not available on PyPI, so it should be installed directly
-from the source repository:
+This includes PaddleOCR and CPU PaddlePaddle, OpenAI and Gemini clients, and the
+benchmark dependencies. PaddleOCR downloads model files when the extractor
+first runs.
+
+The GPU version of PaddlePaddle needs a different installation; follow
+[GPU support](#gpu-support) if you want extraction to use an NVIDIA GPU.
+
+## Minimal installation
+
+If you are bringing your own processing functions, install the core package:
 
 ```bash
-uv pip install "flowde[all] @ git+https://github.com/EPPI-Centre/Flowde.git"
+python -m pip install "flowde @ git+https://github.com/EPPI-Centre/Flowde.git"
 ```
 
-This installs the core package plus all
-[specific extras](#install-specific-extras) for:
+Add only the optional features that you need from the following sections.
 
-- PaddleOCR image extraction functions;
-- OpenAI-based parsing/classification functions;
-- Gemini-based parsing/classification functions;
-- benchmarking and evaluation utilities.
+## Install specific extras
 
-### Minimal installation
+### PaddleOCR helpers {#paddleocr-helpers}
 
-If you only want the core package, install:
+The `paddle` extra installs PaddleOCR. For CPU extraction, also install the
+PaddlePaddle runtime:
 
 ```bash
-uv pip install "flowde @ git+https://github.com/EPPI-Centre/Flowde.git"
+python -m pip install "flowde[paddle] @ git+https://github.com/EPPI-Centre/Flowde.git" paddlepaddle
 ```
 
-This installs the base dependencies needed by the main package.
+For GPU extraction, use the runtime described under [GPU support](#gpu-support).
 
-Use this option if you are bringing your own classification, parsing, and image
-extraction functions and do not need the optional LLM or benchmark dependencies.
+### OpenAI helpers
 
-### Install specific extras
-
-The following extras install support for specific workflows.
-
-#### PaddleOCR helpers {paddleocr-helpers}
-
-Install this if you want to use the default PaddleOCR based image extraction
-function.
+This extra supports both OpenAI and Azure OpenAI:
 
 ```bash
-uv pip install "flowde[paddle] @ git+https://github.com/EPPI-Centre/Flowde.git"
+python -m pip install "flowde[openai] @ git+https://github.com/EPPI-Centre/Flowde.git"
 ```
 
-#### OpenAI helpers
-
-Install this if you want to use the default OpenAI-based parsing or
-classification functions:
+### Gemini helpers
 
 ```bash
-uv pip install "flowde[openai] @ git+https://github.com/EPPI-Centre/Flowde.git"
+python -m pip install "flowde[gemini] @ git+https://github.com/EPPI-Centre/Flowde.git"
 ```
 
-#### Gemini helpers
-
-Install this if you want to use the default Gemini-based parsing or
-classification functions:
+### Benchmarking
 
 ```bash
-uv pip install "flowde[gemini] @ git+https://github.com/EPPI-Centre/Flowde.git"
+python -m pip install "flowde[benchmark] @ git+https://github.com/EPPI-Centre/Flowde.git"
 ```
 
-#### Benchmarking
+Extras can be combined. For example, install `flowde[openai,benchmark]` if you
+already have images and want to parse and evaluate them using OpenAI.
 
-Install this if you want to use the benchmark:
+## GPU support {#gpu-support}
 
-```bash
-uv pip install "flowde[benchmark] @ git+https://github.com/EPPI-Centre/Flowde.git"
+PaddleOCR image extraction runs on your computer. An NVIDIA GPU is used only if
+your environment has a compatible GPU-enabled PaddlePaddle installation. The
+LLM helpers send requests to the selected API provider; a local GPU does not
+accelerate those requests.
+
+For a GPU environment, install the Flowde extras you need without the `all`
+extra, then follow the official
+[PaddlePaddle installation instructions](https://www.paddlepaddle.org.cn/en/install)
+to install the GPU runtime for your operating system, Python and CUDA versions.
+The `all` extra includes the CPU runtime.
+
+After installing the GPU runtime, check the environment:
+
+```python
+import paddle
+
+print(paddle.is_compiled_with_cuda())
+print(paddle.device.cuda.device_count())
 ```
+
+The first value must be `True`, and the second must be at least `1`, before
+using
+[`make_paddle_layout_extract_fn(device="gpu")`](reference/helpers.md#flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn)
+.

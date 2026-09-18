@@ -94,7 +94,7 @@ class ParsingBenchmark:
     """
     A validated parsing benchmark with explicit prediction capabilities.
 
-    ``pred_diagrams_dir`` may be one directory of combined predictions or a
+    `pred_diagrams_dir` may be one directory of combined predictions or a
     sequence of directories containing separately parsed, non-overlapping
     components. Component structure is inferred and the files are joined by
     diagram stem and predicted node number before benchmarking.

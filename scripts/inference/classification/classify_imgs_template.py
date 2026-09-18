@@ -14,7 +14,7 @@ If the image is not a CONSORT image, classify it with label 0.
 """
 
 MODEL = "gemini-3.1-flash-lite-preview"
-# MODEL = "gpt-5.4-mini"
+# MODEL = "gpt-5.6-luna"
 THINKING_LEVEL = "low"
 
 REPO_ROOT = Path(__file__).resolve().parents[3]

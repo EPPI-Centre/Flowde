@@ -24,6 +24,78 @@ VISION_FEW_SHOT_INSTRUCTIONS = (
 
 @dataclass(frozen=True, kw_only=True)
 class VisionFewShotExample:
+    """
+    Describe one example image and its expected JSON answer for a model prompt.
+
+    Parameters
+    ----------
+    img_path : Path
+        Path to an existing example image. The image is included in the prompt
+        as a worked example, before the target image being classified or parsed.
+        The image format must be supported by the selected provider.
+    expected_output_path : Path
+        Path to an existing UTF-8 JSON file containing the desired response for
+        the example image. For binary classification, the file could contain
+        `{"label": 1}`. For parsing, the JSON should match the requested parts
+        or custom response schema, without a benchmark ground truth's `options`
+        wrapper. Schema compatibility is the caller's responsibility; this class
+        does not validate the example answer against the model's response schema.
+    partial_flowchart : BaseModel | None, optional
+        Previously parsed data supplied as input context for this example image,
+        such as node numbers and text when demonstrating label parsing.
+        Defaults to `None`, meaning no partial context accompanies the example.
+        This context belongs to `img_path`, not to the target image that the
+        returned classifier or parser will later process.
+
+    Raises
+    ------
+    ValueError
+        If `img_path` or `expected_output_path` does not point to an existing
+        file when the example is created.
+
+    Notes
+    -----
+    Constructor arguments must be passed by name. The dataclass is frozen, so
+    its fields cannot be reassigned after construction. The referenced files
+    and the supplied Pydantic model are not made immutable.
+
+    Creating an example checks that both paths point to files; it does not
+    decode the image, read the expected JSON or make an API request.
+    [`expected_output_text()`][flowde.utils.VisionFewShotExample.expected_output_text]
+    reads and formats the expected JSON when a request is prepared. File
+    contents are read from disk rather than cached in this object.
+
+    You can pass a list of these instances as `few_shot_examples` to an OpenAI
+    or Gemini classification or parsing factory. Each request includes the
+    worked examples in list order, followed by the target image. Example
+    answers demonstrate the desired response; they are not predictions for
+    the target image.
+
+    When a factory's callable is used in a saved Flowde run, the example image,
+    expected-response file and partial context contribute to the settings
+    checked on resume. Changes to those files or that context require a new
+    run or explicit overwrite.
+
+    Examples
+    --------
+    Given an existing `flowchart.png` and a `flowchart.json` containing
+    `{"label": 1}`, create a classification example:
+
+    ```python
+    from pathlib import Path
+
+    from flowde.utils import VisionFewShotExample
+
+    example = VisionFewShotExample(
+        img_path=Path("data/examples/flowchart.png"),
+        expected_output_path=Path("data/examples/flowchart.json"),
+    )
+    ```
+
+    The factory's `few_shot_examples` argument can then receive `[example]`.
+
+    """
+
     img_path: Path
     expected_output_path: Path
     partial_flowchart: BaseModel | None = None
@@ -40,6 +112,27 @@ class VisionFewShotExample:
             raise ValueError(msg_0)
 
     def expected_output_text(self) -> str:
+        """
+        Read the expected-response file and return its contents as formatted JSON.
+
+        Returns
+        -------
+        str
+            JSON text with two-space indentation. Non-ASCII characters are
+            preserved rather than escaped. The file is read afresh on every
+            call; no response-schema validation is performed.
+
+        Raises
+        ------
+        OSError
+            If `expected_output_path` cannot be opened or read, including when
+            the file has been removed after the example was created.
+        UnicodeDecodeError
+            If the expected-response file is not valid UTF-8 text.
+        json.JSONDecodeError
+            If the expected-response file does not contain valid JSON.
+
+        """
         with self.expected_output_path.open(encoding="utf-8") as f:
             expected_output = json.load(f)
 
