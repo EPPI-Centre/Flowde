@@ -110,9 +110,10 @@ def classify_imgs(
     Parameters
     ----------
     classify_fn : ClassificationFunction[LabelType]
-        Function accepting one image path and returning a string, integer or
-        boolean label. The function returns the label itself, not a dictionary
-        or Pydantic model. Built-in factories declare their settings;
+        Function accepting an image `Path` as its first positional argument
+        and returning a `str`, `int` or `bool` label. The function returns the
+        label itself, not a dictionary or Pydantic model.
+        Built-in factories declare their settings;
         custom functions must declare their settings with
         [`model_function()`][flowde.model_function]. If the classifier exposes
         a `result_structure`, returned labels are validated against that schema.

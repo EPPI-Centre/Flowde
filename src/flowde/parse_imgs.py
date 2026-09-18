@@ -179,8 +179,17 @@ def parse_imgs(
     parse_fn : ParsingFunction
         Function accepting an `img_path` keyword argument and, when context is
         supplied, a `partial_flowchart` keyword argument containing a Pydantic
-        model. The function must return an instance of the Pydantic class exposed
-        as `parse_fn.result_structure`. Built-in factories declare their settings;
+        model. `img_path` is a `Path` to the image being parsed; the partial
+        model contains previously parsed parts for that same image. Without
+        saved context, Flowde passes only `img_path`.
+
+        The function must return an instance of the Pydantic class exposed
+        as `parse_fn.result_structure`, not a dictionary, JSON string or `None`.
+        The class can describe standard flowchart parts or a custom output
+        format. The parser must raise an exception if parsing fails. Flowde
+        saves each returned model as a same-stem JSON file in `save_dir`.
+
+        Built-in factories declare their settings;
         custom functions must declare their settings and result class with
         [`model_function()`][flowde.model_function].
     img_dir : Path

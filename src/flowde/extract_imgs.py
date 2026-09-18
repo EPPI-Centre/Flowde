@@ -110,7 +110,20 @@ def extract_imgs(
     save_dir : Path
         Dedicated output directory containing PNGs and `.flowde` run metadata.
     extract_fn : ExtractImgsFunction
-        Extractor created by a built-in factory or declared with
+        Function accepting `pdf_path` and `save_dir` as keyword arguments,
+        both containing `Path` objects. Flowde supplies a temporary directory
+        for one PDF as the extractor's `save_dir`.
+
+        The extractor must save valid PNG files with the `.png` extension
+        directly inside the supplied directory, without subdirectories,
+        symbolic links or other files. Output filenames must be unique across
+        all PDFs in the run, including when compared without letter case.
+        The extractor must finish writing and close all output files before
+        returning `None`. Flowde checks the PNGs and copies them into the run's
+        output directory only after the extractor finishes successfully.
+
+        Built-in factories declare their settings automatically. Custom
+        extractors must declare their settings with
         [`model_function()`][flowde.model_function].
     n_jobs : int, optional
         Number of PDFs processed concurrently. Defaults to `1`.

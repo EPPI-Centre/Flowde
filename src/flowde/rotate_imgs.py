@@ -118,10 +118,15 @@ def rotate_imgs(
     Parameters
     ----------
     classify_fn : ClassificationFunction[RotationLabel]
-        Function accepting one image path and returning the clockwise correction
-        in degrees: `0`, `90`, `180` or `270`. The function returns the angle
-        itself, not a dictionary or Pydantic model. Built-in factories declare
-        their settings; custom functions must declare their settings with
+        Function accepting an image `Path` as its first positional argument
+        and returning a clockwise correction in degrees as an `int`: `0`,
+        `90`, `180` or `270`. The function returns the angle itself, not a
+        dictionary or Pydantic model, and must raise an exception if angle
+        prediction fails. Returning `None` raises an error.
+
+        The classifier must leave the input image unchanged. Flowde applies
+        the returned angle and saves the corrected copy. Built-in factories
+        declare their settings; custom functions must declare their settings with
         [`model_function()`][flowde.model_function].
     img_dir : Path
         Directory containing the original `*.png` files. Subdirectories are not
