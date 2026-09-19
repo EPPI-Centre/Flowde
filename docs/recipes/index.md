@@ -1,15 +1,13 @@
 # Recipes
 
-Recipes connect several Flowde stages into a complete workflow. The individual
-[pipeline guides](../pipeline/index.md) explain each function using general
-example directories.
+Recipes provide ready-to-use prompts and code that you can copy into a notebook.
 
 ## CONSORT diagrams
 
-The [CONSORT recipe](consort.md) uses the public example PDFs and supplied
-prompts to extract, classify, rotate and parse participant flow diagrams. It
-then compares the parsed results with the supplied manual annotations.
+The [CONSORT recipe](consort.md) uses Gemini 3.1 Pro preview and the prompts
+that gave us our best parsing performance on the training dataset. We will add
+the results later.
 
-Use the website recipe with a local Python environment and an OpenAI API key.
-The linked Colab notebook demonstrates the same package using workshop Azure
-credentials. Model predictions can differ between runs, models and prompts.
+The prompts can also be used with other models. See the
+[Colab demo](https://colab.research.google.com/github/EPPI-Centre/Flowde/blob/main/notebooks/CONSORT_demo.ipynb)
+for the same approach and prompts using Azure OpenAI.
