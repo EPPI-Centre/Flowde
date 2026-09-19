@@ -6,8 +6,8 @@
 [![Coverage](https://raw.githubusercontent.com/EPPI-Centre/Flowde/badges/coverage.svg)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml?query=branch%3Amain)
 
 Flowde is a Python package for extracting structured data from flowcharts.
-Developed for CONSORT diagrams in systematic reviews, Flowde also supports
-other types of flowchart.
+Developed for CONSORT diagrams in systematic reviews, Flowde also supports other
+types of flowchart.
 
 [![Open demo in Google
 Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/EPPI-Centre/Flowde/blob/main/notebooks/CONSORT_demo.ipynb)
@@ -26,10 +26,10 @@ usage guides and the API reference.
 - **Parse** node text, labels, flow and additional text into structured JSON.
 - **Benchmark** classification, rotation and parsing against ground truth.
 
-Use the full pipeline or individual stages, with OpenAI, Azure OpenAI, Gemini
-or your own processing functions. Flowde saves completed work and supports
-stopping and resuming runs. The package includes prompts and example data for
-CONSORT diagrams.
+Use the full pipeline or individual stages, with OpenAI, Azure OpenAI, Gemini or
+your own processing functions. Flowde saves completed work and supports stopping
+and resuming runs. The package includes prompts and example data for CONSORT
+diagrams.
 
 ## Installation
 
@@ -46,12 +46,12 @@ for individual features and GPU setup.
 
 - [Pipeline guide](https://eppi-centre.github.io/Flowde/pipeline/): work through
   extraction, classification, rotation and parsing.
-- [CONSORT recipe](https://eppi-centre.github.io/Flowde/recipes/consort/): copy a
-  complete workflow using the supplied prompts.
+- [CONSORT recipe](https://eppi-centre.github.io/Flowde/recipes/consort/): copy
+  a complete workflow using the supplied prompts.
 - [API reference](https://eppi-centre.github.io/Flowde/reference/): inspect
   functions, parameters and result types.
 - [Example data](data/consort-demo/README.md): view the included studies and
   article licences.
 
-For bug reports and feature requests, [open an
-issue](https://github.com/EPPI-Centre/Flowde/issues).
+For bug reports and feature requests,
+[open an issue](https://github.com/EPPI-Centre/Flowde/issues).
