@@ -2,7 +2,7 @@ from pathlib import Path
 
 from flowde.benchmarks.parsing.parsing_bench import ParsingBenchmark
 from flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn import (
-    levenshtein_with_nfc_and_space_normalisation,
+    levenshtein_with_text_normalisation,
 )
 
 ROOT_DIR = Path(__file__).resolve().parents[3]
@@ -13,7 +13,7 @@ def main() -> None:
     print("Validating data and matching diagrams...", flush=True)
     benchmark = ParsingBenchmark(
         pred_diagrams_dir=DATA_DIR / "pred/full-flowcharts-gemini31",
-        distance_fn=levenshtein_with_nfc_and_space_normalisation,
+        distance_fn=levenshtein_with_text_normalisation,
         allow_missing_pred_diagrams=False,
         true_nodes_dir=DATA_DIR / "ground-truth/nodes",
         true_labels_dir=DATA_DIR / "ground-truth/labels",

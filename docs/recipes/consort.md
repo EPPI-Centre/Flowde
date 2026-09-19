@@ -251,7 +251,7 @@ from tempfile import TemporaryDirectory
 
 from flowde.benchmarks.parsing.parsing_bench import ParsingBenchmark
 from flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn import (
-    levenshtein_with_nfc_and_space_normalisation,
+    levenshtein_with_text_normalisation,
 )
 
 if matched_names:
@@ -265,7 +265,7 @@ if matched_names:
 
         benchmark = ParsingBenchmark(
             pred_diagrams_dir=prediction_dir,
-            distance_fn=levenshtein_with_nfc_and_space_normalisation,
+            distance_fn=levenshtein_with_text_normalisation,
             true_nodes_dir=truth_dir / "nodes",
             true_labels_dir=truth_dir / "labels",
             true_flow_dir=truth_dir / "flow",

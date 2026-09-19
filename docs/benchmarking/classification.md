@@ -54,7 +54,9 @@ pred: data/predictions/paper-2_0.png
 
 ## Binary classification benchmark
 
-You will most likely want to benchmark a binary classification task:
+You can use
+[`BinaryClassificationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_benchmark.BinaryClassificationBenchmark)
+to benchmark a binary classification task:
 
 ```python
 from pathlib import Path
@@ -71,6 +73,10 @@ benchmark = BinaryClassificationBenchmark(
 
 The benchmark loads both JSON files, checks that they are valid, and compares
 the predicted labels with the true labels.
+
+See the
+[`BinaryClassificationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_benchmark.BinaryClassificationBenchmark)
+API reference for full details of the parameters and results.
 
 ### Binary benchmark results
 
@@ -164,6 +170,10 @@ the predicted labels with the true labels.
 The `labels` tuple declares the possible classes and must include every label
 in the ground-truth and prediction files. The benchmark includes every declared
 class in its counts and confusion matrix, even when no image has that label.
+
+See the
+[`MulticlassClassificationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_benchmark.MulticlassClassificationBenchmark)
+API reference for full details of the parameters and results.
 
 ### Multiclass benchmark results
 
