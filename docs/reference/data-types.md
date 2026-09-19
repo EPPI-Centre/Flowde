@@ -46,7 +46,7 @@ the selected parts using
 
 Inference writes one JSON object per image. Ground truth uses an `options`
 wrapper and separates the four parts into different directories. See the
-[parsing benchmark format](../benchmarking/parsing.md#prepare-the-input-directories).
+[parsing benchmark format](../benchmarking/parsing.md#input-format).
 
 Pydantic results support
 [`model_dump()`](https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump)
@@ -99,16 +99,30 @@ context has no effect. See
 
 ## Function contracts
 
-| Protocol                                                                            | Import                               | Required callable behaviour                                                                                                   |
-| ----------------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| `ExtractImgsFunction`                                                               | `flowde.extract_fns.extract_types`   | Accept `pdf_path: Path` and `save_dir: Path`; write PNGs into the supplied directory.                                         |
-| `ClassificationFunction`                                                            | `flowde.classify_fns.classify_types` | Accept `img_path: Path`; return one label.                                                                                    |
-| [`ParsingFunction`](data-types.md#flowde.parsing_fns.parsing_types.ParsingFunction) | `flowde.parsing_fns.parsing_types`   | Accept `img_path: Path` and optional `partial_flowchart`; return a Pydantic model and expose its class as `result_structure`. |
+These protocols describe the callable interfaces that Flowde's processing
+functions must follow. Custom functions do not need to inherit from a protocol.
 
-The [custom-function guide](../pipeline/custom-functions.md) shows how to declare
-settings as well as satisfy these callable contracts.
+| Pipeline stage | Function contract | Result for one input file |
+| --- | --- | --- |
+| Extraction | [`ExtractImgsFunction`](data-types.md#flowde.extract_fns.extract_types.ExtractImgsFunction) | Write PNG files for one PDF into the supplied directory; return `None`. |
+| Classification and rotation | [`ClassificationFunction`](data-types.md#flowde.classify_fns.classify_types.ClassificationFunction) | Return one label, or a clockwise correction angle for rotation. |
+| Parsing | [`ParsingFunction`](data-types.md#flowde.parsing_fns.parsing_types.ParsingFunction) | Return a Pydantic model matching the callable's `result_structure` class. |
+
+The contracts below describe the arguments, return values and requirements
+for each callable. See the [custom-function guide](../pipeline/custom-functions.md)
+for working examples and instructions on declaring settings for saved runs.
 
 <!-- prettier-ignore-start -->
+
+::: flowde.extract_fns.extract_types.ExtractImgsFunction
+    options:
+      members:
+        - __call__
+
+::: flowde.classify_fns.classify_types.ClassificationFunction
+    options:
+      members:
+        - __call__
 
 ::: flowde.parsing_fns.parsing_types.ParsingFunction
     options:

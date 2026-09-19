@@ -81,6 +81,10 @@ every angle in its counts and confusion matrix, even when no image has that
 label. A prediction counts as correct only when the predicted angle exactly
 matches the ground-truth angle.
 
+See the
+[`RotationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.rotation.rotation_benchmark.RotationBenchmark)
+API reference for full details of the parameters and results.
+
 ### Rotation benchmark results
 
 After creating the benchmark object, you can inspect the results through its

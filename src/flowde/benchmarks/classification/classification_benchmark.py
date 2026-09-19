@@ -12,6 +12,65 @@ from flowde.utils import load_json
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ClassificationBenchmark(Generic[LabelType]):
+    """
+    Compare saved image labels with ground truth and report accuracy.
+
+    The benchmark reads JSON files without opening images or making model
+    requests. Binary, multiclass and rotation benchmarks inherit the shared
+    result properties documented here.
+
+    Parameters
+    ----------
+    true_path : Path
+        Ground-truth JSON file containing a list of objects with exactly
+        `img_path` and `label` keys. Image paths must be strings; labels must
+        be `str`, `int` or `bool` values.
+    pred_path : Path
+        Prediction JSON file with the same format and number of entries as
+        `true_path`. Entries are paired by list position. Paired image
+        filenames, including extensions, must match; parent directories may
+        differ. The benchmark does not sort or reorder either list.
+
+    Attributes
+    ----------
+    result_list : tuple[SingleClassificationResult[LabelType], ...]
+        One record per paired image, in the JSON list order. Each record
+        contains `img_path` from ground truth, `true` and `pred`.
+    correct_predictions : tuple[SingleClassificationResult[LabelType], ...]
+        Records whose predicted labels equal their ground-truth labels.
+    incorrect_predictions : tuple[SingleClassificationResult[LabelType], ...]
+        Records whose predicted labels differ from their ground-truth labels.
+    accuracy : float
+        Number of correct predictions divided by the number of paired images.
+        Returns `0.0` for two empty JSON lists.
+    img_paths : tuple[str, ...]
+        Image paths from the ground-truth JSON, in the JSON list order.
+    trues : tuple[LabelType, ...]
+        Ground-truth labels, in the JSON list order.
+    preds : tuple[LabelType, ...]
+        Predicted labels, in the JSON list order.
+
+    Raises
+    ------
+    OSError
+        If either JSON file cannot be opened.
+    TypeError
+        If a JSON document is not a list, an entry is not an object, an
+        `img_path` is not a string, or a label has an unsupported type.
+    ValueError
+        If either file contains invalid JSON, the lists have different
+        lengths, an entry has missing or extra keys, or paired filenames
+        differ.
+
+    Notes
+    -----
+    Pass constructor arguments by keyword. `len(benchmark)` gives the number
+    of paired images. Construction loads the saved labels into memory and
+    leaves both source files unchanged. Subsequent edits to the source files
+    do not update an existing benchmark object.
+
+    """
+
     true_path: Path
     pred_path: Path
     result_list: tuple[SingleClassificationResult[LabelType], ...] = field(
@@ -61,6 +120,104 @@ class ClassificationBenchmark(Generic[LabelType]):
 
 @dataclass(frozen=True, kw_only=True)
 class BinaryClassificationBenchmark(ClassificationBenchmark[int]):
+    """
+    Evaluate binary image classification using saved labels `0` and `1`.
+
+    The benchmark treats `1` as positive and `0` as negative. Construction
+    loads and validates the saved labels; metric properties compare those
+    labels without opening images or making model requests.
+
+    Parameters
+    ----------
+    true_path : Path
+        Ground-truth JSON file containing a list of objects with exactly
+        `img_path` and `label` keys. Each `img_path` must be a string and each
+        `label` must be the integer `0` or `1`. Boolean labels are rejected.
+    pred_path : Path
+        Prediction JSON file in the same format as `true_path`, such as
+        `classifications.json` saved by
+        [`classify_imgs()`][flowde.classify_imgs.classify_imgs]. Both lists must
+        contain the same number of entries in the same image order. At each
+        position, filenames including extensions must match; parent
+        directories may differ.
+
+    Attributes
+    ----------
+    tp : tuple[SingleClassificationResult[int], ...]
+        True-positive records: ground-truth label `1`, predicted label `1`.
+    fp : tuple[SingleClassificationResult[int], ...]
+        False-positive records: ground-truth label `0`, predicted label `1`.
+    fn : tuple[SingleClassificationResult[int], ...]
+        False-negative records: ground-truth label `1`, predicted label `0`.
+    tn : tuple[SingleClassificationResult[int], ...]
+        True-negative records: ground-truth label `0`, predicted label `0`.
+    num_tp : int
+        Number of true-positive records.
+    num_fp : int
+        Number of false-positive records.
+    num_fn : int
+        Number of false-negative records.
+    num_tn : int
+        Number of true-negative records.
+    precision : float
+        Proportion of predicted positives that are correct:
+        `num_tp / (num_tp + num_fp)`.
+    recall : float
+        Proportion of ground-truth positives found:
+        `num_tp / (num_tp + num_fn)`.
+    f1_score : float
+        Harmonic mean of precision and recall:
+        `2 * precision * recall / (precision + recall)`.
+    tpr : float
+        True-positive rate; equal to `recall`.
+    fpr : float
+        Proportion of ground-truth negatives incorrectly predicted positive:
+        `num_fp / (num_fp + num_tn)`.
+    specificity : float
+        Proportion of ground-truth negatives correctly predicted negative:
+        `num_tn / (num_tn + num_fp)`.
+    tnr : float
+        True-negative rate; equal to `specificity`.
+
+    Raises
+    ------
+    OSError
+        If either JSON file cannot be opened.
+    TypeError
+        If a JSON document is not a list, an entry is not an object, an
+        `img_path` is not a string, or a label is not an integer.
+    ValueError
+        If either file contains invalid JSON, the lists have different
+        lengths, an entry has missing or extra keys, paired filenames differ,
+        or a label is an integer other than `0` or `1`.
+
+    Notes
+    -----
+    Pass constructor arguments by keyword. All metric properties return
+    `0.0` when their denominator is zero, including for two empty JSON lists.
+    Result tuples retain the JSON list order. Neither input file is changed.
+
+    The benchmark also exposes `accuracy`, `result_list`, `img_paths`,
+    `trues`, `preds`, `correct_predictions` and `incorrect_predictions`;
+    `len(benchmark)` counts paired images. See the shared properties on
+    [`ClassificationBenchmark`][flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark].
+
+    Examples
+    --------
+    Using existing ground-truth and prediction JSON files:
+
+    >>> from pathlib import Path
+    >>> from flowde.benchmarks.classification.classification_benchmark import (
+    ...     BinaryClassificationBenchmark,
+    ... )
+    >>> benchmark = BinaryClassificationBenchmark(
+    ...     true_path=Path("data/true-classifications.json"),
+    ...     pred_path=Path("results/classification/classifications.json"),
+    ... )
+    >>> print(benchmark.accuracy, benchmark.precision, benchmark.recall)
+
+    """
+
     _num_tp: int = field(init=False, repr=False, compare=False)
     _num_fp: int = field(init=False, repr=False, compare=False)
     _num_fn: int = field(init=False, repr=False, compare=False)
@@ -178,6 +335,93 @@ class BinaryClassificationBenchmark(ClassificationBenchmark[int]):
 
 @dataclass(frozen=True, kw_only=True)
 class MulticlassClassificationBenchmark(ClassificationBenchmark[LabelType]):
+    """
+    Evaluate image classification across a declared set of class labels.
+
+    The benchmark compares saved predicted labels with ground-truth labels
+    and provides overall accuracy, a confusion matrix and per-class counts.
+    Construction reads JSON files without opening images or making model
+    requests.
+
+    Parameters
+    ----------
+    true_path : Path
+        Ground-truth JSON file containing a list of objects with exactly
+        `img_path` and `label` keys. Image paths must be strings; labels must
+        be `str`, `int` or `bool` values included in `labels`.
+    pred_path : Path
+        Prediction JSON file in the same format as `true_path`, such as
+        `classifications.json` saved by
+        [`classify_imgs()`][flowde.classify_imgs.classify_imgs]. Both lists must
+        contain the same number of entries in the same image order. At each
+        position, filenames including extensions must match; parent
+        directories may differ.
+    labels : tuple[LabelType, ...]
+        Non-empty tuple of unique class labels. Must include every label in
+        both JSON files; may also include classes absent from both files.
+        Tuple order determines the order of dictionary keys in the confusion
+        matrix and class summaries. Uniqueness follows Python equality, so
+        `1` and `True`, for example, cannot be separate classes.
+
+    Attributes
+    ----------
+    confusion_matrix : dict[LabelType, dict[LabelType, int]]
+        Counts indexed first by ground-truth label, then by predicted label.
+        `confusion_matrix["table"]["flowchart"]` counts true tables predicted
+        as flowcharts. Includes every pair of declared labels, with zero for
+        pairs absent from the saved results.
+    num_per_true_class : dict[LabelType, int]
+        Number of images with each ground-truth label, including zero counts.
+    num_per_pred_class : dict[LabelType, int]
+        Number of images with each predicted label, including zero counts.
+    per_class_accuracy : dict[LabelType, float]
+        For each ground-truth class, the number of correct predictions divided
+        by the number of images in that class. Returns `0.0` for a declared
+        class with no ground-truth images.
+
+    Raises
+    ------
+    OSError
+        If either JSON file cannot be opened.
+    TypeError
+        If a JSON document is not a list, an entry is not an object, an
+        `img_path` is not a string, or a saved label has an unsupported type.
+    ValueError
+        If either file contains invalid JSON, the lists have different
+        lengths, an entry has missing or extra keys, paired filenames differ,
+        `labels` is empty or contains duplicates, or a saved label is absent
+        from `labels`.
+
+    Notes
+    -----
+    Pass constructor arguments by keyword. Result tuples retain the JSON
+    list order. Neither input file is changed. Two empty JSON lists are
+    accepted with a non-empty `labels` tuple and produce zero counts and
+    accuracies.
+
+    The benchmark also exposes `accuracy`, `result_list`, `img_paths`,
+    `trues`, `preds`, `correct_predictions` and `incorrect_predictions`;
+    `len(benchmark)` counts paired images. See the shared properties on
+    [`ClassificationBenchmark`][flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark].
+
+    Examples
+    --------
+    Using existing ground-truth and prediction JSON files:
+
+    >>> from pathlib import Path
+    >>> from flowde.benchmarks.classification.classification_benchmark import (
+    ...     MulticlassClassificationBenchmark,
+    ... )
+    >>> benchmark = MulticlassClassificationBenchmark(
+    ...     true_path=Path("data/true-classifications.json"),
+    ...     pred_path=Path("results/classification/classifications.json"),
+    ...     labels=("flowchart", "table", "other"),
+    ... )
+    >>> print(benchmark.confusion_matrix)
+    >>> print(benchmark.per_class_accuracy)
+
+    """
+
     labels: tuple[LabelType, ...]
 
     def __post_init__(self) -> None:

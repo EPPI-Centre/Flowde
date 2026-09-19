@@ -71,7 +71,6 @@ nav:
           - Classification: benchmarking/classification.md
           - Rotation: benchmarking/rotation.md
           - Parsing: benchmarking/parsing.md
-          - How diagrams are matched: benchmarking/matching.md
       - Recipes:
           - Overview: recipes/index.md
           - End-to-end:
