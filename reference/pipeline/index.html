@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/reference/pipeline/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Pipeline functions - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Pipeline functions";
+        var mkdocs_page_input_path = "reference/pipeline.md";
+        var mkdocs_page_url = "/Flowde/reference/pipeline/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pipeline/custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Pipeline functions</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#shared-parameters">Shared parameters</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#extraction">Extraction</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.extract_imgs.extract_imgs">extract_imgs</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#classification">Classification</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.classify_imgs.classify_imgs">classify_imgs</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rotation">Rotation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.rotate_imgs.rotate_imgs">rotate_imgs</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#parsing">Parsing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.parse_imgs.parse_imgs">parse_imgs</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+      <li class="breadcrumb-item active">Pipeline functions</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/reference/pipeline.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="pipeline-functions">Pipeline functions</h1>
+<p>All four stages save a run record in the <code>.flowde/run.state</code> file inside
+<code>save_dir</code>. Each stage needs its own output directory. Do not put source files
+or unrelated results in that directory. See
+<a href="../../pipeline/resuming/">stopping and resuming</a> for the complete recovery rules.</p>
+<h2 id="shared-parameters">Shared parameters</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>save_dir</code></td>
+<td>Directory for this run's results and <code>.flowde</code> record. Created when needed.</td>
+</tr>
+<tr>
+<td><code>on_existing</code></td>
+<td><code>"error"</code> (default) rejects an existing run; <code>"resume"</code> restores a compatible run; <code>"overwrite"</code> starts a fresh run and replaces the previous run's tracked outputs. Overwrite also works with a new or empty directory.</td>
+</tr>
+<tr>
+<td><code>n_jobs</code></td>
+<td>Number of worker processes. <code>1</code> runs one item at a time. Extraction defaults to <code>1</code>; the other stages default to the available CPU count. Set this explicitly when controlling concurrent API requests.</td>
+</tr>
+<tr>
+<td><code>range_indices</code></td>
+<td>On classification, rotation and parsing, a <code>(start, stop)</code> slice of sorted input paths, with <code>stop</code> excluded. <code>None</code> selects all paths. Extraction does not take this parameter.</td>
+</tr>
+<tr>
+<td><code>show_usage</code></td>
+<td>On classification, rotation and parsing, show the token and estimated cost summary. <code>False</code> hides the summary without disabling saved usage reports.</td>
+</tr>
+</tbody>
+</table>
+<p>Image functions return results for the selected inputs in sorted input order.
+Resuming an overlapping slice restores completed answers within that slice. Answers
+outside the current slice remain saved, but are not included in the returned
+list.</p>
+<h2 id="extraction">Extraction</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.extract_imgs.extract_imgs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">extract_imgs</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">extract_imgs(pdf_dir: Path, save_dir: Path, extract_fn: ExtractImgsFunction, n_jobs: int = 1, *, on_existing: ExistingRun = 'error') -&gt; None</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Extract sorted top-level PDFs, saving complete image sets and resumable state.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>pdf_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing input PDFs. Subdirectories are not searched.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>save_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dedicated output directory containing PNGs and <code>.flowde</code> run metadata.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>extract_fn</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="ExtractImgsFunction (flowde.extract_fns.extract_types.ExtractImgsFunction)" href="../data-types/#flowde.extract_fns.extract_types.ExtractImgsFunction">ExtractImgsFunction</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Function accepting <code>pdf_path</code> and <code>save_dir</code> as keyword arguments,
+both containing <code>Path</code> objects. Flowde supplies a temporary directory
+for one PDF as the extractor's <code>save_dir</code>.</p>
+<p>The extractor must save valid PNG files with the <code>.png</code> extension
+directly inside the supplied directory, without subdirectories,
+symbolic links or other files. Output filenames must be unique across
+all PDFs in the run, including when compared without letter case.
+The extractor must finish writing and close all output files before
+returning <code>None</code>. Flowde checks the PNGs and copies them into the run's
+output directory only after the extractor finishes successfully.</p>
+<p>Built-in factories declare their settings automatically. Custom
+extractors must declare their settings with
+<a class="autorefs autorefs-internal" title="model_function" href="../helpers/#flowde.model_function"><code>model_function()</code></a>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>n_jobs</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>1</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of PDFs processed concurrently. Defaults to <code>1</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>on_existing</code></b>
+                  (<code>(<span title="error">error</span>, <span title="resume">resume</span>, <span title="overwrite">overwrite</span>)</code>, default:
+                      <code>&#34;error&#34;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Defaults to <code>"error"</code>. Resume skips completed PDFs and restarts unfinished
+PDFs. Missing PNGs trigger re-extraction; edited PNGs cause an error.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>None</code>
+              –
+              <div class="doc-md-description">
+                <p>Extracted images are written into <code>save_dir</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pdf_dir</code></td>
+<td>Directory containing top-level <code>*.pdf</code> files with distinct filename stems, including when compared without letter case.</td>
+</tr>
+<tr>
+<td><code>extract_fn</code></td>
+<td>Callable accepting <code>pdf_path</code> and <code>save_dir</code> keyword arguments. The callable writes top-level PNGs into the supplied temporary directory.</td>
+</tr>
+</tbody>
+</table>
+<p>Returns <code>None</code>. After an entire PDF succeeds, Flowde publishes that PDF's PNGs
+into the run's <code>save_dir</code>. The run record includes successful
+PDFs that produced no images. Missing PNGs cause the whole source PDF to be
+extracted again on resume; modified saved PNGs cause an error.</p>
+<p>For the Paddle factory's crop names and settings, see
+<a href="../../pipeline/image-extraction/">image extraction</a>.</p>
+<h2 id="classification">Classification</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.classify_imgs.classify_imgs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">classify_imgs</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">classify_imgs(classify_fn: ClassificationFunction[LabelType], img_dir: Path, save_dir: Path, *, positive_classes: set[ClassificationLabel] | None = None, range_indices: tuple[int | None, int | None] | None = None, n_jobs: int = cpu_count(), show_usage: bool = True, on_existing: ExistingRun = 'error') -&gt; list[LabelType]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Classify PNG images in a directory and save their labels in a resumable run.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>classify_fn</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="ClassificationFunction (flowde.classify_fns.classify_types.ClassificationFunction)" href="../data-types/#flowde.classify_fns.classify_types.ClassificationFunction">ClassificationFunction</a>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Function accepting an image <code>Path</code> as its first positional argument
+and returning a <code>str</code>, <code>int</code> or <code>bool</code> label. The function returns the
+label itself, not a dictionary or Pydantic model.
+Built-in factories declare their settings;
+custom functions must declare their settings with
+<a class="autorefs autorefs-internal" title="model_function" href="../helpers/#flowde.model_function"><code>model_function()</code></a>. If the classifier exposes
+a <code>result_structure</code>, returned labels are validated against that schema.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>img_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing the input <code>*.png</code> files. Subdirectories are not
+searched. Image paths are sorted before applying <code>range_indices</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>save_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dedicated output directory, created if needed. Labels are saved in
+<code>classifications.json</code>, run metadata in <code>.flowde/run.state</code>, and optional
+image copies in <code>positive_images</code>. Input images and files referenced by
+the classifier's declared settings must be outside this directory.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>positive_classes</code></b>
+                  (<code><span title="set">set</span>[<span title="flowde.classify_fns.classify_types.ClassificationLabel">ClassificationLabel</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Labels whose images are copied into <code>save_dir / "positive_images"</code>,
+preserving filenames and leaving the original images unchanged.
+For example, <code>{1}</code> copies images labelled <code>1</code>. Defaults to <code>None</code>,
+which saves labels without copying images. Must remain unchanged when
+resuming the run.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>range_indices</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="int">int</span> | None] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>A <code>(start, stop)</code> slice of the sorted image paths. <code>start</code> is included
+and <code>stop</code> is excluded; <code>(0, 10)</code> selects up to the first ten images.
+Either bound can be <code>None</code>, and negative indices follow Python slicing
+rules. Defaults to <code>None</code>, which selects all matching images. An empty
+selection raises an error.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>n_jobs</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code><span title="multiprocessing.cpu_count">cpu_count</span>()</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of images that can be classified concurrently. Defaults to the
+number of CPU cores. <code>1</code> processes images sequentially in the calling
+process; larger values use worker processes. This value can change
+when resuming a run.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>show_usage</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to display token usage and estimated costs reported by the
+classifier. Defaults to <code>True</code>. <code>False</code> hides those figures while
+retaining the progress display and saved usage reports. This value
+can change when resuming a run.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>on_existing</code></b>
+                  (<code>(<span title="error">error</span>, <span title="resume">resume</span>, <span title="overwrite">overwrite</span>)</code>, default:
+                      <code>&#34;error&#34;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>How to handle an existing run in <code>save_dir</code>. Defaults to <code>"error"</code>.</p>
+<ul>
+<li><code>"error"</code>: start in a new or empty directory; reject existing work.</li>
+<li><code>"resume"</code>: require a saved classification run with matching classifier
+  settings and <code>positive_classes</code>. Reuse saved labels for unchanged
+  inputs and classify selected images without saved labels.</li>
+<li><code>"overwrite"</code>: remove the previous run's tracked outputs and saved state,
+  then start a new run. Also works in a new or empty directory.
+  Unrelated files in an existing output directory cause an error.</li>
+</ul>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One label per image selected by this call, in sorted image-path order.
+Includes labels restored from a previous run. With <code>range_indices</code>, the
+returned list covers only the selected slice; labels for earlier slices
+remain saved in <code>classifications.json</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="FileExistsError">FileExistsError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>save_dir</code> contains existing work and <code>on_existing="error"</code>.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>img_dir</code> is missing or is not a directory, no PNGs are selected,
+inputs are inside <code>save_dir</code>, or the saved run fails compatibility or
+integrity checks.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the classifier returns a label that is not a string, integer or
+boolean, including <code>None</code>.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If another Flowde call is already using the same <code>save_dir</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p><code>classifications.json</code> contains objects with <code>img_path</code> and <code>label</code> fields.
+The JSON file accumulates labels across resumed calls and orders entries
+by resolved input paths. Run metadata records classifier settings, labels
+and file fingerprints so resume can detect changed inputs or saved outputs.</p>
+<p>On resume, missing <code>classifications.json</code> or selected <code>positive_images</code>
+copies are recreated from saved labels and unchanged input images without
+calling the classifier again. Manually edited saved outputs raise an error.</p>
+</details>
+
+    </div>
+
+</div><p>See the <a href="../../pipeline/classification/">classification guide</a> for worked examples.</p>
+<h2 id="rotation">Rotation</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.rotate_imgs.rotate_imgs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">rotate_imgs</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">rotate_imgs(classify_fn: ClassificationFunction[RotationLabel], img_dir: Path, save_dir: Path, *, range_indices: tuple[int | None, int | None] | None = None, n_jobs: int = cpu_count(), show_usage: bool = True, on_existing: ExistingRun = 'error') -&gt; list[RotationLabel]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Rotate PNG images in a directory and save corrected copies in a resumable run.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>classify_fn</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="ClassificationFunction (flowde.classify_fns.classify_types.ClassificationFunction)" href="../data-types/#flowde.classify_fns.classify_types.ClassificationFunction">ClassificationFunction</a>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Function accepting an image <code>Path</code> as its first positional argument
+and returning a clockwise correction in degrees as an <code>int</code>: <code>0</code>,
+<code>90</code>, <code>180</code> or <code>270</code>. The function returns the angle itself, not a
+dictionary or Pydantic model, and must raise an exception if angle
+prediction fails. Returning <code>None</code> raises an error.</p>
+<p>The classifier must leave the input image unchanged. Flowde applies
+the returned angle and saves the corrected copy. Built-in factories
+declare their settings; custom functions must declare their settings with
+<a class="autorefs autorefs-internal" title="model_function" href="../helpers/#flowde.model_function"><code>model_function()</code></a>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>img_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing the original <code>*.png</code> files. Subdirectories are not
+searched. Image paths are sorted before applying <code>range_indices</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>save_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dedicated output directory, created if needed. Correction angles are
+saved in <code>rotations.json</code>, corrected copies in <code>rotated_images</code>, and run
+metadata in <code>.flowde/run.state</code>. Original images remain unchanged.
+Input images and files referenced by the classifier's declared settings
+must be outside this directory.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>range_indices</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="int">int</span> | None] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>A <code>(start, stop)</code> slice of the sorted image paths. <code>start</code> is included
+and <code>stop</code> is excluded; <code>(0, 10)</code> selects up to the first ten images.
+Either bound can be <code>None</code>, and negative indices follow Python slicing
+rules. Defaults to <code>None</code>, which selects all matching images. An empty
+selection raises an error.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>n_jobs</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code><span title="multiprocessing.cpu_count">cpu_count</span>()</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of angle predictions that can run concurrently. Defaults to the
+number of CPU cores. <code>1</code> processes images sequentially in the calling
+process; larger values use worker processes. This value can change
+when resuming a run.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>show_usage</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to display token usage and estimated costs reported by the
+classifier. Defaults to <code>True</code>. <code>False</code> hides those figures while
+retaining the progress display and saved usage reports. This value
+can change when resuming a run.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>on_existing</code></b>
+                  (<code>(<span title="error">error</span>, <span title="resume">resume</span>, <span title="overwrite">overwrite</span>)</code>, default:
+                      <code>&#34;error&#34;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>How to handle an existing run in <code>save_dir</code>. Defaults to <code>"error"</code>.</p>
+<ul>
+<li><code>"error"</code>: start in a new or empty directory; reject existing work.</li>
+<li><code>"resume"</code>: require a saved rotation run with matching classifier
+  settings. Reuse saved angles for unchanged inputs and predict angles
+  for selected images without saved angles.</li>
+<li><code>"overwrite"</code>: remove the previous run's tracked outputs and saved state,
+  then start a new run. Also works in a new or empty directory.
+  Unrelated files in an existing output directory cause an error.</li>
+</ul>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One clockwise correction angle per image selected by this call, in sorted
+image-path order. Includes angles restored from a previous run. With
+<code>range_indices</code>, the returned list covers only the selected slice;
+angles for earlier slices remain saved in <code>rotations.json</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="FileExistsError">FileExistsError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>save_dir</code> contains existing work and <code>on_existing="error"</code>.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>img_dir</code> is missing or is not a directory, no PNGs are selected,
+an angle is unsupported, inputs are inside <code>save_dir</code>, or the saved
+run fails compatibility or integrity checks.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the classifier returns <code>None</code> instead of an angle.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If another Flowde call is already using the same <code>save_dir</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p><code>rotations.json</code> contains objects with <code>img_path</code> and <code>label</code> fields, where
+<code>label</code> is the clockwise correction angle. The JSON file accumulates angles
+across resumed calls and orders entries by resolved input paths.</p>
+<p>Every successfully processed image has a copy in <code>rotated_images</code>, including
+images with a zero-degree correction. Copies retain their filenames and
+expand to fit the rotated image without cropping.</p>
+<p>On resume, missing <code>rotations.json</code> or selected <code>rotated_images</code> copies are
+recreated from saved angles and unchanged original images without another
+prediction. Corrected copies are always made from the original inputs, so
+resuming does not rotate an already-corrected copy again. Edited previously
+processed input images or saved outputs cause an error.</p>
+</details>
+
+    </div>
+
+</div><p>See the <a href="../../pipeline/rotation/">rotation guide</a> for worked examples.</p>
+<h2 id="parsing">Parsing</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.parse_imgs.parse_imgs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">parse_imgs</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">parse_imgs(parse_fn: ParsingFunction, img_dir: Path, save_dir: Path, nodes_dir: Path | None = None, labels_dir: Path | None = None, additional_texts_dir: Path | None = None, flow_dir: Path | None = None, range_indices: tuple[int | None, int | None] | None = None, n_jobs: int = cpu_count(), img_extensions: set[str] | None = None, *, show_usage: bool = True, on_existing: ExistingRun = 'error') -&gt; list[BaseModel]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Parse images in a directory into JSON files, optionally using saved context.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>parse_fn</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="ParsingFunction (flowde.parsing_fns.parsing_types.ParsingFunction)" href="../data-types/#flowde.parsing_fns.parsing_types.ParsingFunction">ParsingFunction</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Function accepting an <code>img_path</code> keyword argument and, when context is
+supplied, a <code>partial_flowchart</code> keyword argument containing a Pydantic
+model. <code>img_path</code> is a <code>Path</code> to the image being parsed; the partial
+model contains previously parsed parts for that same image. Without
+saved context, Flowde passes only <code>img_path</code>.</p>
+<p>The function must return an instance of the Pydantic class exposed
+as <code>parse_fn.result_structure</code>, not a dictionary, JSON string or <code>None</code>.
+The class can describe standard flowchart parts or a custom output
+format. The parser must raise an exception if parsing fails. Flowde
+saves each returned model as a same-stem JSON file in <code>save_dir</code>.</p>
+<p>Built-in factories declare their settings;
+custom functions must declare their settings and result class with
+<a class="autorefs autorefs-internal" title="model_function" href="../helpers/#flowde.model_function"><code>model_function()</code></a>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>img_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing input images. Subdirectories are not searched.
+Matching paths are sorted before applying <code>range_indices</code>. Filename stems
+must be unique across all matching images, including different extensions,
+because each stem determines an output JSON filename.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>save_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dedicated output directory, created if needed. Each image produces a JSON
+file with the same stem, such as <code>diagram.png</code> producing <code>diagram.json</code>.
+Run metadata is saved in <code>.flowde/run.state</code>. Input images, partial JSONs
+and files referenced by the parser's declared settings must be outside
+this directory.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>nodes_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of node-text JSONs supplied as context alongside the images.
+Each JSON contains <code>nodes</code> with <code>node_number</code> and <code>text</code> fields.
+Defaults to <code>None</code>, meaning no saved context is supplied. Required if
+<code>labels_dir</code>, <code>additional_texts_dir</code> or <code>flow_dir</code> is provided.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of label JSONs to add to the context from <code>nodes_dir</code>.
+Each JSON contains <code>nodes</code> with <code>node_number</code> and <code>labels</code> fields.
+Defaults to <code>None</code>, meaning no saved labels are included in the context.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>additional_texts_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of additional-text JSONs to add to the context from <code>nodes_dir</code>.
+Each JSON contains an <code>additional_texts</code> list. Defaults to <code>None</code>, meaning
+no saved additional text is included in the context.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>flow_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of connection JSONs to add to the context from <code>nodes_dir</code>.
+Each JSON contains <code>nodes</code> with <code>node_number</code> and <code>points_to</code> fields.
+Defaults to <code>None</code>, meaning no saved connections are included in the
+context.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>range_indices</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="int">int</span> | None] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>A <code>(start, stop)</code> slice of the sorted image paths. <code>start</code> is included
+and <code>stop</code> is excluded; <code>(0, 10)</code> selects up to the first ten images.
+Either bound can be <code>None</code>, and negative indices follow Python slicing
+rules. Defaults to <code>None</code>, which selects all matching images. The same
+slice is applied to supplied context files after checking their filenames
+against all matching images. An empty selection raises an error.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>n_jobs</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code><span title="multiprocessing.cpu_count">cpu_count</span>()</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of images that can be parsed concurrently. Defaults to the number
+of CPU cores. <code>1</code> processes images sequentially in the calling process;
+larger values use worker processes. This value can change when resuming
+a run.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>img_extensions</code></b>
+                  (<code><span title="set">set</span>[<span title="str">str</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Image extensions to select, without leading dots, such as
+<code>{"png", "jpg", "webp"}</code>. Defaults to <code>None</code>, which selects PNG files.
+The supplied parser must support the selected image formats.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>show_usage</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to display token usage and estimated costs reported by the
+parser. Defaults to <code>True</code>. <code>False</code> hides those figures while retaining
+the progress display and saved usage reports. This value can change
+when resuming a run.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>on_existing</code></b>
+                  (<code>(<span title="error">error</span>, <span title="resume">resume</span>, <span title="overwrite">overwrite</span>)</code>, default:
+                      <code>&#34;error&#34;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>How to handle an existing run in <code>save_dir</code>. Defaults to <code>"error"</code>.</p>
+<ul>
+<li><code>"error"</code>: start in a new or empty directory; reject existing work.</li>
+<li><code>"resume"</code>: require a saved parsing run with matching parser settings.
+  Restore saved results for unchanged images and assembled partial
+  context, and parse selected images without saved results.</li>
+<li><code>"overwrite"</code>: remove the previous run's tracked outputs and saved state,
+  then start a new run. Also works in a new or empty directory.
+  Unrelated files in an existing output directory cause an error.</li>
+</ul>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<span title="pydantic.BaseModel">BaseModel</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One Pydantic result per image selected by this call, in sorted image-path
+order. Each result uses <code>parse_fn.result_structure</code>. Includes results
+restored from a previous run. With <code>range_indices</code>, the returned list
+covers only the selected slice; JSON files for earlier slices remain
+saved in <code>save_dir</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="FileExistsError">FileExistsError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>save_dir</code> contains existing work and <code>on_existing="error"</code>.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>img_dir</code> is invalid, no images are selected, image stems are not
+unique, context files do not match the images or required part schemas,
+node numbers cannot be joined, inputs are inside <code>save_dir</code>, or the saved
+run fails compatibility or integrity checks.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>parse_fn.result_structure</code> is not a Pydantic class or the parser
+returns a value that is not an instance of that class, including <code>None</code>.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If another Flowde call is already using the same <code>save_dir</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Each supplied context directory must contain exactly one top-level <code>*.json</code>
+file per matching input image, with the same stem and no extra JSON files.
+Filename and file-count checks cover all matching images before slicing,
+including images outside <code>range_indices</code>.</p>
+<p>Context files contain the fields for their individual parts, without the
+benchmark ground truth's <code>options</code> wrapper. Selected node-text files must
+contain at least one node, numbered consecutively from <code>1</code>. Selected label
+and flow files must contain the same node numbers as the node-text file.
+The parts are joined into the <code>partial_flowchart</code> passed to the parser.</p>
+<p>Context files supply input to the parser; they are not automatically merged
+into its output. The output fields are defined by <code>parse_fn.result_structure</code>.
+For built-in parsers, the factory's <code>parts_to_parse</code> or <code>result_structure</code>
+argument chooses those fields.</p>
+<p>On resume, missing output JSONs are recreated from the results recorded in
+<code>.flowde/run.state</code> without another parsing request. Edited saved outputs or
+changes to previously parsed input images or their assembled partial context
+cause an error.</p>
+</details>
+
+    </div>
+
+</div><p>See the <a href="../../pipeline/parsing/">parsing guide</a> for full, partial and custom-schema
+examples.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../helpers/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

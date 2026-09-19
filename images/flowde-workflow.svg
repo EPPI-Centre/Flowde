@@ -1,0 +1,219 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1900" viewBox="0 0 1100 1900" role="img" aria-labelledby="title description">
+  <title id="title">Flowde: from PDF figures to structured data</title>
+  <desc id="description">Five illustrated steps. Extract a sideways flowchart and other figures from a PDF. Classify the candidates, crossing out a chart and a photograph while keeping the flowchart. Rotate the flowchart into an upright saved copy. Parse the flowchart into JSON. Optionally benchmark the prediction against ground truth: the predicted word Enro1led has a red digit 1 where the reference word Enrolled has a green letter l, a difference of one character.</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #263e50; }
+      .stage-title { font-size: 32px; font-weight: 650; letter-spacing: -.4px; }
+      .stage-number { font-size: 17px; font-weight: 700; fill: #fff; text-anchor: middle; }
+      .caption { font-size: 21px; fill: #577083; text-anchor: middle; }
+      .small-label { font-size: 15px; font-weight: 650; letter-spacing: 1.1px; }
+      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+      .outline { stroke: #6d8fa8; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+      .connector { fill: none; stroke: #7197b2; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+    <filter id="paper-shadow" x="-20%" y="-20%" width="150%" height="155%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#234966" flood-opacity=".09"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M2 1 L8 5 L2 9" fill="none" stroke="#7197b2" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="small-arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M1 1 L6 4 L1 7" fill="none" stroke="#6587a2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <!-- The same diagram is reused in every stage. -->
+    <g id="flowchart">
+      <g fill="none" stroke="#6587a2" stroke-width="2" stroke-linejoin="round" marker-end="url(#small-arrow)">
+        <path d="M0 -24 V-11 H-31 V2"/>
+        <path d="M0 -11 H31 V2"/>
+        <path d="M-31 26 V46"/>
+        <path d="M31 26 V46"/>
+      </g>
+      <g stroke="#5d8aad" stroke-width="2">
+        <rect x="-44" y="-54" width="88" height="30" rx="5" fill="#dcecf7"/>
+        <rect x="-55" y="3" width="48" height="23" rx="4" fill="#eef5fa"/>
+        <rect x="7" y="3" width="48" height="23" rx="4" fill="#eef5fa"/>
+        <rect x="-55" y="47" width="48" height="22" rx="4" fill="#eef5fa"/>
+        <rect x="7" y="47" width="48" height="22" rx="4" fill="#eef5fa"/>
+      </g>
+      <text x="0" y="-34" text-anchor="middle" font-size="12" font-weight="600">Enrolled</text>
+      <g stroke="#86a5bd" stroke-width="3" stroke-linecap="round">
+        <path d="M-43 15 H-19 M19 15 H43 M-43 58 H-19 M19 58 H43"/>
+      </g>
+    </g>
+    <g id="bar-chart">
+      <path d="M-42 -30 V33 H45" fill="none" stroke="#9aaebd" stroke-width="2" stroke-linecap="round"/>
+      <rect x="-29" y="2" width="15" height="30" rx="3" fill="#e8b678"/>
+      <rect x="-6" y="-22" width="15" height="54" rx="3" fill="#97b1c6"/>
+      <rect x="17" y="-9" width="15" height="41" rx="3" fill="#a8c5b5"/>
+    </g>
+    <g id="landscape">
+      <rect x="-47" y="-32" width="94" height="65" rx="5" fill="#eef3f6"/>
+      <circle cx="24" cy="-16" r="9" fill="#ecd2a4"/>
+      <path d="M-47 27 L-13 -14 L20 33 H-47Z" fill="#acc4b6"/>
+      <path d="M-10 33 L19 1 L47 28 V33Z" fill="#8eaa9b"/>
+    </g>
+    <g id="check-badge">
+      <circle r="17" fill="#e8f5ef" stroke="#379078" stroke-width="2"/>
+      <path d="M-7 0 L-2 5 L8 -6" fill="none" stroke="#28846c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <!-- Each stage has its own row; the gaps leave room for visible arrows. -->
+  <g id="extract-images" transform="translate(0 20)">
+    <rect x="24" width="1052" height="320" rx="22" fill="#f7fafc" stroke="#dce6ed" stroke-width="1.5"/>
+    <circle cx="58" cy="39" r="17" fill="#467fab"/>
+    <text class="stage-number" x="58" y="45">1</text>
+    <text class="stage-title" x="88" y="49">Extract images from PDFs</text>
+
+    <g transform="translate(164 -20)">
+      <g transform="rotate(-5 137 188)">
+        <rect x="71" y="101" width="136" height="175" rx="8" fill="#e9eff3" stroke="#b8cbd8" stroke-width="2"/>
+      </g>
+      <g filter="url(#paper-shadow)">
+        <path d="M76 96 H176 L202 122 V266 Q202 275 193 275 H76 Q67 275 67 266 V105 Q67 96 76 96Z" fill="#fff" class="outline"/>
+        <path d="M175 97 V116 Q175 123 182 123 H201" fill="#edf4f8" class="outline"/>
+        <rect x="81" y="111" width="46" height="23" rx="5" fill="#be7063"/>
+        <text x="104" y="127" text-anchor="middle" font-size="14" font-weight="700" style="fill:#fff">PDF</text>
+        <path d="M82 147 H174" stroke="#ccd8e0" stroke-width="4" stroke-linecap="round"/>
+        <rect x="81" y="161" width="104" height="59" rx="6" fill="#f0f6fa" stroke="#9bb8ce" stroke-width="1.5"/>
+        <use href="#flowchart" transform="translate(133 191) rotate(-90) scale(.42)"/>
+        <use href="#bar-chart" transform="translate(109 245) scale(.38)"/>
+        <path d="M141 235 H183 M141 245 H176 M141 255 H183" stroke="#d8e2e9" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </g>
+    <path class="connector" d="M428 174 H615" marker-end="url(#arrow)"/>
+    <g transform="translate(378 -20)">
+      <g transform="rotate(8 428 159)" filter="url(#paper-shadow)">
+        <rect x="369" y="112" width="116" height="86" rx="9" fill="#fff" class="outline"/>
+        <use href="#bar-chart" transform="translate(427 154) scale(.76)"/>
+      </g>
+      <g transform="rotate(-7 417 239)" filter="url(#paper-shadow)">
+        <rect x="357" y="203" width="116" height="79" rx="9" fill="#fff" class="outline"/>
+        <use href="#landscape" transform="translate(416 241) scale(.9)"/>
+      </g>
+      <g transform="rotate(-4 353 196)" filter="url(#paper-shadow)">
+        <rect x="290" y="153" width="138" height="96" rx="10" fill="#fff" stroke="#4b86b3" stroke-width="2.5"/>
+        <use href="#flowchart" transform="translate(359 201) rotate(-90) scale(.64)"/>
+      </g>
+    </g>
+    <text class="caption" x="298" y="306">PDFs</text>
+    <text class="caption" x="783" y="306">Extracted images</text>
+  </g>
+
+  <path class="connector" d="M550 354 V404" marker-end="url(#arrow)"/>
+
+  <!-- Keep the flowchart and visibly reject the other two figures. -->
+  <g id="classify-images" transform="translate(0 420)">
+    <rect x="24" width="1052" height="300" rx="22" fill="#f7fafc" stroke="#dce6ed" stroke-width="1.5"/>
+    <circle cx="58" cy="39" r="17" fill="#467fab"/>
+    <text class="stage-number" x="58" y="45">2</text>
+    <text class="stage-title" x="88" y="49">Classify images</text>
+    <g>
+      <rect x="187" y="90" width="184" height="140" rx="10" fill="#fff" stroke="#d6dfe5" stroke-width="2"/>
+      <use href="#bar-chart" transform="translate(279 159) scale(1.24)" opacity=".65"/>
+      <rect x="187" y="90" width="184" height="140" rx="10" fill="#fbece8" opacity=".24"/>
+      <path d="M208 106 L350 214 M350 106 L208 214" stroke="#c7736b" stroke-width="4" stroke-linecap="round"/>
+      <text class="caption" x="279" y="270">Other figure</text>
+    </g>
+    <g>
+      <rect x="458" y="90" width="184" height="140" rx="10" fill="#fff" stroke="#d6dfe5" stroke-width="2"/>
+      <use href="#landscape" transform="translate(550 159) scale(1.4)" opacity=".65"/>
+      <rect x="458" y="90" width="184" height="140" rx="10" fill="#fbece8" opacity=".24"/>
+      <path d="M479 106 L621 214 M621 106 L479 214" stroke="#c7736b" stroke-width="4" stroke-linecap="round"/>
+      <text class="caption" x="550" y="270">Other figure</text>
+    </g>
+    <g filter="url(#paper-shadow)">
+      <rect x="729" y="90" width="184" height="140" rx="10" fill="#fff" stroke="#379078" stroke-width="2.5"/>
+      <use href="#flowchart" transform="translate(821 160) rotate(-90) scale(.95)"/>
+    </g>
+    <use href="#check-badge" transform="translate(906 92)"/>
+    <text class="caption" x="821" y="270" style="fill:#28846c">Keep flowchart</text>
+  </g>
+
+  <path class="connector" d="M550 734 V784" marker-end="url(#arrow)"/>
+
+  <!-- A clockwise correction turns the same diagram upright. -->
+  <g id="rotate-images" transform="translate(0 800)">
+    <rect x="24" width="1052" height="300" rx="22" fill="#f7fafc" stroke="#dce6ed" stroke-width="1.5"/>
+    <circle cx="58" cy="39" r="17" fill="#467fab"/>
+    <text class="stage-number" x="58" y="45">3</text>
+    <text class="stage-title" x="88" y="49">Rotate images</text>
+    <g transform="rotate(-4 298 163)" filter="url(#paper-shadow)">
+      <rect x="208" y="95" width="180" height="136" rx="10" fill="#fff" class="outline"/>
+      <use href="#flowchart" transform="translate(298 163) rotate(-90) scale(.95)"/>
+    </g>
+    <path class="connector" d="M434 164 H660" marker-end="url(#arrow)"/>
+    <path class="connector" d="M534 127 A24 24 0 1 1 568 119" marker-end="url(#arrow)"/>
+    <text x="550" y="219" class="caption">90° clockwise</text>
+    <g filter="url(#paper-shadow)">
+      <rect x="720" y="76" width="150" height="174" rx="10" fill="#fff" stroke="#379078" stroke-width="2.5"/>
+      <use href="#flowchart" transform="translate(795 154) scale(1.08)"/>
+    </g>
+    <use href="#check-badge" transform="translate(864 78)"/>
+    <text class="caption" x="298" y="280">Sideways image</text>
+    <text class="caption" x="795" y="280">Upright copy</text>
+  </g>
+
+  <path class="connector" d="M550 1114 V1164" marker-end="url(#arrow)"/>
+
+  <!-- The image becomes structured data. Show one node as an excerpt. -->
+  <g id="parse-images" transform="translate(0 1180)">
+    <rect x="24" width="1052" height="300" rx="22" fill="#f7fafc" stroke="#dce6ed" stroke-width="1.5"/>
+    <circle cx="58" cy="39" r="17" fill="#467fab"/>
+    <text class="stage-number" x="58" y="45">4</text>
+    <text class="stage-title" x="88" y="49">Parse images</text>
+    <g filter="url(#paper-shadow)">
+      <rect x="230" y="78" width="150" height="174" rx="10" fill="#fff" class="outline"/>
+      <use href="#flowchart" transform="translate(305 156) scale(1.08)"/>
+    </g>
+    <path class="connector" d="M428 164 H646" marker-end="url(#arrow)"/>
+    <g filter="url(#paper-shadow)">
+      <path d="M710 78 H914 L942 106 V244 Q942 254 932 254 H710 Q700 254 700 244 V88 Q700 78 710 78Z" fill="#fff" class="outline"/>
+      <path d="M913 79 V98 Q913 107 922 107 H941" fill="#edf4f8" class="outline"/>
+      <text x="720" y="113" class="mono" font-size="26" font-weight="600" style="fill:#467fab">{ }</text>
+      <text x="777" y="111" class="small-label" style="fill:#577083">JSON</text>
+      <path d="M720 126 H922" stroke="#e2eaf0" stroke-width="1.5"/>
+      <text x="720" y="155" class="mono" font-size="20">"node_number": 1,</text>
+      <text x="720" y="186" class="mono" font-size="20">"text":</text>
+      <text x="735" y="221" class="mono" font-size="24">"Enro1led"</text>
+    </g>
+    <text class="caption" x="305" y="280">Flowchart</text>
+    <text class="caption" x="821" y="280">Parsed JSON excerpt</text>
+  </g>
+
+  <path class="connector" d="M550 1494 V1544" stroke-dasharray="7 8" marker-end="url(#arrow)"/>
+
+  <!-- Evaluation is a separate, optional comparison with a reference. -->
+  <g id="benchmark-results" transform="translate(0 1560)">
+    <rect x="24" width="1052" height="316" rx="22" fill="#f8faf9" stroke="#d8e5df" stroke-width="1.5"/>
+    <circle cx="58" cy="39" r="17" fill="#467fab"/>
+    <text class="stage-number" x="58" y="45">5</text>
+    <text class="stage-title" x="88" y="49">Benchmark results</text>
+    <rect x="398" y="22" width="114" height="31" rx="15.5" fill="#e9efec"/>
+    <text x="455" y="43" text-anchor="middle" font-size="17" font-weight="600" style="fill:#57766a">Optional</text>
+    <text x="48" y="89" font-size="21" style="fill:#577083">Compare the prediction with accepted ground truth.</text>
+    <g filter="url(#paper-shadow)">
+      <rect x="66" y="116" width="405" height="114" rx="12" fill="#fff" stroke="#d6e2eb" stroke-width="2"/>
+      <path d="M67 155 H470" stroke="#e4ebf0" stroke-width="1.5"/>
+      <text x="86" y="142" class="small-label" style="fill:#567d9a">PREDICTED JSON</text>
+      <text x="449" y="142" text-anchor="end" class="mono" font-size="19" style="fill:#8aa4b6">{ }</text>
+      <rect x="288" y="169" width="18" height="29" rx="4" fill="#f9dfdb"/>
+      <text y="191" class="mono" font-size="26" xml:space="preserve"><tspan x="86" textLength="203" lengthAdjust="spacingAndGlyphs">"text": "Enro</tspan><tspan x="289" style="fill:#b14d45" font-weight="700">1</tspan><tspan x="305">led"</tspan></text>
+      <text x="86" y="214" font-size="15" style="fill:#a45e55">Incorrect character</text>
+    </g>
+    <path class="connector" d="M495 172 H579" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+    <g filter="url(#paper-shadow)">
+      <rect x="603" y="116" width="405" height="114" rx="12" fill="#fff" stroke="#cbded4" stroke-width="2"/>
+      <path d="M604 155 H1007" stroke="#e0ebe5" stroke-width="1.5"/>
+      <text x="623" y="142" class="small-label" style="fill:#4d8069">GROUND-TRUTH JSON</text>
+      <text x="986" y="142" text-anchor="end" class="mono" font-size="19" style="fill:#86ab98">{ }</text>
+      <rect x="825" y="169" width="18" height="29" rx="4" fill="#d9eee0"/>
+      <text y="191" class="mono" font-size="26" xml:space="preserve"><tspan x="623" textLength="203" lengthAdjust="spacingAndGlyphs">"text": "Enro</tspan><tspan x="826" style="fill:#237b50" font-weight="700">l</tspan><tspan x="842">led"</tspan></text>
+      <text x="623" y="214" font-size="15" style="fill:#478067">Reference character</text>
+    </g>
+    <path d="M269 231 V249 Q269 272 292 272 H435 M806 231 V249 Q806 272 783 272 H641" fill="none" stroke="#a8beb1" stroke-width="2" stroke-linecap="round"/>
+    <rect x="435" y="250" width="206" height="45" rx="22.5" fill="#e9f1ed" stroke="#bed3c5" stroke-width="1.5"/>
+    <text x="538" y="279" text-anchor="middle" font-size="21" font-weight="650" style="fill:#3d6e58">1 character edit</text>
+  </g>
+</svg>

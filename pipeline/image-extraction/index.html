@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/image-extraction/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Image extraction - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Image extraction";
+        var mkdocs_page_input_path = "pipeline/image-extraction.md";
+        var mkdocs_page_url = "/Flowde/pipeline/image-extraction/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Image extraction</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#extract-images-from-a-directory-of-pdfs">Extract images from a directory of PDFs</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#saved-images">Saved images</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#resume-extraction">Resume extraction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#configure-the-paddleocr-extractor">Configure the PaddleOCR extractor</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bring-your-own-extraction-function">Bring your own extraction function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#next-step">Next step</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Image extraction</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/image-extraction.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="image-extraction">Image extraction</h1>
+<p>Image extraction is the first stage of the core pipeline. It takes PDFs as input
+and saves candidate flowchart images as PNG files.</p>
+<p>The default PaddleOCR extractor detects regions labelled as images. These crops
+can include figures that are not flowcharts. Use the
+<a href="../classification/">classification stage</a> to select the images you want to keep.</p>
+<h2 id="extract-images-from-a-directory-of-pdfs">Extract images from a directory of PDFs</h2>
+<p><a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>
+takes a directory of PDFs and saves the extracted images into
+one dedicated output directory.</p>
+<p>First complete the <a href="../setup-default-funcs/#set-up-image-extraction">PaddleOCR setup</a>.
+Then run:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.extract_fns.paddle_layout_detect_extraction import (
+    make_paddle_layout_extract_fn,
+)
+from flowde.extract_imgs import extract_imgs
+
+pdf_dir = Path(&quot;data/pdfs&quot;)
+save_dir = Path(&quot;results/extraction&quot;)
+
+extract_fn = make_paddle_layout_extract_fn(device=&quot;cpu&quot;, cpu_threads=1)
+
+extract_imgs(
+    pdf_dir=pdf_dir,
+    save_dir=save_dir,
+    extract_fn=extract_fn,
+    n_jobs=1,
+)
+</code></pre>
+<p><a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>
+searches for <code>*.pdf</code> files directly inside <code>pdf_dir</code>, sorts the
+paths and processes those PDFs. Subdirectories are not searched.</p>
+<p>See the
+<a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>
+and
+<a href="../../reference/helpers/#flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn"><code>make_paddle_layout_extract_fn()</code></a>
+API references for full details of all parameters.</p>
+<h2 id="saved-images">Saved images</h2>
+<p>The PaddleOCR extractor names each PNG using the PDF stem and an image counter
+starting at zero. The counter runs across all detected images in that PDF; it
+is not a page number.</p>
+<pre><code class="language-text">results/
+└── extraction/
+    ├── paper-1_0.png
+    ├── paper-1_1.png
+    ├── paper-2_0.png
+    ├── paper-3_0.png
+    └── .flowde/
+        ├── run.state
+        └── run.lock
+</code></pre>
+<p><code>.flowde/run.state</code> stores run metadata, including extraction settings, completed
+PDFs and file fingerprints. Flowde uses this metadata to resume the run and
+detect changes to the input PDFs or saved PNGs.</p>
+<h2 id="resume-extraction">Resume extraction</h2>
+<p>Repeat the call with the same settings and <code>on_existing="resume"</code>:</p>
+<pre><code class="language-python">extract_imgs(
+    pdf_dir=pdf_dir,
+    save_dir=save_dir,
+    extract_fn=extract_fn,
+    n_jobs=1,
+    on_existing=&quot;resume&quot;,
+)
+</code></pre>
+<p>Completed PDFs with all their unchanged PNGs are skipped. An unfinished PDF is
+extracted again from its first page. If a completed PDF's saved PNG is missing,
+Flowde also extracts that entire PDF again.</p>
+<p>If a PNG in <code>save_dir</code> has been edited, resume raises an error. It does not
+silently replace the edited PNG. Use a new output directory or explicitly
+choose <code>on_existing="overwrite"</code> to start the extraction again.</p>
+<p>See <a href="../resuming/">managing runs</a> for interruption handling, settings checks and
+what overwrite removes.</p>
+<h2 id="configure-the-paddleocr-extractor">Configure the PaddleOCR extractor</h2>
+<p>See the
+<a href="../../reference/helpers/#flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn"><code>make_paddle_layout_extract_fn()</code></a>
+API reference for all parameters, defaults and configuration details.</p>
+<h2 id="bring-your-own-extraction-function">Bring your own extraction function</h2>
+<p>You can write your own extractor and pass it to
+<a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>
+as <code>extract_fn</code>.
+See the <a href="../custom-functions/#an-extraction-function">custom extraction tutorial</a>
+for the requirements your function must meet and a complete working example.</p>
+<h2 id="next-step">Next step</h2>
+<p><a href="../classification/">Classify the extracted images</a> to select flowcharts or a
+particular type of flowchart.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../setup-default-funcs/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../classification/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

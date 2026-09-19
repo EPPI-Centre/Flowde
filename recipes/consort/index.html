@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/recipes/consort/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>CONSORT - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CONSORT";
+        var mkdocs_page_input_path = "recipes/consort.md";
+        var mkdocs_page_url = "/Flowde/recipes/consort/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pipeline/custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Recipes</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" >End-to-end</a>
+    <ul class="current">
+                <li class="toctree-l3 current"><a class="reference internal current" href="#">CONSORT</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#1-set-up-the-package-and-data">1. Set up the package and data</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#2-extract-images">2. Extract images</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#3-select-consort-diagrams">3. Select CONSORT diagrams</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#4-correct-orientation">4. Correct orientation</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#5-parse-the-diagram-parts">5. Parse the diagram parts</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#6-combine-the-results">6. Combine the results</a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Recipes</li>
+          <li class="breadcrumb-item">End-to-end</li>
+      <li class="breadcrumb-item active">CONSORT</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/recipes/consort.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="consort-from-pdfs-to-parsed-diagrams">CONSORT: from PDFs to parsed diagrams</h1>
+<p>This recipe uses Gemini 3.1 Pro preview and the prompts that gave us our best
+parsing performance on the training dataset. We will add the results here later.</p>
+<p>The prompts can also be used with other models. The
+<a href="https://colab.research.google.com/github/EPPI-Centre/Flowde/blob/main/notebooks/CONSORT_demo.ipynb">Colab demo</a>
+shows the same approach with the same prompts using Azure OpenAI.</p>
+<h2 id="1-set-up-the-package-and-data">1. Set up the package and data</h2>
+<p>Follow the <a href="../../installation/#full-installation">full installation</a> and
+<a href="../../pipeline/setup-default-funcs/#use-gemini">Gemini setup</a> instructions.
+Copy the code blocks into notebook cells and run the cells in order.</p>
+<p>To try the recipe with the public example PDFs, download and extract the
+<a href="https://github.com/EPPI-Centre/Flowde/archive/refs/heads/main.zip">repository archive</a>
+and set <code>data_dir</code> to <code>Flowde-main/data/consort-demo</code>. To use your own PDFs,
+change <code>pdf_dir</code>.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv(Path(&quot;.env&quot;))
+
+data_dir = Path(&quot;Flowde-main/data/consort-demo&quot;)
+pdf_dir = data_dir / &quot;pdfs&quot;
+run_dir = Path(&quot;results/consort-example&quot;)
+model = &quot;gemini-3.1-pro-preview&quot;
+effort = &quot;high&quot;
+</code></pre>
+<h2 id="2-extract-images">2. Extract images</h2>
+<pre><code class="language-python">from flowde.extract_fns.paddle_layout_detect_extraction import (
+    make_paddle_layout_extract_fn,
+)
+from flowde.extract_imgs import extract_imgs
+
+extraction_dir = run_dir / &quot;extraction&quot;
+extract_fn = make_paddle_layout_extract_fn(device=&quot;cpu&quot;, cpu_threads=1)
+
+extract_imgs(
+    pdf_dir=pdf_dir,
+    save_dir=extraction_dir,
+    extract_fn=extract_fn,
+    n_jobs=1,
+)
+</code></pre>
+<h2 id="3-select-consort-diagrams">3. Select CONSORT diagrams</h2>
+<pre><code class="language-python">from flowde.classify_fns.classify_types import ConsortClassification
+from flowde.classify_fns.gemini_classify_fn import make_gemini_classify_fn
+from flowde.classify_imgs import classify_imgs
+
+classification_dir = run_dir / &quot;classification&quot;
+classify_fn = make_gemini_classify_fn(
+    input_text=(
+        &quot;Classify the image as a CONSORT image with label 1.\n&quot;
+        &quot;If the image is not a CONSORT image, classify it with label 0.&quot;
+    ),
+    result_structure=ConsortClassification,
+    model=model,
+    effort=effort,
+)
+
+labels = classify_imgs(
+    classify_fn=classify_fn,
+    img_dir=extraction_dir,
+    save_dir=classification_dir,
+    positive_classes={1},
+    n_jobs=1,
+)
+
+consort_dir = classification_dir / &quot;positive_images&quot;
+</code></pre>
+<h2 id="4-correct-orientation">4. Correct orientation</h2>
+<pre><code class="language-python">from flowde.classify_fns.classify_types import RotationClassification
+from flowde.rotate_imgs import INPUT_TEXT as rotation_prompt, rotate_imgs
+
+rotation_dir = run_dir / &quot;rotation&quot;
+rotation_fn = make_gemini_classify_fn(
+    input_text=rotation_prompt,
+    result_structure=RotationClassification,
+    model=model,
+    effort=effort,
+)
+
+angles = rotate_imgs(
+    classify_fn=rotation_fn,
+    img_dir=consort_dir,
+    save_dir=rotation_dir,
+    n_jobs=1,
+)
+
+rotated_dir = rotation_dir / &quot;rotated_images&quot;
+</code></pre>
+<h2 id="5-parse-the-diagram-parts">5. Parse the diagram parts</h2>
+<p>Parse node text first, then flow, labels and additional text, passing the
+previously parsed parts as context.</p>
+<h3 id="node-text">Node text</h3>
+<pre><code class="language-python">from flowde.parse_imgs import parse_imgs
+from flowde.parsing_fns.gemini_parse import make_gemini_parse_fn
+from flowde.prompts.consort import consort_nodes_prompt
+
+parsed_dir = run_dir / &quot;parsed&quot;
+nodes_fn = make_gemini_parse_fn(
+    input_text=consort_nodes_prompt,
+    parts_to_parse={&quot;node_text&quot;},
+    model=model,
+    effort=effort,
+)
+
+nodes = parse_imgs(
+    parse_fn=nodes_fn,
+    img_dir=rotated_dir,
+    save_dir=parsed_dir / &quot;node_text&quot;,
+    n_jobs=1,
+)
+</code></pre>
+<h3 id="flow">Flow</h3>
+<pre><code class="language-python">from flowde.prompts.consort_flow import consort_flow_prompt
+
+flow_fn = make_gemini_parse_fn(
+    input_text=consort_flow_prompt,
+    parts_to_parse={&quot;flow&quot;},
+    model=model,
+    effort=effort,
+)
+
+flow = parse_imgs(
+    parse_fn=flow_fn,
+    img_dir=rotated_dir,
+    save_dir=parsed_dir / &quot;flow&quot;,
+    nodes_dir=parsed_dir / &quot;node_text&quot;,
+    n_jobs=1,
+)
+</code></pre>
+<h3 id="labels">Labels</h3>
+<pre><code class="language-python">from flowde.prompts.consort_labels import consort_labels_prompt
+
+labels_fn = make_gemini_parse_fn(
+    input_text=consort_labels_prompt,
+    parts_to_parse={&quot;labels&quot;},
+    model=model,
+    effort=effort,
+)
+
+node_labels = parse_imgs(
+    parse_fn=labels_fn,
+    img_dir=rotated_dir,
+    save_dir=parsed_dir / &quot;labels&quot;,
+    nodes_dir=parsed_dir / &quot;node_text&quot;,
+    flow_dir=parsed_dir / &quot;flow&quot;,
+    n_jobs=1,
+)
+</code></pre>
+<h3 id="additional-text">Additional text</h3>
+<pre><code class="language-python">from flowde.prompts.consort_add_text import consort_add_text_prompt
+
+additional_texts_fn = make_gemini_parse_fn(
+    input_text=consort_add_text_prompt,
+    parts_to_parse={&quot;additional_texts&quot;},
+    model=model,
+    effort=effort,
+)
+
+additional_texts = parse_imgs(
+    parse_fn=additional_texts_fn,
+    img_dir=rotated_dir,
+    save_dir=parsed_dir / &quot;additional_texts&quot;,
+    nodes_dir=parsed_dir / &quot;node_text&quot;,
+    flow_dir=parsed_dir / &quot;flow&quot;,
+    labels_dir=parsed_dir / &quot;labels&quot;,
+    n_jobs=1,
+)
+</code></pre>
+<h2 id="6-combine-the-results">6. Combine the results</h2>
+<pre><code class="language-python">from flowde.combine_parsed_parts import combine_parsed_parts
+
+combined_dir = parsed_dir / &quot;combined&quot;
+combined = combine_parsed_parts(
+    nodes_dir=parsed_dir / &quot;node_text&quot;,
+    flow_dir=parsed_dir / &quot;flow&quot;,
+    labels_dir=parsed_dir / &quot;labels&quot;,
+    additional_texts_dir=parsed_dir / &quot;additional_texts&quot;,
+    save_dir=combined_dir,
+)
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../reference/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

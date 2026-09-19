@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="400" viewBox="0 0 560 400" role="img" aria-labelledby="title description">
+  <title id="title">Participant follow-up flowchart</title>
+  <desc id="description">A box labelled Screened (n = 10) points down to a single Follow-up box containing two measurements: 8 at 26 weeks and 7 at 52 weeks. The caption reads Figure 1.</desc>
+  <rect width="560" height="400" fill="#fff"/>
+  <g stroke="#577184" stroke-width="2.5">
+    <rect x="90" y="24" width="380" height="72" rx="8" fill="#f3f7fa"/>
+    <path d="M280 96 V143" fill="none"/>
+    <path d="M273 139 L280 151 L287 139" fill="#577184" stroke-linejoin="round"/>
+    <rect x="90" y="158" width="380" height="158" rx="8" fill="#f3f7fa"/>
+    <path d="M90 210 H470" stroke="#c9d7e1" stroke-width="1.5"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#263e50">
+    <text x="280" y="69" text-anchor="middle">Screened (n = 10)</text>
+    <text x="280" y="192" text-anchor="middle" font-weight="bold">Follow-up</text>
+    <text x="136" y="251">26 weeks</text>
+    <text x="410" y="251" text-anchor="end">8</text>
+    <text x="136" y="294">52 weeks</text>
+    <text x="410" y="294" text-anchor="end">7</text>
+    <text x="280" y="371" text-anchor="middle" font-size="22">Figure 1</text>
+  </g>
+</svg>

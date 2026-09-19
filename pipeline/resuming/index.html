@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/resuming/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Stopping and resuming - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Stopping and resuming";
+        var mkdocs_page_input_path = "pipeline/resuming.md";
+        var mkdocs_page_url = "/Flowde/pipeline/resuming/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Stopping and resuming</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#existing-run-options">Existing run options</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#resume-an-unfinished-run">Resume an unfinished run</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#checks-before-resuming">Checks before resuming</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#overwrite-an-existing-run">Overwrite an existing run</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#stop-a-run">Stop a run</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Stopping and resuming</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/resuming.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="stopping-and-resuming">Stopping and resuming</h1>
+<p>When you run image extraction, classification, rotation or parsing, Flowde
+records the settings, input files and output files belonging to the run in
+the <code>.flowde/run.state</code> file inside <code>save_dir</code>. Flowde can use this record
+to continue unfinished work with <code>on_existing="resume"</code>, or to identify the
+previous run's output files before replacing the run with
+<code>on_existing="overwrite"</code>.</p>
+<h2 id="existing-run-options">Existing run options</h2>
+<table>
+<thead>
+<tr>
+<th><code>on_existing</code></th>
+<th>With a saved run in <code>save_dir</code></th>
+<th>With a new or empty <code>save_dir</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"error"</code> <span class="default-option">(Default)</span></td>
+<td>Raises an error.</td>
+<td>Starts a new run.</td>
+</tr>
+<tr>
+<td><code>"resume"</code></td>
+<td>Reuses completed work and continues the run.</td>
+<td>Raises an error because no saved run exists.</td>
+</tr>
+<tr>
+<td><code>"overwrite"</code></td>
+<td>Removes the previous run's recorded outputs and starts a new run.</td>
+<td>Starts a new run.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="resume-an-unfinished-run">Resume an unfinished run</h2>
+<p>A run can stop before completion if an API request fails. After resolving the
+error, you can continue the unfinished run by setting <code>on_existing="resume"</code>
+in any of the core pipeline functions:
+<a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>,
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>,
+<a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> and
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>.
+Each function records completed work in the <code>.flowde/run.state</code> file inside
+<code>save_dir</code> as the run progresses. Flowde uses the saved record to recover
+completed work and check that the run can safely continue.</p>
+<p>For example, using <code>classify_fn</code>, <code>img_dir</code> and <code>save_dir</code> from the
+<a href="../classification/#classify-images-from-a-directory">classification example</a>:</p>
+<pre><code class="language-python">labels = classify_imgs(
+    classify_fn=classify_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    positive_classes={1},
+    n_jobs=1,
+    on_existing=&quot;resume&quot;,
+)
+</code></pre>
+<h3 id="checks-before-resuming">Checks before resuming</h3>
+<p>Before resuming, Flowde raises an error if the model, prompt or previously
+processed input data have changed. This prevents a single <code>save_dir</code> from
+containing results produced using different models, prompts or versions of the
+input data.</p>
+<h4 id="settings-checked-when-resuming">Settings checked when resuming</h4>
+<p>In the table below, <code>classify_fn</code> and <code>parse_fn</code> are created with the
+<a href="../setup-default-funcs/">OpenAI or Gemini helpers</a>. <code>extract_fn</code> is created with
+<a href="../../reference/helpers/#flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn"><code>make_paddle_layout_extract_fn()</code></a>.</p>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>When defining a custom function, you must manually declare the settings
+that cannot change when resuming a run. See
+<a href="../custom-functions/#declare-settings">Declare settings</a> for how to do this.</p>
+</div>
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Cannot change</th>
+<th>Applies to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline stage</td>
+<td>Extraction, classification, rotation or parsing.</td>
+<td><a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a></td>
+</tr>
+<tr>
+<td>Prompt</td>
+<td><code>input_text</code></td>
+<td><code>classify_fn</code>, <code>parse_fn</code></td>
+</tr>
+<tr>
+<td>Model</td>
+<td><code>model</code></td>
+<td><code>classify_fn</code>, <code>parse_fn</code></td>
+</tr>
+<tr>
+<td>Provider</td>
+<td>Choice of OpenAI or Gemini helper, and <code>from_azure</code> for OpenAI.</td>
+<td><code>classify_fn</code>, <code>parse_fn</code></td>
+</tr>
+<tr>
+<td>Reasoning effort</td>
+<td><code>effort</code></td>
+<td><code>classify_fn</code>, <code>parse_fn</code></td>
+</tr>
+<tr>
+<td>Output schema</td>
+<td>The schema defined by <code>result_structure</code>, or by <code>parts_to_parse</code> for parsing.</td>
+<td><code>classify_fn</code>, <code>parse_fn</code></td>
+</tr>
+<tr>
+<td>Few-shot examples</td>
+<td><code>few_shot_examples</code>, including the example images and expected responses.</td>
+<td><code>classify_fn</code>, <code>parse_fn</code></td>
+</tr>
+<tr>
+<td>Paddle device</td>
+<td><code>device</code></td>
+<td><code>extract_fn</code></td>
+</tr>
+<tr>
+<td>Paddle CPU threads</td>
+<td><code>cpu_threads</code></td>
+<td><code>extract_fn</code></td>
+</tr>
+<tr>
+<td>Paddle batch size</td>
+<td><code>batch_size</code></td>
+<td><code>extract_fn</code></td>
+</tr>
+<tr>
+<td>PDF rendering resolution</td>
+<td><code>dpi</code></td>
+<td><code>extract_fn</code></td>
+</tr>
+<tr>
+<td>Image-crop padding</td>
+<td><code>padding</code></td>
+<td><code>extract_fn</code></td>
+</tr>
+<tr>
+<td>Paddle software versions</td>
+<td>Installed PaddleOCR and PaddleX versions.</td>
+<td><code>extract_fn</code></td>
+</tr>
+<tr>
+<td>Positive classification labels</td>
+<td><code>positive_classes</code></td>
+<td><a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a></td>
+</tr>
+<tr>
+<td>Custom function settings</td>
+<td>Declared settings.</td>
+<td><a href="../../reference/helpers/#flowde.model_function"><code>model_function()</code></a></td>
+</tr>
+</tbody>
+</table>
+<h4 id="files-checked-when-resuming">Files checked when resuming</h4>
+<table>
+<thead>
+<tr>
+<th>Files</th>
+<th>Cannot change</th>
+<th>Applies to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PDFs selected from <code>pdf_dir</code></td>
+<td>PDF file paths and contents.</td>
+<td><a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a></td>
+</tr>
+<tr>
+<td>Images selected from <code>img_dir</code></td>
+<td>Image file paths and contents.</td>
+<td><a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a></td>
+</tr>
+<tr>
+<td>JSON files supplied through <code>nodes_dir</code></td>
+<td>Previously parsed node numbers and text.</td>
+<td><a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a></td>
+</tr>
+<tr>
+<td>JSON files supplied through <code>labels_dir</code></td>
+<td>Previously parsed node numbers and labels.</td>
+<td><a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a></td>
+</tr>
+<tr>
+<td>JSON files supplied through <code>flow_dir</code></td>
+<td>Previously parsed node numbers and flow.</td>
+<td><a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a></td>
+</tr>
+<tr>
+<td>JSON files supplied through <code>additional_texts_dir</code></td>
+<td>Previously parsed additional text.</td>
+<td><a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a></td>
+</tr>
+<tr>
+<td>All output files in <code>save_dir</code></td>
+<td>Saved file contents.</td>
+<td><a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>, <a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="overwrite-an-existing-run">Overwrite an existing run</h2>
+<p>With <code>on_existing="overwrite"</code>, Flowde removes all output files recorded during
+the previous run.
+Flowde then starts a new run with the current inputs and settings. The previous
+run's saved results and usage history are cleared. Unrecorded files or unrelated
+directories in <code>save_dir</code> cause an error before any previous outputs are deleted.</p>
+<h2 id="stop-a-run">Stop a run</h2>
+<p>When a pipeline function is running in the main Python thread, you can stop
+processing from the terminal:</p>
+<ol>
+<li>Press <strong>Ctrl+C once</strong> to stop Flowde processing any new PDFs or images.
+   Flowde finishes processing the PDFs or images it has already started, saves
+   the results, then raises <code>KeyboardInterrupt</code>.</li>
+<li>Press <strong>Ctrl+C again</strong> to force an immediate stop.</li>
+</ol>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../parsing/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../usage/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,4590 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/reference/benchmarks/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Benchmarks - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Benchmarks";
+        var mkdocs_page_input_path = "reference/benchmarks.md";
+        var mkdocs_page_url = "/Flowde/reference/benchmarks/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pipeline/custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Benchmarks</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#classification-and-rotation">Classification and rotation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark">ClassificationBenchmark</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.classification.classification_benchmark.BinaryClassificationBenchmark">BinaryClassificationBenchmark</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.classification.classification_benchmark.MulticlassClassificationBenchmark">MulticlassClassificationBenchmark</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.rotation.rotation_benchmark.RotationBenchmark">RotationBenchmark</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#individual-classification-results">Individual classification results</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#parsing">Parsing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark">ParsingBenchmark</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches">node_matches</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches_with_flow">node_matches_with_flow</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_and_label_matches">node_and_label_matches</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.additional_text_matches">additional_text_matches</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.diagram_matches">diagram_matches</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_node_text_cost">total_node_text_cost</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_label_cost">total_label_cost</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_additional_text_cost">total_additional_text_cost</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_scores">all_flow_scores</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_jaccard_scores">all_flow_jaccard_scores</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.avg_flow_jaccard">avg_flow_jaccard</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#matching-result-objects">Matching result objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatch">NodeMatch</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches">TextListMatches</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.TextListMatch">TextListMatch</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch">DiagramMatch</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flow-scores">Flow scores</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.FlowScores">FlowScores</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#nodes-and-diagrams">Nodes and diagrams</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.parsing_bench_types.Diagram">Diagram</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#text-distances">Text distances</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_with_text_normalisation">levenshtein_with_text_normalisation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_fn">levenshtein_fn</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.number_only_levenshtein">number_only_levenshtein</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.benchmarks.parsing.text_distance_fns.distance_fn_protocol.DistanceFnProtocol">DistanceFnProtocol</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.benchmarks.parsing.text_distance_fns.distance_fn_protocol.DistanceFnProtocol.__call__">__call__</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+      <li class="breadcrumb-item active">Benchmarks</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/reference/benchmarks.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="benchmarks">Benchmarks</h1>
+<p>Benchmarks read saved JSONs and run locally. Constructing or evaluating a
+benchmark does not call an LLM. See the stage-specific benchmarking guides for
+input formats.</p>
+<h2 id="classification-and-rotation">Classification and rotation</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ClassificationBenchmark</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">ClassificationBenchmark(*, true_path: Path, pred_path: Path)</code></pre>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]</code></p>
+
+
+
+        <p>Compare saved image labels with ground truth and report accuracy.</p>
+<p>The benchmark reads JSON files without opening images or making model
+requests. Binary, multiclass and rotation benchmarks inherit the shared
+result properties documented here.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth JSON file containing a list of objects with exactly
+<code>img_path</code> and <code>label</code> keys. Image paths must be strings; labels must
+be <code>str</code>, <code>int</code> or <code>bool</code> values.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Prediction JSON file with the same format and number of entries as
+<code>true_path</code>. Entries are paired by list position. Paired image
+filenames, including extensions, must match; parent directories may
+differ. The benchmark does not sort or reorder either list.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>result_list</code></b>
+                  (<code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SingleClassificationResult
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>], ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>One record per paired image, in the JSON list order. Each record
+contains <code>img_path</code> from ground truth, <code>true</code> and <code>pred</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>correct_predictions</code></b>
+                  (<code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SingleClassificationResult
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>], ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Records whose predicted labels equal their ground-truth labels.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>incorrect_predictions</code></b>
+                  (<code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SingleClassificationResult
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>], ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Records whose predicted labels differ from their ground-truth labels.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>accuracy</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of correct predictions divided by the number of paired images.
+Returns <code>0.0</code> for two empty JSON lists.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>img_paths</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="str">str</span>, ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Image paths from the ground-truth JSON, in the JSON list order.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>trues</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth labels, in the JSON list order.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>preds</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Predicted labels, in the JSON list order.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either JSON file cannot be opened.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a JSON document is not a list, an entry is not an object, an
+<code>img_path</code> is not a string, or a label has an unsupported type.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either file contains invalid JSON, the lists have different
+lengths, an entry has missing or extra keys, or paired filenames
+differ.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Pass constructor arguments by keyword. <code>len(benchmark)</code> gives the number
+of paired images. Construction loads the saved labels into memory and
+leaves both source files unchanged. Subsequent edits to the source files
+do not update an existing benchmark object.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.benchmarks.classification.classification_benchmark.BinaryClassificationBenchmark" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">BinaryClassificationBenchmark</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">BinaryClassificationBenchmark(*, true_path: Path, pred_path: Path)</code></pre>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ClassificationBenchmark
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark)" href="#flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark">ClassificationBenchmark</a>[<span title="int">int</span>]</code></p>
+
+
+
+        <p>Evaluate binary image classification using saved labels <code>0</code> and <code>1</code>.</p>
+<p>The benchmark treats <code>1</code> as positive and <code>0</code> as negative. Construction
+loads and validates the saved labels; metric properties compare those
+labels without opening images or making model requests.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth JSON file containing a list of objects with exactly
+<code>img_path</code> and <code>label</code> keys. Each <code>img_path</code> must be a string and each
+<code>label</code> must be the integer <code>0</code> or <code>1</code>. Boolean labels are rejected.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Prediction JSON file in the same format as <code>true_path</code>, such as
+<code>classifications.json</code> saved by
+<a class="autorefs autorefs-internal" title="classify_imgs" href="../pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>. Both lists must
+contain the same number of entries in the same image order. At each
+position, filenames including extensions must match; parent
+directories may differ.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>tp</code></b>
+                  (<code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SingleClassificationResult
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>[<span title="int">int</span>], ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>True-positive records: ground-truth label <code>1</code>, predicted label <code>1</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>fp</code></b>
+                  (<code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SingleClassificationResult
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>[<span title="int">int</span>], ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>False-positive records: ground-truth label <code>0</code>, predicted label <code>1</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>fn</code></b>
+                  (<code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SingleClassificationResult
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>[<span title="int">int</span>], ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>False-negative records: ground-truth label <code>1</code>, predicted label <code>0</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>tn</code></b>
+                  (<code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SingleClassificationResult
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)" href="#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult">SingleClassificationResult</a>[<span title="int">int</span>], ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>True-negative records: ground-truth label <code>0</code>, predicted label <code>0</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_tp</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of true-positive records.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_fp</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of false-positive records.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_fn</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of false-negative records.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_tn</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of true-negative records.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>precision</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Proportion of predicted positives that are correct:
+<code>num_tp / (num_tp + num_fp)</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>recall</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Proportion of ground-truth positives found:
+<code>num_tp / (num_tp + num_fn)</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>f1_score</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Harmonic mean of precision and recall:
+<code>2 * precision * recall / (precision + recall)</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>tpr</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>True-positive rate; equal to <code>recall</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>fpr</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Proportion of ground-truth negatives incorrectly predicted positive:
+<code>num_fp / (num_fp + num_tn)</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>specificity</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Proportion of ground-truth negatives correctly predicted negative:
+<code>num_tn / (num_tn + num_fp)</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>tnr</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>True-negative rate; equal to <code>specificity</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either JSON file cannot be opened.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a JSON document is not a list, an entry is not an object, an
+<code>img_path</code> is not a string, or a label is not an integer.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either file contains invalid JSON, the lists have different
+lengths, an entry has missing or extra keys, paired filenames differ,
+or a label is an integer other than <code>0</code> or <code>1</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Pass constructor arguments by keyword. All metric properties return
+<code>0.0</code> when their denominator is zero, including for two empty JSON lists.
+Result tuples retain the JSON list order. Neither input file is changed.</p>
+<p>The benchmark also exposes <code>accuracy</code>, <code>result_list</code>, <code>img_paths</code>,
+<code>trues</code>, <code>preds</code>, <code>correct_predictions</code> and <code>incorrect_predictions</code>;
+<code>len(benchmark)</code> counts paired images. See the shared properties on
+<a class="autorefs autorefs-internal" title="ClassificationBenchmark
+
+
+  
+      dataclass
+  " href="#flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark"><code>ClassificationBenchmark</code></a>.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Using existing ground-truth and prediction JSON files:</p>
+    <pre class="highlight"><code class="language-pycon">&gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; from flowde.benchmarks.classification.classification_benchmark import (
+...     BinaryClassificationBenchmark,
+... )
+&gt;&gt;&gt; benchmark = BinaryClassificationBenchmark(
+...     true_path=Path("data/true-classifications.json"),
+...     pred_path=Path("results/classification/classifications.json"),
+... )
+&gt;&gt;&gt; print(benchmark.accuracy, benchmark.precision, benchmark.recall)</code></pre>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.benchmarks.classification.classification_benchmark.MulticlassClassificationBenchmark" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">MulticlassClassificationBenchmark</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">MulticlassClassificationBenchmark(*, true_path: Path, pred_path: Path, labels: tuple[LabelType, ...])</code></pre>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ClassificationBenchmark
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark)" href="#flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark">ClassificationBenchmark</a>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]</code></p>
+
+
+
+        <p>Evaluate image classification across a declared set of class labels.</p>
+<p>The benchmark compares saved predicted labels with ground-truth labels
+and provides overall accuracy, a confusion matrix and per-class counts.
+Construction reads JSON files without opening images or making model
+requests.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth JSON file containing a list of objects with exactly
+<code>img_path</code> and <code>label</code> keys. Image paths must be strings; labels must
+be <code>str</code>, <code>int</code> or <code>bool</code> values included in <code>labels</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Prediction JSON file in the same format as <code>true_path</code>, such as
+<code>classifications.json</code> saved by
+<a class="autorefs autorefs-internal" title="classify_imgs" href="../pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>. Both lists must
+contain the same number of entries in the same image order. At each
+position, filenames including extensions must match; parent
+directories may differ.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Non-empty tuple of unique class labels. Must include every label in
+both JSON files; may also include classes absent from both files.
+Tuple order determines the order of dictionary keys in the confusion
+matrix and class summaries. Uniqueness follows Python equality, so
+<code>1</code> and <code>True</code>, for example, cannot be separate classes.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>confusion_matrix</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, <span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, <span title="int">int</span>]]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Counts indexed first by ground-truth label, then by predicted label.
+<code>confusion_matrix["table"]["flowchart"]</code> counts true tables predicted
+as flowcharts. Includes every pair of declared labels, with zero for
+pairs absent from the saved results.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_per_true_class</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, <span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of images with each ground-truth label, including zero counts.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_per_pred_class</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, <span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of images with each predicted label, including zero counts.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>per_class_accuracy</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>, <span title="float">float</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>For each ground-truth class, the number of correct predictions divided
+by the number of images in that class. Returns <code>0.0</code> for a declared
+class with no ground-truth images.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either JSON file cannot be opened.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a JSON document is not a list, an entry is not an object, an
+<code>img_path</code> is not a string, or a saved label has an unsupported type.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either file contains invalid JSON, the lists have different
+lengths, an entry has missing or extra keys, paired filenames differ,
+<code>labels</code> is empty or contains duplicates, or a saved label is absent
+from <code>labels</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Pass constructor arguments by keyword. Result tuples retain the JSON
+list order. Neither input file is changed. Two empty JSON lists are
+accepted with a non-empty <code>labels</code> tuple and produce zero counts and
+accuracies.</p>
+<p>The benchmark also exposes <code>accuracy</code>, <code>result_list</code>, <code>img_paths</code>,
+<code>trues</code>, <code>preds</code>, <code>correct_predictions</code> and <code>incorrect_predictions</code>;
+<code>len(benchmark)</code> counts paired images. See the shared properties on
+<a class="autorefs autorefs-internal" title="ClassificationBenchmark
+
+
+  
+      dataclass
+  " href="#flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark"><code>ClassificationBenchmark</code></a>.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Using existing ground-truth and prediction JSON files:</p>
+    <pre class="highlight"><code class="language-pycon">&gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; from flowde.benchmarks.classification.classification_benchmark import (
+...     MulticlassClassificationBenchmark,
+... )
+&gt;&gt;&gt; benchmark = MulticlassClassificationBenchmark(
+...     true_path=Path("data/true-classifications.json"),
+...     pred_path=Path("results/classification/classifications.json"),
+...     labels=("flowchart", "table", "other"),
+... )
+&gt;&gt;&gt; print(benchmark.confusion_matrix)
+&gt;&gt;&gt; print(benchmark.per_class_accuracy)</code></pre>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><h3 id="flowde.benchmarks.rotation.rotation_benchmark.RotationBenchmark">RotationBenchmark</h3>
+<pre><code class="language-python">RotationBenchmark(*, true_path: Path, pred_path: Path)
+</code></pre>
+<!-- Griffe includes the inherited labels argument despite init=False here. -->
+<!-- Keep the actual signature above and render the source docstring below. -->
+<!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="MulticlassClassificationBenchmark
+
+
+  
+      dataclass
+   (flowde.benchmarks.classification.classification_benchmark.MulticlassClassificationBenchmark)" href="#flowde.benchmarks.classification.classification_benchmark.MulticlassClassificationBenchmark">MulticlassClassificationBenchmark</a>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>]</code></p>
+
+
+
+        <p>Compare predicted image rotations with ground-truth rotation labels.</p>
+<p>Labels describe the clockwise correction, in degrees, needed by each
+original input image: <code>0</code>, <code>90</code>, <code>180</code> or <code>270</code>. A prediction is correct
+only when the predicted angle equals the ground-truth angle. The benchmark
+reads saved labels without opening or rotating images or making model
+requests.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_path</code></b>
+                  (<code><span title="Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth JSON file containing a list of objects with exactly
+<code>img_path</code> and <code>label</code> keys. Each <code>img_path</code> must be a string; each
+<code>label</code> specifies the clockwise correction for the original image.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_path</code></b>
+                  (<code><span title="Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Prediction JSON file in the same format as <code>true_path</code>, such as
+<code>rotations.json</code> saved by
+<a class="autorefs autorefs-internal" title="rotate_imgs" href="../pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>. Both lists must
+contain the same number of entries in the same image order. At each
+position, filenames including extensions must match; parent
+directories may differ.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>labels</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>, ...]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Fixed class labels <code>(0, 90, 180, 270)</code>. The constructor does not accept
+a <code>labels</code> argument.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>confusion_matrix</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>, <span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>, <span title="int">int</span>]]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Counts indexed first by ground-truth angle, then by predicted angle.
+For example, <code>confusion_matrix[90][0]</code> counts images requiring a
+90-degree correction that received a prediction of zero degrees.
+Includes all four angles, even when no image has a particular angle.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_per_true_class</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>, <span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of images requiring each ground-truth correction.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>num_per_pred_class</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>, <span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of images assigned each predicted correction.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>per_class_accuracy</code></b>
+                  (<code><span title="dict">dict</span>[<span title="flowde.classify_fns.classify_types.RotationLabel">RotationLabel</span>, <span title="float">float</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>For each ground-truth angle, correct predictions divided by images
+requiring that angle. Returns <code>0.0</code> when no image requires the angle.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either JSON file cannot be opened.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a JSON document is not a list, an entry is not an object, an
+<code>img_path</code> is not a string, or a saved label has an unsupported type.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If either file contains invalid JSON, the lists have different
+lengths, an entry has missing or extra keys, paired filenames differ,
+or a saved label is outside the supported rotation classes.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Pass <code>true_path</code> and <code>pred_path</code> by keyword. Result tuples retain the JSON
+list order. Neither input file is changed. Two empty JSON lists produce
+zero counts and accuracies. Incorrect angles receive no partial credit
+based on how close the predicted angle is to the ground-truth angle.</p>
+<p>The benchmark also exposes <code>accuracy</code>, <code>result_list</code>, <code>img_paths</code>,
+<code>trues</code>, <code>preds</code>, <code>correct_predictions</code> and <code>incorrect_predictions</code>;
+<code>len(benchmark)</code> counts paired images. See the shared properties on
+<a class="autorefs autorefs-internal" title="ClassificationBenchmark
+
+
+  
+      dataclass
+  " href="#flowde.benchmarks.classification.classification_benchmark.ClassificationBenchmark"><code>ClassificationBenchmark</code></a>.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Using existing ground-truth and prediction JSON files:</p>
+    <pre class="highlight"><code class="language-pycon">&gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; from flowde.benchmarks.rotation.rotation_benchmark import RotationBenchmark
+&gt;&gt;&gt; benchmark = RotationBenchmark(
+...     true_path=Path("data/true-rotations.json"),
+...     pred_path=Path("results/rotation/rotations.json"),
+... )
+&gt;&gt;&gt; print(benchmark.accuracy)
+&gt;&gt;&gt; print(benchmark.confusion_matrix)</code></pre>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><h3 id="individual-classification-results">Individual classification results</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">SingleClassificationResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">SingleClassificationResult(*, img_path: str, pred: LabelType, true: LabelType)</code></pre>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]</code></p>
+
+
+
+        <p>Store the true and predicted labels for one benchmark image.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>img_path</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to the classified image. Benchmarks take this path from the
+ground-truth classification file.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred</code></b>
+                  (<code><span title="flowde.classify_fns.classify_types.LabelType">LabelType</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Predicted label for the image.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true</code></b>
+                  (<code><span title="flowde.classify_fns.classify_types.LabelType">LabelType</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth label for the image.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><h2 id="parsing">Parsing</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ParsingBenchmark</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">ParsingBenchmark(pred_diagrams_dir: Path | Sequence[Path], distance_fn: DistanceFnProtocol = levenshtein_with_text_normalisation, allow_missing_pred_diagrams: bool = False, true_nodes_dir: Path = Path('./experiment_data/parsing/training-smoking-cessation/ground-truth-nodes-texts-numbers-row-major-column/'), true_labels_dir: Path = Path('./experiment_data/parsing/training-smoking-cessation/ground-truth-labels-attempt-2/'), true_additional_texts_dir: Path = Path('./experiment_data/parsing/training-smoking-cessation/ground-truth-additional-texts/'), true_flow_dir: Path = Path('./experiment_data/parsing/training-smoking-cessation/ground-truth-flow/'), expected_num_diagrams: int = N_DIAGRAMS_IN_BENCHMARK)</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Evaluate parsed flowcharts against accepted ground-truth interpretations.</p>
+<p>Construction loads and validates saved JSON files. Scoring methods match
+predicted nodes to ground-truth nodes and compare node text, labels,
+directed connections and additional text. Benchmarking runs locally,
+without opening images, changing source files or making model requests.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>pred_diagrams_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | <span title="collections.abc.Sequence">Sequence</span>[<span title="pathlib.Path">Path</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>One directory containing prediction JSONs, or a sequence of directories
+containing separately parsed parts. Reads top-level <code>*.json</code> files;
+subdirectories are not searched. Each filename stem identifies a
+flowchart, and each file contains one prediction object rather than
+a ground-truth <code>options</code> list.</p>
+<p>Predictions must include node text. Labels, flow and additional text
+are optional. All JSONs within a prediction directory must contain
+the same parts. Separate prediction directories must contain matching
+filename stems and non-overlapping parts. Node-based parts must use
+the same node numbers for each flowchart. The benchmark joins those
+parts in memory; combined JSON files are not required.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>distance_fn</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="DistanceFnProtocol (flowde.benchmarks.parsing.text_distance_fns.distance_fn_protocol.DistanceFnProtocol)" href="#flowde.benchmarks.parsing.text_distance_fns.distance_fn_protocol.DistanceFnProtocol">DistanceFnProtocol</a></code>, default:
+                      <code><a class="autorefs autorefs-internal" title="levenshtein_with_text_normalisation (flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_with_text_normalisation)" href="#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_with_text_normalisation">levenshtein_with_text_normalisation</a></code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Function accepting <code>true_text</code> and <code>pred_text</code> as keyword arguments
+and returning a finite, non-negative <code>int</code> or <code>float</code>. Either argument
+may be <code>None</code> to represent unmatched text; the supplied functions
+treat <code>None</code> as an empty string. Lower costs mean closer text matches.</p>
+<p>Defaults to
+<a class="autorefs autorefs-internal" title="levenshtein_with_text_normalisation" href="#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_with_text_normalisation"><code>levenshtein_with_text_normalisation()</code></a>,
+which normalises Unicode, whitespace and selected punctuation before
+counting character edits. You can supply a different function to
+change the text comparison used for matching and scoring.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>allow_missing_pred_diagrams</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Defaults to <code>False</code>, requiring predictions for every ground-truth
+flowchart. With <code>True</code>, evaluate only flowcharts that have predictions.
+Missing predictions receive no penalty and do not contribute to
+averages. Predictions without corresponding ground truth remain
+invalid.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_nodes_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>, default:
+                      <code><span title="pathlib.Path">Path</span>(&#39;./experiment_data/parsing/training-smoking-cessation/ground-truth-nodes-texts-numbers-row-major-column/&#39;)</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of ground-truth node-text JSONs. Each file contains an
+<code>options</code> list of objects with <code>nodes</code>; each node supplies
+<code>node_number</code> and <code>text</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_labels_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>, default:
+                      <code><span title="pathlib.Path">Path</span>(&#39;./experiment_data/parsing/training-smoking-cessation/ground-truth-labels-attempt-2/&#39;)</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of ground-truth label JSONs. Each file contains an <code>options</code>
+list of objects with <code>nodes</code>; each node supplies <code>node_number</code> and a
+<code>labels</code> list of strings, which may be empty.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_additional_texts_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>, default:
+                      <code><span title="pathlib.Path">Path</span>(&#39;./experiment_data/parsing/training-smoking-cessation/ground-truth-additional-texts/&#39;)</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of ground-truth additional-text JSONs. Each file contains
+an <code>options</code> list of objects with an <code>additional_texts</code> list of
+strings, which may be empty.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_flow_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>, default:
+                      <code><span title="pathlib.Path">Path</span>(&#39;./experiment_data/parsing/training-smoking-cessation/ground-truth-flow/&#39;)</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory of ground-truth flow JSONs. Each file contains an <code>options</code>
+list of objects with <code>nodes</code>; each node supplies <code>node_number</code> and a
+<code>points_to</code> list of destination node numbers.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>expected_num_diagrams</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code><span title="flowde.benchmarks.parsing.check_parsing_bench_data.N_DIAGRAMS_IN_BENCHMARK">N_DIAGRAMS_IN_BENCHMARK</span></code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of flowcharts in the complete ground-truth dataset, before
+filtering missing predictions. Counts filename stems, not accepted
+interpretations. Defaults to <code>346</code>, the original research dataset's
+size. Supply the count for your own dataset.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>pred_diagrams</code></b>
+                  (<code><span title="list">list</span>[<span title="Diagram">Diagram</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Loaded predictions, including any parts joined from separate
+directories, in sorted filename-stem order.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_diagrams_options_list</code></b>
+                  (<code><span title="list">list</span>[<span title="DiagramOptions">DiagramOptions</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Accepted ground-truth interpretations for each evaluated flowchart,
+in the same filename-stem order as <code>pred_diagrams</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_structure</code></b>
+                  (<code><span title="flowde.benchmarks.parsing.parsing_bench_types.PredDiagramStructure">PredDiagramStructure</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Which parts the predictions contain: node text, labels, flow and
+additional text.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>capabilities</code></b>
+                  (<code><span title="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmarkCapabilities">ParsingBenchmarkCapabilities</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Which scoring operations the predicted parts support. The
+<code>available_methods</code> tuple lists the supported method names.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a discovered JSON file cannot be opened.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="TypeError">TypeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a prediction or ground-truth field has an invalid type.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If JSON is malformed, prediction directories are empty, file counts
+or stems disagree, Ground-Truth Options do not align, or a node or
+connection fails validation. Also raised for missing predicted node
+text, overlapping predicted parts, or inconsistent predicted parts
+or node numbers across their source files.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Supply all four ground-truth directories for your dataset, even when the
+predictions contain only some parts. The default ground-truth paths refer
+to the original research dataset, which is not included in a package
+installation. The four directories must contain matching filename stems.
+For each flowchart, the four <code>options</code> lists must have the same length;
+entries at the same index form one Ground-Truth Option and must agree on
+node numbers across node-based parts.</p>
+<p>Scoring methods select Node Matches by minimising node-text cost. Among
+ties, the benchmark maximises flow similarity, then uses label cost to
+resolve remaining ties. Missing predicted parts are skipped. Ground-Truth
+Option selection follows the same order, then uses additional-text cost
+to resolve remaining ties; a complete tie selects the first option.
+All scoring methods use the available predicted parts for matching.
+Prediction and ground-truth node numbers do not need to match.</p>
+<p>Text-cost methods sum matched and unmatched text costs. Flow-score methods
+compare directed connections after matching nodes. Results follow sorted
+filename-stem order, and <code>avg_flow_jaccard()</code> gives each evaluated
+flowchart equal weight. Methods requiring an unparsed part raise
+<code>ValueError</code>. A scoring method raises <code>RuntimeError</code> if the node matcher
+cannot establish an optimal solution; an invalid text-distance value
+raises <code>ValueError</code> during scoring.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Using existing predictions and a ground-truth dataset of one flowchart:</p>
+    <pre class="highlight"><code class="language-pycon">&gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; from flowde.benchmarks.parsing.parsing_bench import ParsingBenchmark
+&gt;&gt;&gt; truth_dir = Path("data/ground-truth")
+&gt;&gt;&gt; benchmark = ParsingBenchmark(
+...     pred_diagrams_dir=Path("results/predictions"),
+...     true_nodes_dir=truth_dir / "nodes",
+...     true_labels_dir=truth_dir / "labels",
+...     true_flow_dir=truth_dir / "flow",
+...     true_additional_texts_dir=truth_dir / "additional_texts",
+...     expected_num_diagrams=1,
+... )
+&gt;&gt;&gt; print(benchmark.total_node_text_cost())
+&gt;&gt;&gt; print(benchmark.avg_flow_jaccard())</code></pre>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><h3 id="methods">Methods</h3>
+<p>Select a method below for its parameters, return values and error conditions.
+Select a result type to inspect the fields and properties on each returned
+object. Lists follow sorted flowchart filename-stem order.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Required predicted parts</th>
+<th>Return value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches"><code>node_matches(range_indices=None)</code></a></td>
+<td>Node text</td>
+<td>List of <a href="./#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches"><code>NodeMatches</code></a></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches_with_flow"><code>node_matches_with_flow()</code></a></td>
+<td>Node text and flow</td>
+<td>List of <a href="./#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches"><code>NodeMatches</code></a></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_and_label_matches"><code>node_and_label_matches()</code></a></td>
+<td>Node text and labels</td>
+<td>List of <a href="./#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches"><code>NodeMatches</code></a></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.additional_text_matches"><code>additional_text_matches()</code></a></td>
+<td>Node text and additional text</td>
+<td>List of <a href="./#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches"><code>TextListMatches</code></a></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.diagram_matches"><code>diagram_matches()</code></a></td>
+<td>All four parts</td>
+<td>List of <a href="./#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch"><code>DiagramMatch</code></a></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_node_text_cost"><code>total_node_text_cost()</code></a></td>
+<td>Node text</td>
+<td><code>float</code></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_label_cost"><code>total_label_cost()</code></a></td>
+<td>Node text and labels</td>
+<td><code>float</code></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_additional_text_cost"><code>total_additional_text_cost()</code></a></td>
+<td>Node text and additional text</td>
+<td><code>float</code></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_scores"><code>all_flow_scores()</code></a></td>
+<td>Node text and flow</td>
+<td>List of <a href="./#flowde.benchmarks.parsing.parsing_bench_types.FlowScores"><code>FlowScores</code></a></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_jaccard_scores"><code>all_flow_jaccard_scores()</code></a></td>
+<td>Node text and flow</td>
+<td><code>list[float]</code></td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.avg_flow_jaccard"><code>avg_flow_jaccard()</code></a></td>
+<td>Node text and flow</td>
+<td><code>float</code></td>
+</tr>
+</tbody>
+</table>
+<p>All methods use the available predicted parts to select Node Matches and a
+Ground-Truth Option; see <a href="../../benchmarking/parsing/#how-diagrams-are-matched">how diagrams are matched</a>.
+Each method calculates its results from the loaded data when called. Results
+are not cached between calls, and scoring makes no model requests.</p>
+<!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">node_matches</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">node_matches(range_indices: <span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="int">int</span> | None] | None = None) -&gt; <span title="list">list</span>[<a class="autorefs autorefs-internal" title="NodeMatches (flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Match predicted nodes to ground-truth nodes for each flowchart.</p>
+<p>Requires predicted node text. Matching minimises node-text cost,
+uses flow similarity to resolve ties when flow was parsed, and then
+uses label cost when labels were parsed. Ground-Truth Option selection
+also uses additional-text cost to resolve remaining ties when that
+part was parsed. A complete tie selects the first Ground-Truth Option.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>range_indices</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="int">int</span> | None] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>A <code>(start, stop)</code> slice of the evaluated flowcharts in sorted
+filename-stem order. <code>start</code> is included and <code>stop</code> is excluded.
+Either bound may be <code>None</code>; negative indices follow Python
+slicing rules. Defaults to <code>None</code>, which matches all evaluated
+flowcharts. An empty slice returns an empty list.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="NodeMatches (flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One collection per selected flowchart, in sorted filename-stem
+order. Each collection identifies the selected Ground-Truth
+Option and records paired nodes, unmatched ground-truth nodes and
+unmatched predicted nodes, together with their node-text costs.
+Node numbers identify nodes within each diagram; matching does
+not require equal predicted and ground-truth node numbers.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text is missing or a text-distance value fails
+validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>The method uses every available predicted part for matching, even
+though the returned result focuses on nodes. Label matches may be
+populated while resolving ties; use
+<a class="autorefs autorefs-internal" title="node_and_label_matches" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_and_label_matches"><code>node_and_label_matches()</code></a>
+when you need label matches for every node.</p>
+</details>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches_with_flow" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">node_matches_with_flow</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">node_matches_with_flow() -&gt; <span title="list">list</span>[<a class="autorefs autorefs-internal" title="NodeMatches (flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Return Node Matches after requiring predicted flow as well as text.</p>
+<p>Uses the same matching policy as
+<a class="autorefs autorefs-internal" title="node_matches" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches"><code>node_matches()</code></a>.
+The additional flow requirement ensures that each returned collection
+can calculate its <code>flow_score</code> property.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="NodeMatches (flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One collection per evaluated flowchart, in sorted filename-stem
+order, including the selected Ground-Truth Option and unmatched
+nodes. Flow compares directed connections after applying the
+Node Matches.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or flow is missing, or a text-distance
+value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_and_label_matches" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">node_and_label_matches</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">node_and_label_matches() -&gt; <span title="list">list</span>[<a class="autorefs autorefs-internal" title="NodeMatches (flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Match nodes, then match the labels belonging to each Node Match.</p>
+<p>Requires predicted node text and labels. The benchmark selects nodes
+and a Ground-Truth Option using all available predicted parts, then
+pairs label strings within each Node Match to minimise label cost.
+Labels belonging to unmatched nodes count as unmatched labels.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="NodeMatches (flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One collection per evaluated flowchart, in sorted filename-stem
+order. Every <code>NodeMatch.label_matches</code> contains a <code>TextListMatches</code>
+object, including an empty collection when both nodes have no
+labels. <code>total_label_error_cost</code> sums the collection's label costs.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or labels are missing, or a text-distance
+value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.additional_text_matches" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">additional_text_matches</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">additional_text_matches() -&gt; <span title="list">list</span>[<a class="autorefs autorefs-internal" title="TextListMatches (flowde.benchmarks.parsing.parsing_bench_types.TextListMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches">TextListMatches</a>]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Match additional-text strings for each evaluated flowchart.</p>
+<p>Requires predicted node text and additional text. The benchmark first
+selects a Ground-Truth Option using all available predicted parts,
+then pairs that option's additional text with the prediction to
+minimise additional-text cost. Strings are matched by cost, not by
+their positions in the input lists.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="TextListMatches (flowde.benchmarks.parsing.parsing_bench_types.TextListMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches">TextListMatches</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One collection per flowchart, in sorted filename-stem order.
+Each collection contains paired and unmatched strings with their
+original list indices and costs. Individual records also identify
+the flowchart and selected Ground-Truth Option. If both diagrams
+have empty additional-text lists, the collection has no records
+and <code>total_cost</code> is zero.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or additional text is missing, or a
+text-distance value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.diagram_matches" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">diagram_matches</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">diagram_matches() -&gt; <span title="list">list</span>[<a class="autorefs autorefs-internal" title="DiagramMatch (flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch)" href="#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch">DiagramMatch</a>]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Match all four parsed parts for each evaluated flowchart.</p>
+<p>Requires predicted node text, labels, flow and additional text. The
+benchmark selects one Ground-Truth Option per prediction and uses
+that option for the node, label, additional-text and flow comparisons.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="DiagramMatch (flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch)" href="#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch">DiagramMatch</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One complete comparison per flowchart, in sorted filename-stem
+order. Each result contains the prediction, the selected
+ground-truth diagram, Node Matches with label matches, and
+additional-text matches. Text totals and flow scores are
+available as properties on each result.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If any required predicted part is missing or a text-distance
+value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_node_text_cost" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">total_node_text_cost</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">total_node_text_cost() -&gt; <span title="float">float</span></code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Sum node-text costs across all evaluated flowcharts.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="float">float</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Total cost of paired and unmatched node text, using <code>distance_fn</code>.
+With the default distance function, the total counts character
+edits after text normalisation. Lower is better; the total is not
+an average or percentage. Requires predicted node text.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text is missing or a text-distance value fails
+validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_label_cost" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">total_label_cost</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">total_label_cost() -&gt; <span title="float">float</span></code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Sum label costs across all evaluated flowcharts.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="float">float</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Total cost of paired and unmatched label strings, including
+labels on unmatched nodes, using <code>distance_fn</code>. Lower is better;
+the total is not an average or percentage. Requires predicted
+node text and labels. Node text selects the Node Matches but
+does not contribute to this label-only total.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or labels are missing, or a text-distance
+value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_additional_text_cost" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">total_additional_text_cost</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">total_additional_text_cost() -&gt; <span title="float">float</span></code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Sum additional-text costs across all evaluated flowcharts.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="float">float</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Total cost of paired and unmatched additional-text strings, using
+<code>distance_fn</code>. Lower is better; the total is not an average or
+percentage. Requires predicted node text and additional text.
+Node text helps select the Ground-Truth Option but does not
+contribute to this additional-text-only total.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or additional text is missing, or a
+text-distance value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_scores" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">all_flow_scores</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">all_flow_scores() -&gt; <span title="list">list</span>[<a class="autorefs autorefs-internal" title="FlowScores (flowde.benchmarks.parsing.parsing_bench_types.FlowScores)" href="#flowde.benchmarks.parsing.parsing_bench_types.FlowScores">FlowScores</a>]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Score the predicted directed connections in each flowchart.</p>
+<p>Requires predicted node text and flow. The benchmark matches nodes
+before comparing connections, so predicted node numbers may differ
+from ground-truth node numbers. Connection direction matters:
+<code>1 -&gt; 2</code> and <code>2 -&gt; 1</code> represent different connections.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="FlowScores (flowde.benchmarks.parsing.parsing_bench_types.FlowScores)" href="#flowde.benchmarks.parsing.parsing_bench_types.FlowScores">FlowScores</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>One score object per evaluated flowchart, in sorted filename-stem
+order. Each object contains correct, extra and missing connection
+counts, precision, recall, F1, Jaccard similarity, and the sets of
+extra and missing connections. Reported connections use matched
+ground-truth node numbers; unmatched predicted endpoints receive
+generated identifiers starting at <code>10000</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or flow is missing, or a text-distance
+value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_jaccard_scores" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">all_flow_jaccard_scores</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">all_flow_jaccard_scores() -&gt; <span title="list">list</span>[<span title="float">float</span>]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Return one flow Jaccard similarity score per evaluated flowchart.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<span title="float">float</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Scores in sorted filename-stem order, calculated after matching
+nodes. Each score is <code>TP / (TP + FP + FN)</code>, between <code>0.0</code> and
+<code>1.0</code>; higher is better. A score of <code>1.0</code> means the directed
+connection sets agree. Two empty connection sets score <code>1.0</code>.
+Requires predicted node text and flow.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or flow is missing, or a text-distance
+value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.avg_flow_jaccard" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">avg_flow_jaccard</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">avg_flow_jaccard() -&gt; <span title="float">float</span></code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Average the flow Jaccard scores of the evaluated flowcharts.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="float">float</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Arithmetic mean of the individual flow Jaccard scores, between
+<code>0.0</code> and <code>1.0</code>; higher is better. Each flowchart has equal weight,
+regardless of its number of connections. Missing predictions
+excluded with <code>allow_missing_pred_diagrams=True</code> do not contribute
+to the mean. Requires predicted node text and flow.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If predicted node text or flow is missing, there are no evaluated
+flowcharts, or a text-distance value fails validation.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the node matcher cannot establish an optimal solution.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><h3 id="matching-result-objects">Matching result objects</h3>
+<p>These Pydantic models hold the comparisons returned by the benchmark.
+A match can pair a prediction with ground truth or record an unmatched node
+or string. The following entries describe the stored fields and computed
+properties.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches"><code>NodeMatches</code></a></td>
+<td>Node Matches for one flowchart and the selected Ground-Truth Option.</td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.NodeMatch"><code>NodeMatch</code></a></td>
+<td>One paired or unmatched node, with text cost and optional label matches.</td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches"><code>TextListMatches</code></a></td>
+<td>Comparisons for one node's labels or one flowchart's additional text.</td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.TextListMatch"><code>TextListMatch</code></a></td>
+<td>One paired or unmatched string, with source-list indices and cost.</td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch"><code>DiagramMatch</code></a></td>
+<td>A complete prediction, its selected ground-truth diagram and all part comparisons.</td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.FlowScores"><code>FlowScores</code></a></td>
+<td>Directed-connection counts, metrics, and missing and extra connections.</td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.Node"><code>Node</code></a></td>
+<td>An individual predicted or ground-truth node held inside a match.</td>
+</tr>
+<tr>
+<td><a href="./#flowde.benchmarks.parsing.parsing_bench_types.Diagram"><code>Diagram</code></a></td>
+<td>The prediction or selected ground-truth diagram held inside a complete comparison.</td>
+</tr>
+</tbody>
+</table>
+<p>You can inspect stored fields with
+<a href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump"><code>model_dump()</code></a>
+or serialise stored fields with
+<a href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump_json"><code>model_dump_json()</code></a>.
+Computed properties such as <code>total_text_cost</code> and <code>flow_score</code> are accessed
+directly and are not included in those dumps.</p>
+<!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.NodeMatches" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">NodeMatches</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Collect the Node Matches for one flowchart and one Ground-Truth Option.</p>
+<p>Benchmark-generated collections include every ground-truth and predicted
+node exactly once, either in a pair or as an unmatched node.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>matches</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="NodeMatch (flowde.benchmarks.parsing.parsing_bench_types.NodeMatch)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatch">NodeMatch</a>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Paired and unmatched node records. Inspect <code>true_node</code> and <code>pred_node</code>
+on each record to identify the nodes; list positions are not node
+numbers.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_diagram_option_idx</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Index of the selected Ground-Truth Option, starting at <code>0</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_img_code</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Source flowchart's filename stem, taken from the first Node Match.
+Access raises <code>ValueError</code> if <code>matches</code> is empty.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_nodes</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>All present ground-truth nodes, including unmatched nodes, in the
+order of their records in <code>matches</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_nodes</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>All present predicted nodes, including unmatched nodes, in the
+order of their records in <code>matches</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_node_text_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of the records' <code>node_text_cost</code> values, including unmatched nodes.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_numbers_only_node_text_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of the records' numbers-only text costs. Uses the existing Node
+Matches without choosing different pairings or a different option.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_label_error_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of label costs across all Node Matches. Access raises <code>ValueError</code>
+if any record has <code>label_matches=None</code>; an empty collection costs zero.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>flow_score</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="FlowScores (flowde.benchmarks.parsing.parsing_bench_types.FlowScores)" href="#flowde.benchmarks.parsing.parsing_bench_types.FlowScores">FlowScores</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directed-connection scores calculated from these Node Matches.
+Requires a <code>points_to</code> list on every present node. Matched endpoints
+use ground-truth node numbers; unmatched predicted endpoints receive
+generated identifiers starting at <code>10000</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a field is invalid or a ground-truth or predicted node number
+appears in more than one record on the same side during validation.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Text costs include unmatched nodes and labels. Flow uses the same Node
+Matches; accessing <code>flow_score</code> does not select new pairings. Cost
+properties sum the stored records rather than rerunning model requests
+or matching.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="flowde.benchmarks.parsing.parsing_bench_types.NodeMatches.get_matched_true_node" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_matched_true_node</span>
+
+
+</h5>
+<pre class="highlight"><code class="language-python doc-signature">get_matched_true_node(pred_node_number: <span title="int">int</span>, allow_fake_pred_node: <span title="bool">bool</span> = False) -&gt; <a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a> | None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Find the ground-truth node paired with a predicted node number.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>pred_node_number</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Identifier of a predicted node recorded in <code>matches</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>allow_fake_pred_node</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether an absent predicted node number should return <code>None</code>
+instead of raising an error. Defaults to <code>False</code>. Flow scoring
+uses this option when looking up predicted connection endpoints.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a> | None</code>
+              –
+              <div class="doc-md-description">
+                <p>The paired ground-truth node. Returns <code>None</code> for a recorded
+unmatched predicted node, or for an absent predicted node number
+when <code>allow_fake_pred_node=True</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>pred_node_number</code> is absent and <code>allow_fake_pred_node=False</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="flowde.benchmarks.parsing.parsing_bench_types.NodeMatches.get_matched_pred_node" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_matched_pred_node</span>
+
+
+</h5>
+<pre class="highlight"><code class="language-python doc-signature">get_matched_pred_node(true_node_number: <span title="int">int</span>) -&gt; <a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a> | None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Find the predicted node paired with a ground-truth node number.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_node_number</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Identifier of a ground-truth node recorded in <code>matches</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a> | None</code>
+              –
+              <div class="doc-md-description">
+                <p>The paired predicted node, or <code>None</code> when the recorded ground-truth
+node is unmatched.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>true_node_number</code> does not appear in <code>matches</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.NodeMatch" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">NodeMatch</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Record one pair of corresponding nodes or one unmatched node.</p>
+<p>A paired prediction and ground-truth node may have different text or node
+numbers. The benchmark stores text cost separately from any label costs.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_node</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Node from the selected Ground-Truth Option, or <code>None</code> when a predicted
+node has no ground-truth match.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_node</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Predicted node, or <code>None</code> when a ground-truth node has no prediction.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>node_text_cost</code></b>
+                  (<code><span title="int">int</span> | <span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Cost returned by the benchmark's <code>distance_fn</code> for the node text.
+An unmatched node is compared with a missing text value; built-in
+distance functions treat the missing value as an empty string.
+Excludes label and flow costs.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>label_matches</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="TextListMatches (flowde.benchmarks.parsing.parsing_bench_types.TextListMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches">TextListMatches</a> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Label comparisons for this Node Match, or <code>None</code> before labels have
+been matched. An empty collection means both nodes have no labels.
+Label comparisons include labels belonging to unmatched nodes.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>match_type</code></b>
+                  (<code>{&#39;match&#39;, &#39;unmatched_true&#39;, &#39;unmatched_pred&#39;}</code>)
+              –
+              <div class="doc-md-description">
+                <p><code>"match"</code> for two present nodes; <code>"unmatched_true"</code> for a ground-truth
+node without a prediction; <code>"unmatched_pred"</code> for a predicted node
+without ground truth. A pair need not have zero text cost.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_img_code</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Source flowchart's filename stem, taken from the ground-truth node
+when present, otherwise from the predicted node.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>numbers_only_node_text_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Cost from comparing only the numbers in the two nodes' text with
+<a class="autorefs autorefs-internal" title="number_only_levenshtein" href="#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.number_only_levenshtein"><code>number_only_levenshtein()</code></a>.
+Uses this existing Node Match without changing the nodes or their
+pairing.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a field is invalid, both nodes are absent, or two present nodes
+have different <code>parent_img_code</code> values.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.TextListMatches" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">TextListMatches</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Collect comparisons for one node's labels or a diagram's additional text.</p>
+<p>The benchmark matches strings to minimise total cost rather than pairing
+strings by their list positions. Each record retains the original indices
+so the source strings can be identified.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>matches</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="TextListMatch (flowde.benchmarks.parsing.parsing_bench_types.TextListMatch)" href="#flowde.benchmarks.parsing.parsing_bench_types.TextListMatch">TextListMatch</a>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Paired and unmatched string records. Benchmark-generated collections
+account for every string in both source lists. Two empty source lists
+produce an empty collection. Use each record's <code>true_index</code> and
+<code>pred_index</code> to identify its original positions.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of every record's <code>cost</code>, including unmatched strings. An empty
+collection has cost zero. The property reports a total, not an average.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This class stores the supplied records and computes their total; the
+class does not perform string matching when constructed. The container
+does not store source lists or flowchart metadata. For additional text,
+the individual records hold the flowchart and Ground-Truth Option IDs.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.TextListMatch" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">TextListMatch</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Record one paired or unmatched label or additional-text string.</p>
+<p>A pair records which predicted string represents which ground-truth
+string, even when their text differs. An unmatched record contains text
+on only one side.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_index</code></b>
+                  (<code><span title="int">int</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Zero-based position in the ground-truth text list. <code>None</code> when a
+predicted string has no ground-truth match.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_index</code></b>
+                  (<code><span title="int">int</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Zero-based position in the predicted text list. <code>None</code> when a
+ground-truth string has no predicted match.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_text</code></b>
+                  (<code><span title="str">str</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Original ground-truth string, before normalisation; <code>None</code> exactly
+when <code>true_index</code> is <code>None</code>. Present strings must be non-empty.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_text</code></b>
+                  (<code><span title="str">str</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Original predicted string, before normalisation; <code>None</code> exactly when
+<code>pred_index</code> is <code>None</code>. Present strings must be non-empty.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_img_code</code></b>
+                  (<code><span title="str">str</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Source flowchart's filename stem. Additional-text matching sets this
+field; label matching leaves the default <code>None</code> because the containing
+<code>NodeMatch</code> identifies the flowchart.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_option_idx</code></b>
+                  (<code><span title="int">int</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Selected Ground-Truth Option index, starting at <code>0</code>. Additional-text
+matching sets this field; label matching leaves the default <code>None</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Distance-function cost for this string pair or unmatched string.
+An unmatched string is compared with <code>None</code>; the built-in distance
+functions treat the missing side as an empty string.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>match_type</code></b>
+                  (<code>{&#39;match&#39;, &#39;unmatched_true&#39;, &#39;unmatched_pred&#39;}</code>)
+              –
+              <div class="doc-md-description">
+                <p><code>"match"</code> when both strings are present; <code>"unmatched_true"</code> for a
+ground-truth string without a prediction; <code>"unmatched_pred"</code> for a
+predicted string without ground truth. <code>"match"</code> does not imply
+identical text or zero cost.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a field is invalid, an index and its text disagree about whether
+the corresponding side is absent, or both sides are absent.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">DiagramMatch</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Collect a complete prediction's comparison with one Ground-Truth Option.</p>
+<p>Both diagrams contain node text, labels, flow and additional text. The
+result exposes the loaded diagrams, their matching records, and the text
+and flow scores calculated from those records.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>node_matches</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="NodeMatches (flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Every paired and unmatched node, with label matches for each record.
+<code>true_diagram_option_idx</code> identifies the selected Ground-Truth Option.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>additional_text_matches</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="TextListMatches (flowde.benchmarks.parsing.parsing_bench_types.TextListMatches)" href="#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches">TextListMatches</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Paired and unmatched additional-text strings from both diagrams.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_diagram</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="Diagram (flowde.benchmarks.parsing.parsing_bench_types.Diagram)" href="#flowde.benchmarks.parsing.parsing_bench_types.Diagram">Diagram</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Complete predicted diagram, retaining its original node numbers and
+text.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_diagram</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="Diagram (flowde.benchmarks.parsing.parsing_bench_types.Diagram)" href="#flowde.benchmarks.parsing.parsing_bench_types.Diagram">Diagram</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Complete ground-truth diagram selected from the accepted options.
+<code>true_option_idx</code> is its zero-based option index.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_node_text_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of paired and unmatched node-text costs.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_label_error_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of paired and unmatched label costs, including labels on unmatched
+nodes.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_additional_text_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of paired and unmatched additional-text costs.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>total_text_cost</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Sum of node-text, label and additional-text costs. Excludes flow scores.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>flow_score</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="FlowScores (flowde.benchmarks.parsing.parsing_bench_types.FlowScores)" href="#flowde.benchmarks.parsing.parsing_bench_types.FlowScores">FlowScores</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directed-connection scores after applying <code>node_matches</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a field is invalid, either diagram is incomplete, the diagrams
+refer to different flowcharts or have incorrect <code>diagram_type</code>
+values, or the node and additional-text records do not account for
+the contents of the compared diagrams.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><h3 id="flow-scores">Flow scores</h3>
+<!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.FlowScores" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">FlowScores</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Store directed-connection counts and scores for one matched flowchart.</p>
+<p>The benchmark calculates these fields after matching predicted nodes to
+ground-truth nodes. Connection direction matters: <code>1 -&gt; 2</code> differs from
+<code>2 -&gt; 1</code>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>tp</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of connections present in both the prediction and ground truth.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>fp</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of predicted connections absent from ground truth.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>fn</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Number of ground-truth connections absent from the prediction.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>precision</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Correct connections divided by predicted connections:
+<code>tp / (tp + fp)</code>. Zero when the prediction has no connections.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>recall</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Correct connections divided by ground-truth connections:
+<code>tp / (tp + fn)</code>. Zero when ground truth has no connections.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>f1</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Harmonic mean of precision and recall. Zero when both are zero.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>jaccard</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Correct connections divided by all distinct connections in either
+diagram: <code>tp / (tp + fp + fn)</code>. Ranges from <code>0.0</code> to <code>1.0</code>; higher is
+better. Two empty connection sets score <code>1.0</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>missing_edges</code></b>
+                  (<code><span title="set">set</span>[<span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>]]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Missing ground-truth connections as <code>(source, destination)</code> pairs
+of ground-truth node numbers.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>extra_edges</code></b>
+                  (<code><span title="set">set</span>[<span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>]]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Predicted connections absent from ground truth, expressed using
+matched ground-truth node numbers. Unmatched predicted endpoints use
+generated identifiers starting at <code>10000</code>, not original node numbers.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>A <code>FlowScores</code> object stores supplied values; constructing the object does
+not calculate metrics from <code>tp</code>, <code>fp</code> and <code>fn</code>. Benchmark methods calculate
+the metrics before constructing the object.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><h3 id="nodes-and-diagrams">Nodes and diagrams</h3>
+<p>These benchmark models preserve the source text and node numbers alongside
+the metadata identifying the flowchart and Ground-Truth Option.</p>
+<!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.Node" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Node</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Represent one predicted or ground-truth node inside a parsing benchmark.</p>
+<p>Benchmark loaders attach the flowchart identifier and Ground-Truth Option
+index to the node fields read from JSON. Node numbers identify nodes within
+a diagram; predicted and ground-truth versions of a node may have different
+numbers.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>node_number</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Node identifier. Must be less than <code>1000</code>; the containing <code>Diagram</code>
+checks uniqueness and applies the ground-truth numbering rules.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>text</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Non-empty node text as loaded, before any distance-function
+normalisation.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels</code></b>
+                  (<code><span title="list">list</span>[<span title="str">str</span>] | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Non-empty label strings. <code>[]</code> means labels were parsed and none were
+found; <code>None</code>, the default, means labels were not parsed.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>points_to</code></b>
+                  (<code><span title="list">list</span>[<span title="int">int</span>] | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Destination node numbers for outgoing connections. <code>[]</code> means flow
+was parsed and the node has no outgoing connections; <code>None</code>, the
+default, means flow was not parsed.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>diagram_type</code></b>
+                  (<code>{&#39;pred&#39;, &#39;true&#39;}</code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether the node belongs to a prediction or to ground truth.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_option_idx</code></b>
+                  (<code><span title="int">int</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Zero-based Ground-Truth Option index. Required for a ground-truth
+node; must be <code>None</code> for a predicted node. Defaults to <code>None</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_img_code</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Filename stem identifying the source flowchart.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>text_done</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether node text is present; always <code>True</code> for a valid <code>Node</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels_done</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether <code>labels</code> is present, including an empty list.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>flow_done</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether <code>points_to</code> is present, including an empty list.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>is_complete</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether text, labels and flow are all present.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a field has an invalid type, text or a label string is empty,
+<code>node_number</code> is at least <code>1000</code>, or <code>true_option_idx</code> conflicts with
+<code>diagram_type</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="flowde.benchmarks.parsing.parsing_bench_types.Diagram" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Diagram</span>
+
+
+</h4>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Represent one prediction or one accepted ground-truth interpretation.</p>
+<p>A <code>DiagramMatch</code> exposes the compared diagrams through <code>pred_diagram</code> and
+<code>true_diagram</code>. Diagram fields retain the original text and node numbers;
+matching and text normalisation do not rewrite the loaded diagrams.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>nodes</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="Node (flowde.benchmarks.parsing.parsing_bench_types.Node)" href="#flowde.benchmarks.parsing.parsing_bench_types.Node">Node</a>] | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Non-empty list of nodes, or <code>None</code> when no node-based parts were
+supplied. Defaults to <code>None</code>. Parsing benchmarks require predicted
+node text, so diagrams returned by benchmark methods contain nodes.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>additional_texts</code></b>
+                  (<code><span title="list">list</span>[<span title="str">str</span>] | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Non-empty strings outside the nodes. <code>[]</code> means additional text was
+parsed and none was found; <code>None</code>, the default, means the part was
+not parsed.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parent_img_code</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Filename stem identifying the source flowchart.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>diagram_type</code></b>
+                  (<code>{&#39;pred&#39;, &#39;true&#39;}</code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether the diagram is a prediction or a Ground-Truth Option.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>true_option_idx</code></b>
+                  (<code><span title="int">int</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Zero-based Ground-Truth Option index for a ground-truth diagram;
+<code>None</code> for a predicted diagram.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>text_done</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether nodes and their text are present.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels_done</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether every node has a labels list, including empty lists.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>flow_done</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether every node has a <code>points_to</code> list, including empty lists.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>additional_texts_done</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether <code>additional_texts</code> is present, including an empty list.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>is_complete</code></b>
+                  (<code><span title="bool">bool</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Whether node text, labels, flow and additional text are all present.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If fields are invalid, node numbers repeat, connections refer to
+absent nodes, or node metadata disagrees with the diagram. Also
+raised if only some nodes supply labels or flow, or a ground-truth
+diagram is incomplete, has non-sequential node numbers, or contains
+a node absent from every connection.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Ground-truth nodes must appear in consecutive node-number order starting
+at <code>1</code>. Predictions may use different numbering. Ground-truth diagrams
+must contain all four parts; predictions may omit labels, flow or
+additional text.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><h2 id="text-distances">Text distances</h2>
+<p>Import the following functions from
+<code>flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn</code>.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_with_text_normalisation" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">levenshtein_with_text_normalisation</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">levenshtein_with_text_normalisation(true_text: str | None, pred_text: str | None) -&gt; int</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Count character edits after normalising both input strings.</p>
+<p>This is the default text distance used by <code>ParsingBenchmark</code>. Normalisation
+reduces differences caused by formatting and alternative character forms
+before Levenshtein distance counts insertions, deletions and substitutions.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_text</code></b>
+                  (<code><span title="str">str</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth text. <code>None</code> represents unmatched predicted text and is
+treated as an empty string.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_text</code></b>
+                  (<code><span title="str">str</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Predicted text. <code>None</code> represents missing predicted text and is treated
+as an empty string.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="int">int</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Minimum number of single-character edits between the normalised
+strings. <code>0</code> means the normalised strings are identical. The result is
+an edit count, not a score scaled between zero and one.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If both <code>true_text</code> and <code>pred_text</code> are <code>None</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Both strings receive the same normalisation:</p>
+<ul>
+<li>Apply Unicode NFC so equivalent composed and decomposed characters match.</li>
+<li>Standardise line endings, convert tabs to spaces, collapse repeated
+  ordinary spaces and newlines, and strip surrounding whitespace.</li>
+<li>Standardise supported bullet, dash, quotation-mark and caret characters.
+  A line beginning with <code>o</code> or <code>O</code> followed by whitespace becomes a bullet.</li>
+<li>Standardise spacing around punctuation, brackets, equals signs, plus
+  signs and hyphens between word characters, including digits.</li>
+<li>Collapse repeated HTML line-break tags to one <code>&lt;br&gt;</code> tag.</li>
+<li>Convert superscript ordinal suffixes following digits, such as <code>1ˢᵗ</code>
+  to <code>1st</code>.</li>
+</ul>
+<p>Normalisation does not lowercase the text or remove accents. Single
+newlines remain distinct from spaces unless a punctuation-spacing rule
+removes the newline. HTML break tags are not converted to newlines.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <pre class="highlight"><code class="language-pycon">&gt;&gt;&gt; levenshtein_with_text_normalisation("n=10", "n = 10")
+0
+&gt;&gt;&gt; levenshtein_with_text_normalisation("n = 10", "n = 11")
+1
+&gt;&gt;&gt; levenshtein_with_text_normalisation(None, " ABC ")
+3</code></pre>
+
+
+    </div>
+
+</div><p><a href="./#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+uses this function when you omit <code>distance_fn</code>. You can still pass
+<a href="./#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_fn"><code>levenshtein_fn()</code></a>
+for raw character comparisons, or another distance function.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_fn" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">levenshtein_fn</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">levenshtein_fn(true_text: str | None, pred_text: str | None) -&gt; int</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+    </div>
+
+</div><p>Counts the minimum number of single-character insertions, deletions and
+substitutions. Treats a missing string as empty; two missing strings are invalid.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.number_only_levenshtein" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">number_only_levenshtein</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">number_only_levenshtein(true_text: str | None, pred_text: str | None) -&gt; int</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+    </div>
+
+</div><p>Compares the extracted numbers in the two strings. Use this for a separate
+number-focused check, not as a measure of whether the surrounding words agree.
+<code>NodeMatches.total_numbers_only_node_text_cost</code> provides this check for the
+already selected node matches.</p>
+<!-- prettier-ignore -->
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.benchmarks.parsing.text_distance_fns.distance_fn_protocol.DistanceFnProtocol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">DistanceFnProtocol</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+
+
+        <p>Describe a callable that calculates a cost between true and predicted text.</p>
+<p>Pass a function with this interface as <code>distance_fn</code> to
+<a class="autorefs autorefs-internal" title="ParsingBenchmark" href="#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+to compare node text, labels and additional text. Lower costs must indicate
+closer matches because the benchmark minimises text costs when matching
+predictions to ground truth.</p>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This protocol describes the callable interface; it does not calculate
+costs or validate returned values. A function or callable object can
+satisfy the interface without inheriting from <code>DistanceFnProtocol</code>.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.benchmarks.parsing.text_distance_fns.distance_fn_protocol.DistanceFnProtocol.__call__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__call__</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">__call__(*, true_text: str | None, pred_text: str | None) -&gt; int | float</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculate the comparison cost for one pair of text values.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>true_text</code></b>
+                  (<code><span title="str">str</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Ground-truth text. The benchmark supplies this argument by keyword.
+<code>None</code> represents predicted text with no ground-truth match.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>pred_text</code></b>
+                  (<code><span title="str">str</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Predicted text. The benchmark supplies this argument by keyword.
+<code>None</code> represents ground-truth text with no prediction.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="int">int</span> | <span title="float">float</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Finite, non-negative comparison cost. Lower values must indicate
+closer text matches. Return a cost rather than a similarity score
+where higher values indicate closer matches.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>The function must handle either argument being <code>None</code> and assign a
+cost to the unmatched text. Flowde's built-in distance functions treat
+<code>None</code> as an empty string. A custom function can choose another penalty
+for unmatched text. The benchmark does not compare two <code>None</code> values.</p>
+</details>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../data-types/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

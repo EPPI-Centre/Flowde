@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/rotation/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Image rotation - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Image rotation";
+        var mkdocs_page_input_path = "pipeline/rotation.md";
+        var mkdocs_page_url = "/Flowde/pipeline/rotation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Image rotation</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#rotate-images-from-a-directory">Rotate images from a directory</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rotation-results">Rotation results</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#resume-rotation">Resume rotation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bring-your-own-rotation-function">Bring your own rotation function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#next-step">Next step</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Image rotation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/rotation.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="image-rotation">Image rotation</h1>
+<p>Rotation predicts the correction needed to orient an image correctly and saves
+a corrected copy. In the core pipeline, rotation follows
+<a href="../classification/">classification</a> and prepares the selected images for
+parsing.</p>
+<h2 id="rotate-images-from-a-directory">Rotate images from a directory</h2>
+<p><a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>
+takes a directory of images and saves correction angles and corrected copies
+into one dedicated output directory.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.classify_fns.classify_types import RotationClassification
+from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+from flowde.rotate_imgs import rotate_imgs
+
+img_dir = Path(&quot;results/classification/positive_images&quot;)
+save_dir = Path(&quot;results/rotation&quot;)
+
+rotation_fn = make_openai_classify_fn(
+    input_text=(
+        &quot;Return the clockwise angle needed to orient this image correctly, &quot;
+        &quot;so the majority of text reads left to right and top to bottom. &quot;
+        &quot;Return one of 0, 90, 180 or 270 degrees.&quot;
+    ),
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+    result_structure=RotationClassification,
+)
+
+angles = rotate_imgs(
+    classify_fn=rotation_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    n_jobs=1,
+)
+</code></pre>
+<p><a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>
+processes <code>*.png</code> files inside <code>img_dir</code>, in sorted path order.
+Subdirectories are not searched. The returned <code>angles</code> list contains one
+correction angle per processed image: <code>angles[0]</code> corresponds to the first
+sorted image path, <code>angles[1]</code> to the second sorted image path, and so on.</p>
+<p>The example above uses OpenAI and requires the
+<a href="../setup-default-funcs/#set-up-openai">OpenAI setup</a>.
+For <code>classify_fn</code>, you can use an OpenAI classifier created with
+<a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn"><code>make_openai_classify_fn()</code></a>,
+a Gemini classifier created with
+<a href="../../reference/helpers/#flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn"><code>make_gemini_classify_fn()</code></a>,
+or <a href="../custom-functions/#a-rotation-function">your own rotation classifier</a>.
+The <a href="../setup-default-funcs/#use-azure-openai">provider setup guide</a> also covers
+Azure OpenAI.</p>
+<p>The example sets <code>result_structure</code> to
+<a href="../../reference/data-types/#flowde.classify_fns.classify_types.RotationClassification"><code>RotationClassification</code></a>
+to restrict the classifier's labels to <code>0</code>, <code>90</code>, <code>180</code> or <code>270</code>. These labels
+specify <strong>clockwise corrections in degrees</strong>: <code>90</code> means rotate the input image
+clockwise by 90 degrees.</p>
+<p>You can also rotate extracted images before classification by using the
+extraction output directory as <code>img_dir</code>.</p>
+<p>See the
+<a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>
+and
+<a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn"><code>make_openai_classify_fn()</code></a>
+API references for full details of all parameters.</p>
+<h2 id="rotation-results">Rotation results</h2>
+<p>Flowde saves the correction angles and corrected image copies:</p>
+<pre><code class="language-text">results/rotation/
+├── rotations.json
+├── rotated_images/
+│   ├── paper-1_0.png
+│   └── paper-2_0.png
+└── .flowde/
+    ├── run.state
+    └── run.lock
+</code></pre>
+<p><code>rotations.json</code> records the input image path and correction angle:</p>
+<pre><code class="language-json">[
+  {
+    &quot;img_path&quot;: &quot;results/classification/positive_images/paper-1_0.png&quot;,
+    &quot;label&quot;: 0
+  },
+  {
+    &quot;img_path&quot;: &quot;results/classification/positive_images/paper-2_0.png&quot;,
+    &quot;label&quot;: 90
+  }
+]
+</code></pre>
+<p>Every successfully processed image has a copy in
+<code>save_dir / "rotated_images"</code>, including images labelled <code>0</code> that need no
+rotation. The copies retain their filenames, and the original images in
+<code>img_dir</code> remain unchanged.</p>
+<p><code>.flowde/run.state</code> records which images have been processed, their correction
+angles, the rotation settings and file fingerprints. Flowde uses this metadata
+to resume the run and detect changes to the input images or saved results.</p>
+<h2 id="resume-rotation">Resume rotation</h2>
+<p>To continue an unfinished rotation run whose results are saved in <code>save_dir</code>,
+you can set <code>on_existing="resume"</code>:</p>
+<pre><code class="language-python">angles = rotate_imgs(
+    classify_fn=rotation_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    n_jobs=1,
+    on_existing=&quot;resume&quot;,
+)
+</code></pre>
+<p>The <code>.flowde/run.state</code> file inside <code>save_dir</code> stores the rotation run's state.
+Flowde uses this record to resume unfinished work and check the integrity of the run.
+Resume raises an error if the classifier's settings have changed, or if
+previously processed input images or saved outputs have been edited.</p>
+<p>To use different settings, you can start a run in a new <code>save_dir</code> or replace
+the previous run with <code>on_existing="overwrite"</code>. See
+<a href="../resuming/">managing runs</a> for the full rules.</p>
+<h2 id="bring-your-own-rotation-function">Bring your own rotation function</h2>
+<p>You can write your own rotation classifier and pass it to
+<a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>
+as <code>classify_fn</code>. See the
+<a href="../custom-functions/#a-rotation-function">custom rotation tutorial</a>
+for the requirements your function must meet and a complete working example.</p>
+<h2 id="next-step">Next step</h2>
+<p>You can use <code>save_dir / "rotated_images"</code> as the input directory for
+<a href="../parsing/">image parsing</a>.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../classification/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../parsing/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
