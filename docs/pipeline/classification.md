@@ -1,286 +1,180 @@
 # Image classification
 
-Classification is the second stage of the core pipeline. It takes extracted
-images as input and assigns a label to each image.
+Classification takes images as input and assigns a label to each image. In the
+core pipeline, classification selects the relevant images after
+[extraction](image-extraction.md).
 
-In a typical workflow, we
-[extract images](./image-extraction.md#image-extraction) from PDFs, and use
-classification to decide which of those images are relevant. For this workflow,
-you will probably want to classify each extracted image as a flowchart or some
-specific type of flowchart, such as a CONSORT diagram.
+For example, label a flowchart `1` and any other figure `0`. You can also define
+several classes, such as CONSORT diagram, other flowchart, table and graph.
 
-## Define a classification function
+## Classify images from a directory
 
-Before running classification, define the function that will classify each
-image. This can be one of the default LLM-based classification functions, or a
-custom function that you provide.
-
-A classification function takes the path to one image and returns a label.
-
-### Use a default classification function
-
-`flowde` includes default classification functions using OpenAI and Gemini
-models.
-
-<!-- markdownlint-disable MD046 -->
-<!-- prettier-ignore-start -->
-
-!!! note "Default classification with Gemini or OpenAI"
-    To use either of the default classification functions, follow the
-    [setup default parsing and classification](./setup-default-funcs.md#setup-default-parsing-and-classification)
-    steps.
-
-<!-- prettier-ignore-end -->
-
-<!-- markdownlint-enable MD046 -->
-
-To define an OpenAI classification function:
+[`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs)
+takes a directory of images and saves their labels into one dedicated output
+directory.
 
 ```python
-from flowde.classify_fns.classify_types import Classification
+from pathlib import Path
+
 from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+from flowde.classify_imgs import classify_imgs
+
+img_dir = Path("results/extraction")
+save_dir = Path("results/classification")
 
 input_text = """
 Classify whether this image is a flowchart.
-
 Return 1 if it is a flowchart.
 Return 0 if it is not a flowchart.
 """
 
 classify_fn = make_openai_classify_fn(
     input_text=input_text,
-    model="gpt-5.4-mini",
-    effort="high",
+    model="gpt-5.6-luna",
+    effort="medium",
 )
-```
-
-To use Gemini instead, use `make_gemini_classify_fn`:
-
-```python
-from flowde.classify_fns.gemini_classify_fn import make_gemini_classify_fn
-
-classify_fn = make_gemini_classify_fn(
-    input_text=input_text,
-    model="gemini-3.1-flash-lite",
-    result_structure=FlowchartClassification,
-    effort="high",
-)
-```
-
-See (insert api ref docs here) for details about params.
-
-#### Multiclass classification
-
-By default, these functions do binary classification, outputting `0` for
-negative and `1` for positive. You can also use multiclass classification by
-passing a Pydantic model with a `label` field to the `result_structure`
-parameter.
-
-For example, you could classify extracted images by image type:
-
-```python
-from typing import Literal
-
-from pydantic import BaseModel
-
-from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
-
-
-class ImageTypeClassification(BaseModel):
-    label: Literal[
-        "consort_flowchart",
-        "other_flowchart",
-        "table",
-        "graph",
-        "other",
-    ]
-
-
-input_text = """
-Classify the extracted image into exactly one of the following categories:
-
-- consort_flowchart: a CONSORT-style participant flow diagram
-- other_flowchart: a flowchart that is not a CONSORT-style participant flow diagram
-- table: a table or tabular display
-- graph: a chart, plot, or graph
-- other: anything else
-
-Return only the selected label.
-"""
-
-classify_fn = make_openai_classify_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    result_structure=ImageTypeClassification,
-    effort="high",
-)
-```
-
-(add rotation defaults so user doesn't need to edit the result structure.)
-
-### Bring your own classification function
-
-You do not have to use the default OpenAI or Gemini classification helpers. Any
-function with the same interface can be used.
-
-A custom classification function must accept an image path and return a label:
-
-```python
-from pathlib import Path
-from typing import Literal
-
-FlowchartLabel = Literal[0, 1]
-
-
-def classify_flowchart(img_path: Path) -> FlowchartLabel:
-    ...
-```
-
-## Run classification
-
-After defining `classify_fn`, pass it to one of the classification pipeline
-functions.
-
-Most users should use `classify_imgs`. This takes a directory of PNG images,
-classifies each image, and returns the predicted labels.
-
-### Classify images from a directory
-
-```python
-from pathlib import Path
-
-from flowde.classify_imgs import classify_imgs
 
 labels = classify_imgs(
     classify_fn=classify_fn,
-    img_dir=Path("data/extracted-images"),
-    json_path=Path("data/classifications.json"),
-)
-```
-
-The input directory should contain the extracted PNG images at the top level.
-`classify_imgs` searches for files matching `*.png` directly inside `img_dir`.
-
-For example:
-
-```text
-data/
-└── extracted-images/
-    ├── paper-1_0.png
-    ├── paper-1_1.png
-    ├── paper-2_0.png
-    └── paper-3_0.png
-```
-
-### Save classifications to JSON
-
-Pass `json_path` to save the classification results:
-
-```python
-labels = classify_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/extracted-images"),
-    json_path=Path("data/classifications.json"),
-)
-```
-
-The JSON file contains the image path and predicted label for each image:
-
-```json
-[
-  {
-    "img_path": "data/extracted-images/paper-1_0.png",
-    "label": 1
-  },
-  {
-    "img_path": "data/extracted-images/paper-1_1.png",
-    "label": 0
-  }
-]
-```
-
-### Save positive images
-
-You can copy positively classified images into a separate directory. This is
-useful when you want to keep only images with particular labels.
-
-```python
-labels = classify_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/extracted-images"),
-    json_path=Path("data/classifications.json"),
-    positive_img_save_dir=Path("data/flowchart-images"),
+    img_dir=img_dir,
+    save_dir=save_dir,
     positive_classes={1},
-)
-```
-
-When `positive_img_save_dir` and `positive_classes` are provided, each image
-with a label in `positive_classes` is copied to `positive_img_save_dir`.
-
-Both arguments must be provided together.
-
-### Classify an explicit list of images
-
-If you do not want to classify every PNG in a directory, use
-`classify_imgs_from_paths`. This lets you pass the image paths directly.
-
-```python
-from pathlib import Path
-
-from flowde.classify_imgs import classify_imgs_from_paths
-
-img_paths = [
-    Path("data/extracted-images/paper-1_0.png"),
-    Path("data/extracted-images/paper-2_0.png"),
-]
-
-labels = classify_imgs_from_paths(
-    classify_fn=classify_fn,
-    img_paths=img_paths,
-    json_path=Path("data/classifications.json"),
-)
-```
-
-You can also provide explicit save paths for positive images:
-
-```python
-labels = classify_imgs_from_paths(
-    classify_fn=classify_fn,
-    img_paths=img_paths,
-    json_path=Path("data/classifications.json"),
-    positive_img_save_paths=[
-        Path("data/flowchart-images/paper-1_0.png"),
-        Path("data/flowchart-images/paper-2_0.png"),
-    ],
-    positive_clsses={1},
-)
-```
-
-`img_paths` and `positive_img_save_paths` must have the same length. Each image
-is copied to the corresponding save path if its predicted label is in
-`positive_clsses`.
-
-### Parallelism
-
-Both `classify_imgs` and `classify_imgs_from_paths` accept an `n_jobs` parameter
-to control the number of parallel processes of `classify_fn` to run. By default,
-they will try to use all cpu cores available. If your `classify_fn` is memory
-heavy, you may need to manually reduce the number of jobs.
-
-```python
-from pathlib import Path
-
-from flowde.classify_imgs import classify_imgs
-
-labels = classify_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/extracted-images"),
-    json_path=Path("data/classifications.json"),
     n_jobs=1,
 )
 ```
 
+[`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs)
+processes `*.png` files inside `img_dir`, in sorted path order.
+Subdirectories are not searched. The returned `labels` list contains one label
+per processed image: `labels[0]` corresponds to the first sorted image path,
+`labels[1]` to the second sorted image path, and so on.
+
+The example above uses OpenAI and requires the
+[OpenAI setup](setup-default-funcs.md#set-up-openai).
+For `classify_fn`, you can use an OpenAI classifier created with
+[`make_openai_classify_fn()`](../reference/helpers.md#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn),
+a Gemini classifier created with
+[`make_gemini_classify_fn()`](../reference/helpers.md#flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn),
+or [your own classification function](custom-functions.md#a-classification-function).
+
+You can use `positive_classes` to save copies of images with selected labels.
+For example, `positive_classes={1}` copies images labelled `1` into
+`save_dir / "positive_images"` for use in the core pipeline's
+[image rotation](rotation.md) or [image parsing](parsing.md) stage.
+Without `positive_classes`, Flowde saves the labels without copying images.
+
+[`make_openai_classify_fn()`](../reference/helpers.md#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn)
+creates a binary classification function by default, returning `0` or `1`.
+You can change the allowed labels through its `result_structure` parameter;
+see [multiclass classification](#multiclass-classification).
+
+See the
+[`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs)
+and
+[`make_openai_classify_fn()`](../reference/helpers.md#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn)
+API references for full details of all parameters.
+
+## Classification results
+
+In the example above, Flowde saves the labels and copies images labelled `1`:
+
+```text
+results/classification/
+├── classifications.json
+├── positive_images/
+│   ├── paper-1_0.png
+│   └── paper-2_0.png
+└── .flowde/
+    ├── run.state
+    └── run.lock
+```
+
+`classifications.json` contains image paths and labels:
+
+```json
+[
+  { "img_path": "results/extraction/paper-1_0.png", "label": 1 },
+  { "img_path": "results/extraction/paper-1_1.png", "label": 0 },
+  { "img_path": "results/extraction/paper-2_0.png", "label": 1 }
+]
+```
+
+`.flowde/run.state` records which images have been classified, their labels,
+the classification settings and file fingerprints. Flowde uses this metadata
+to resume the run and detect changes to the input images or saved results.
+
+## Resume classification
+
+To continue an unfinished classification run whose results are saved in
+`save_dir`, you can set `on_existing="resume"`:
+
+```python
+labels = classify_imgs(
+    classify_fn=classify_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    positive_classes={1},
+    n_jobs=1,
+    on_existing="resume",
+)
+```
+
+The `.flowde/run.state` file inside `save_dir` stores the classification run's
+state. Flowde uses this record to resume unfinished work and check the integrity
+of the run.
+Resume raises an error if the classifier's settings or `positive_classes` have
+changed, or if previously classified input images or saved outputs have been
+edited.
+
+To use different settings, you can start a run in a new `save_dir` or replace
+the previous run with `on_existing="overwrite"`. See
+[managing runs](resuming.md) for the full rules.
+
+## Multiclass classification
+
+You can classify images into more than two categories. This example creates
+a classifier with five possible labels:
+
+```python
+from typing import Literal
+
+from flowde.classify_fns.classify_types import Classification
+from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+
+
+class ImageTypeClassification(
+    Classification[Literal["consort", "other_flowchart", "table", "graph", "other"]]
+):
+    pass
+
+
+image_type_fn = make_openai_classify_fn(
+    input_text=(
+        "Classify this image as consort, other_flowchart, table, graph, or other. "
+        "Use consort for a CONSORT-style participant flow diagram."
+    ),
+    model="gpt-5.6-luna",
+    effort="medium",
+    result_structure=ImageTypeClassification,
+)
+```
+
+`ImageTypeClassification` defines the allowed labels using
+[`Classification`](../reference/data-types.md#flowde.classify_fns.classify_types.Classification).
+Passing this schema as `result_structure` to
+[`make_openai_classify_fn()`](../reference/helpers.md#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn)
+creates a classifier that returns one of those five labels.
+
+## Bring your own classification function
+
+You can write your own classifier and pass it to
+[`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs)
+as `classify_fn`. See the
+[custom classification tutorial](custom-functions.md#a-classification-function)
+for the requirements your function must meet and a complete working example.
+
 ## Next step
 
-After classification, use the rotation stage to rotate the classified flowchart
-images into the correct orientation.
+You can use `save_dir / "positive_images"` as the input directory for
+[image rotation](rotation.md) or, if the copied images are already correctly
+oriented, [image parsing](parsing.md).

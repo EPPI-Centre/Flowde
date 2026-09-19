@@ -93,3 +93,50 @@
   height: auto;
   margin: 1.5rem auto;
 }
+
+.workflow-graphic {
+  display: block;
+  margin: 1.5rem 0;
+}
+
+.workflow-graphic img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Keep parameter descriptions readable without horizontal scrolling. */
+.rst-content .wy-table-responsive table td,
+.rst-content .wy-table-responsive table th {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.rst-content table code {
+  white-space: normal;
+}
+
+.rst-content table .default-option {
+  display: block;
+  margin-top: 0.4rem;
+  color: #878787;
+  font-size: 0.8em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.rst-content a code,
+.rst-content code a {
+  color: #2980b9;
+}
+
+.rst-content table code.function-call {
+  display: block;
+  padding: 8px 10px;
+  border: 1px solid #e1e4e5;
+  color: inherit;
+  background: #fff;
+  font-size: 13px;
+  white-space: pre;
+  line-height: 1.6;
+}

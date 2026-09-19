@@ -113,31 +113,93 @@ def rotate_imgs(
     on_existing: ExistingRun = "error",
 ) -> list[RotationLabel]:
     """
-    Rotate sorted top-level PNGs, saving corrected copies and resumable results.
+    Rotate PNG images in a directory and save corrected copies in a resumable run.
 
     Parameters
     ----------
     classify_fn : ClassificationFunction[RotationLabel]
-        Predict the clockwise correction for one image.
+        Function accepting an image `Path` as its first positional argument
+        and returning a clockwise correction in degrees as an `int`: `0`,
+        `90`, `180` or `270`. The function returns the angle itself, not a
+        dictionary or Pydantic model, and must raise an exception if angle
+        prediction fails. Returning `None` raises an error.
+
+        The classifier must leave the input image unchanged. Flowde applies
+        the returned angle and saves the corrected copy. Built-in factories
+        declare their settings; custom functions must declare their settings with
+        [`model_function()`][flowde.model_function].
     img_dir : Path
-        Directory containing the original PNG images.
+        Directory containing the original `*.png` files. Subdirectories are not
+        searched. Image paths are sorted before applying `range_indices`.
     save_dir : Path
-        Dedicated run directory; corrected copies go in `rotated_images` and
-        angles in `rotations.json`. Original images are preserved.
+        Dedicated output directory, created if needed. Correction angles are
+        saved in `rotations.json`, corrected copies in `rotated_images`, and run
+        metadata in `.flowde/run.state`. Original images remain unchanged.
+        Input images and files referenced by the classifier's declared settings
+        must be outside this directory.
     range_indices : tuple[int | None, int | None] | None, optional
-        Slice the sorted images using an inclusive start and exclusive stop.
+        A `(start, stop)` slice of the sorted image paths. `start` is included
+        and `stop` is excluded; `(0, 10)` selects up to the first ten images.
+        Either bound can be `None`, and negative indices follow Python slicing
+        rules. Defaults to `None`, which selects all matching images. An empty
+        selection raises an error.
     n_jobs : int, optional
-        Number of parallel model calls. Defaults to the number of CPU cores.
+        Number of angle predictions that can run concurrently. Defaults to the
+        number of CPU cores. `1` processes images sequentially in the calling
+        process; larger values use worker processes. This value can change
+        when resuming a run.
     show_usage : bool, optional
-        Show reported token usage and estimated costs. Defaults to `True`.
+        Whether to display token usage and estimated costs reported by the
+        classifier. Defaults to `True`. `False` hides those figures while
+        retaining the progress display and saved usage reports. This value
+        can change when resuming a run.
     on_existing : {"error", "resume", "overwrite"}, optional
-        How to handle existing work. Defaults to `"error"`. Resume requires
-        matching settings and unchanged previously answered input images.
+        How to handle an existing run in `save_dir`. Defaults to `"error"`.
+
+        - `"error"`: start in a new or empty directory; reject existing work.
+        - `"resume"`: require a saved rotation run with matching classifier
+          settings. Reuse saved angles for unchanged inputs and predict angles
+          for selected images without saved angles.
+        - `"overwrite"`: remove the previous run's tracked outputs and saved state,
+          then start a new run. Also works in a new or empty directory.
+          Unrelated files in an existing output directory cause an error.
 
     Returns
     -------
     list[RotationLabel]
-        Clockwise angles in the selected sorted-image order.
+        One clockwise correction angle per image selected by this call, in sorted
+        image-path order. Includes angles restored from a previous run. With
+        `range_indices`, the returned list covers only the selected slice;
+        angles for earlier slices remain saved in `rotations.json`.
+
+    Raises
+    ------
+    FileExistsError
+        If `save_dir` contains existing work and `on_existing="error"`.
+    ValueError
+        If `img_dir` is missing or is not a directory, no PNGs are selected,
+        an angle is unsupported, inputs are inside `save_dir`, or the saved
+        run fails compatibility or integrity checks.
+    TypeError
+        If the classifier returns `None` instead of an angle.
+    RuntimeError
+        If another Flowde call is already using the same `save_dir`.
+
+    Notes
+    -----
+    `rotations.json` contains objects with `img_path` and `label` fields, where
+    `label` is the clockwise correction angle. The JSON file accumulates angles
+    across resumed calls and orders entries by resolved input paths.
+
+    Every successfully processed image has a copy in `rotated_images`, including
+    images with a zero-degree correction. Copies retain their filenames and
+    expand to fit the rotated image without cropping.
+
+    On resume, missing `rotations.json` or selected `rotated_images` copies are
+    recreated from saved angles and unchanged original images without another
+    prediction. Corrected copies are always made from the original inputs, so
+    resuming does not rotate an already-corrected copy again. Edited previously
+    processed input images or saved outputs cause an error.
 
     """
     if not img_dir.is_dir():

@@ -3,19 +3,101 @@
 Parsing is the final stage of the core pipeline. It takes flowchart images as
 input and extracts structured flowchart data.
 
-In a typical workflow, we
-[extract images](./image-extraction.md#image-extraction),
-[classify](./classification.md#image-classification) the relevant flowchart
-images, [rotate](./rotation.md#image-rotation) them into the correct
-orientation, and then parse them into structured data.
+The parsed data describes the nodes, their text and labels, the connections
+between nodes, and any additional text in the diagram.
 
-Parsing can be done in one step, or split into smaller parsing tasks. Splitting
-the task can improve performance and is useful when you want to or check
-intermediate outputs.
+## Parse images from a directory
+
+[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
+takes a directory of flowchart images and saves one JSON result per image
+into a dedicated output directory.
+
+```python
+from pathlib import Path
+
+from flowde.parse_imgs import parse_imgs
+from flowde.parsing_fns.openai_parse import make_openai_parse_fn
+
+img_dir = Path("results/rotation/rotated_images")
+save_dir = Path("results/parsing/full")
+
+input_text = """
+Parse this flowchart into structured data.
+Assign consecutive node numbers starting at 1.
+Capture each node's text, labels and outgoing connections.
+Put text that does not belong to a node in additional_texts.
+"""
+
+parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model="gpt-5.6-luna",
+    effort="medium",
+)
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    n_jobs=1,
+)
+```
+
+By default,
+[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
+processes `*.png` files inside `img_dir`, in sorted path order.
+Subdirectories are not searched. The returned `responses` list contains one
+Pydantic model per processed image: `responses[0]` contains the parsed data for
+the first sorted image path, `responses[1]` for the second, and so on.
+
+The example above uses OpenAI and requires the
+[OpenAI setup](setup-default-funcs.md#set-up-openai).
+For `parse_fn`, you can use an OpenAI parser created with
+[`make_openai_parse_fn()`](../reference/helpers.md#flowde.parsing_fns.openai_parse.make_openai_parse_fn),
+a Gemini parser created with
+[`make_gemini_parse_fn()`](../reference/helpers.md#flowde.parsing_fns.gemini_parse.make_gemini_parse_fn),
+or [your own parsing function](custom-functions.md#a-parsing-function).
+The [provider setup guide](setup-default-funcs.md#use-azure-openai) also covers
+Azure OpenAI.
+
+[`make_openai_parse_fn()`](../reference/helpers.md#flowde.parsing_fns.openai_parse.make_openai_parse_fn)
+creates a parser for the complete flowchart format by default. You can instead
+[parse selected parts](#parse-parts-separately), such as node text or connections,
+or [use a custom output schema](#use-a-custom-output-schema).
+
+See the
+[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
+and
+[`make_openai_parse_fn()`](../reference/helpers.md#flowde.parsing_fns.openai_parse.make_openai_parse_fn)
+API references for full details of all parameters.
+
+## Parsing results
+
+Each image's result is saved as a JSON file with the same filename stem.
+For example, `paper-1_0.png` produces `paper-1_0.json`:
+
+```text
+results/parsing/full/
+├── paper-1_0.json
+├── paper-2_0.json
+└── .flowde/
+    ├── run.state
+    └── run.lock
+```
+
+You can also inspect a result from the returned `responses` list:
+
+```python
+print(responses[0].model_dump_json(indent=2))
+```
+
+`.flowde/run.state` records which images have been parsed, their results, parser
+settings, image fingerprints and any supplied partial flowchart data. Flowde
+uses this metadata to resume the run and detect changes to the inputs or saved
+results.
 
 ## Understand the flowchart format
 
-`flowde` represents parsed flowcharts using nodes and additional texts.
+Flowde represents a flowchart as a list of nodes and a list of additional texts.
 
 A complete parsed flowchart has this structure:
 
@@ -39,23 +121,27 @@ Each node represents one box or item in the flowchart.
 
 The fields have the following meanings:
 
-- `node_number`: a unique id given to each node in the flowchart;
+- `node_number`: a unique identifier given to each node;
 - `text`: the text inside the node;
 - `labels`: text labels that apply to the node;
-- `points_to`: the node numbers that follow this node in the flow;
-- `additional_texts`: text that is not assigned to a specific node.
+- `points_to`: the node numbers reached by following this node's outgoing arrows;
+- `additional_texts`: text that is not assigned to a specific node, such as a caption.
 
-### Example 1: A Basic Flowchart
+The examples below show how this format represents the information in a
+diagram. These interpretation conventions are also used in the supplied
+[CONSORT prompts](../reference/helpers.md#supplied-consort-prompts).
+
+### Example 1: A basic flowchart
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable MD013 -->
-![Example flowchart for demonstrating parsing](../images/demo-flowchart.webp){ .docs-image }
+![Example flowchart for demonstrating parsing](../images/demo-flowchart.webp){.docs-image}
 
 <!-- prettier-ignore-end -->
 
 <!-- markdownlint-enable MD013 -->
 
-Is ideally parsed as:
+A complete parse of this diagram looks like:
 
 ```json
 {
@@ -97,69 +183,69 @@ Is ideally parsed as:
 
 ### Example 2: Keeping branches separate
 
-The goal of parsing is to interpret the visual content of an image and convert
-it into a standardised JSON format. This means we may not always want to parse
-the image exactly as it appears.
-
-Commonly, a flowchart will have two branches that follow the same step; see `C`
-in the image below. The author may use a single node to describe the step, but
-the branches are still very much consdiered separate. If we parsed this exactly
-as it appears in our JSON format, we would lose track of which branch is which:
-
-```text
-A → C → [D, E]
-B → C → [D, E]
-```
+Some diagrams use one box to describe a step that applies separately to two or
+more branches. Here, the eight-week treatment phase applies independently to
+the intervention group and the control group:
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable MD013 -->
-![Example flowchart for demonstrating split nodes](../images/split-node-flowchart.webp){ .docs-image }
+![Separate intervention and control branches with a shared eight-week treatment phase box](../images/treatment-phase-flowchart.png){.docs-image}
 
 <!-- prettier-ignore-end -->
 
 <!-- markdownlint-enable MD013 -->
 
-To combat this, if a single node is used to describe a step that applies
-separately to each branch, we duplicate the node to keep the branches separate.
-Now we are able to capture the underlying meaning of the image in our JSON
-format:
+The aligned arrows show two separate participant flows. Of the 50 participants
+allocated to intervention, 43 are analysed after the treatment phase. Of the
+50 participants allocated to control, 45 are analysed. The shared treatment
+box avoids repeating the same text; the two groups do not merge during treatment.
+
+If the parsed data used just one treatment node, both allocation nodes would
+point to that treatment node, and the treatment node would point to both
+analysis nodes. Those connections would incorrectly allow a path from
+intervention allocation to control analysis, and from control allocation to
+intervention analysis.
+
+To preserve the intended participant flows, the parsed data represents the
+treatment box as two nodes with the same text. Node `3` belongs to the
+intervention branch, and node `4` belongs to the control branch:
 
 ```json
 {
   "nodes": [
     {
       "node_number": 1,
-      "text": "A",
+      "text": "Allocated to\nintervention\n(n = 50)",
       "labels": [],
       "points_to": [3]
     },
     {
       "node_number": 2,
-      "text": "B",
+      "text": "Allocated to\ncontrol\n(n = 50)",
       "labels": [],
       "points_to": [4]
     },
     {
       "node_number": 3,
-      "text": "C",
+      "text": "Eight-week treatment phase",
       "labels": [],
       "points_to": [5]
     },
     {
       "node_number": 4,
-      "text": "C",
+      "text": "Eight-week treatment phase",
       "labels": [],
       "points_to": [6]
     },
     {
       "node_number": 5,
-      "text": "D",
+      "text": "Intervention\nparticipants analysed\n(n = 43)",
       "labels": [],
       "points_to": []
     },
     {
       "node_number": 6,
-      "text": "E",
+      "text": "Control\nparticipants analysed\n(n = 45)",
       "labels": [],
       "points_to": []
     }
@@ -168,29 +254,26 @@ format:
 }
 ```
 
-This preserves the two intended branches as:
-
-```text
-A → C → D
-B → C → E
-```
+The intervention branch follows nodes `1 → 3 → 5`, and the control branch
+follows nodes `2 → 4 → 6`. Neither branch has a connection to the other
+group's analysis node.
 
 ### Example 3: Advanced labels
 
-Complicated nodes and labels may require additional processing to convert the
-visual content to JSON.
+A single box can contain several values, each with a label that applies only
+to that value. The parsed representation needs to preserve which label belongs
+to each value.
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable MD013 -->
-![Example flowcharts with advanced labels](../images/double-label-flowchart2.webp){.docs-image }
+![Example flowcharts with advanced labels](../images/double-label-flowchart2.webp){.docs-image}
 <!-- prettier-ignore-end -->
 
 <!-- markdownlint-enable MD013 -->
 
-If we parse this exactly as it appears, for the bottom left node, we get
-something like this:
+Representing the bottom-left box as one node could produce:
 
-```json
+```text
 ...
     {
       "node_number": 2,
@@ -205,25 +288,20 @@ something like this:
 ...
 ```
 
-By parsing `26 weeks` and `52 weeks` as separate labels, each labels appears to
-apply to the entire node. This is incorrect. In reality, `26 weeks` applies to
-`42` and `52 weeks` applies to `35`.
-
-But remember, our goal is to correctly represent the information in the image,
-not to parse the image exactly as it appears.
-
-For this scenario, where labels appear to apply to separate parts of the node,
-we have a couple of options:
+This representation lists `26 weeks` and `52 weeks` as labels for a single node
+containing both `42` and `35`, without specifying which label belongs to which
+value. The diagram's intended meaning is that `26 weeks` applies to `42` and
+`52 weeks` applies to `35`. The parsed data needs to preserve those pairings.
+Flowde's format supports two ways to represent those pairings:
 
 <div class="indent-section" markdown>
 
 #### Option 1: Join labels
 
-We can join labels that apply to separate parts of a node, into a single label,
-effectively capturing that each part of the label applies to a different part of
-the node.
+You can join the timepoint labels into one label, keeping the timepoints in
+the same line order as the corresponding values:
 
-```json
+```text
 ...
     {
       "node_number": 2,
@@ -237,17 +315,15 @@ the node.
 ...
 ```
 
-Now `26 weeks\n52 weeks` correctly applies to `42\n35`
+The first line, `26 weeks`, corresponds to `42`; the second line, `52 weeks`,
+corresponds to `35`.
 
 #### Option 2: Split nodes
 
-In cases such as this one, the bottom left node would probably be more
-accurately represented by 2 separate nodes. We can split the nodes like these to
-more accurately capture the information in the image.
+You can instead represent the two follow-up measurements as separate nodes,
+each with its own value and timepoint label. The bottom-left box becomes:
 
-The the bottom left node would become:
-
-```json
+```text
 ...
     {
       "node_number": 2,
@@ -271,474 +347,268 @@ The the bottom left node would become:
 ...
 ```
 
-Now we correctly capture that 42 patients attended the 26 weeks follow-up and 35
-patients attended the 52 weeks follow-up.
+The connection from node `2` to node `4` represents
+the progression between those follow-up measurements.
 
 </div>
 
-## Parse full or partial flowcharts
+## Resume parsing
 
-`flowde` can parse a flowchart in one call, or split the task into smaller
-parts.
-
-### Parsing options
-
-There are three main ways to parse a flowchart:
-
-- **Full parsing:** parse the whole flowchart in one step.
-- **Partial parsing:** parse one part of the flowchart, such as node text or
-  flow.
-- **Combined partial parsing:** parse several parts together, such as node text
-  and labels.
-
-Full parsing is simpler. Partial parsing usually gives better performance, but
-it is more expensive because it requires multiple model calls.
-
-### Flowchart parts
-
-The supported parsing parts are:
-
-| Parse type         | Output fields         |
-| ------------------ | --------------------- |
-| `node_text`        | `node_number`, `text` |
-| `labels`           | `labels`              |
-| `flow`             | `points_to`           |
-| `additional_texts` | `additional_texts`    |
-
-See [Understand the flowchart format](#understand-the-flowchart-format) for more
-details on these fields.
-
-### Using partial results as context
-
-Partial parsing lets you use earlier parsed results as context for later parsing
-steps.
-
-For example, you might first parse the node text:
+To continue an unfinished parsing run whose results are saved in `save_dir`,
+you can set `on_existing="resume"`:
 
 ```python
-parts_to_parse={"node_text"}
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    n_jobs=1,
+    on_existing="resume",
+)
 ```
 
-Then use those parsed nodes as context when parsing labels or flow:
+The `.flowde/run.state` file inside `save_dir` stores the parsing run's state.
+Flowde uses this record to resume unfinished work and check the integrity of the run.
+Resume raises an error if the parser's settings have changed, or if previously
+parsed input images, their supplied partial flowchart data or saved results
+have changed.
 
-```python
-parts_to_parse={"labels"}
-```
+To use different settings or partial flowchart data, you can start a run in a
+new `save_dir` or replace the previous run with `on_existing="overwrite"`.
+See [managing runs](resuming.md) for the full rules.
 
-```python
-parts_to_parse={"flow"}
-```
+## Parse parts separately
 
-When parsing `labels`, `flow`, or `additional_text` using existing partial
-results, the corresponding node text files must also be provided. This is
-because node numbers are needed to join the different parsed parts together.
+Splitting parsing into separate tasks can improve parsing accuracy by allowing
+the model to focus on one part of the flowchart at a time and use earlier
+results as context for later requests. You can also inspect intermediate
+results.
 
-## Define a parsing function
-
-Before running parsing, define the function that will parse each image. This can
-be one of the default LLM-based parsing functions, or a custom function that you
-provide.
-
-A parsing function takes the path to one image and an optional partial
-flowchart. It returns a Pydantic model containing the parsed result.
-
-### Use a default parsing function
-
-`flowde` includes default parsing functions using OpenAI and Gemini models.
-
-<!-- markdownlint-disable MD046 -->
 <!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
 
-!!! note "Default parsing with Gemini or OpenAI"
-    To use either of the default parsing functions, follow the
-    [setup default parsing and classification](./setup-default-funcs.md#setup-default-parsing-and-classification)
-    steps.
+!!! important
 
-<!-- prettier-ignore-end -->
+    `node_text` must be parsed **before or together with** `labels` or `flow`
+    so the parser knows which node numbers to use for labels and connections.
+    If node text was parsed in an earlier run, pass the saved node-text
+    directory as `nodes_dir`.
 
 <!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
 
-To define an OpenAI parsing function:
-
-```python
-from flowde.parsing_fns.openai_parse import make_openai_parse_fn
-
-input_text = """
-Parse this flowchart into structured data.
-"""
-
-parse_fn = make_openai_parse_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    effort="high",
-)
-```
-
-By default, this parses all supported parts:
-
-- `node_text`
-- `labels`
-- `flow`
-- `additional_text`
-
-To parse only particular parts, pass `parts_to_parse`:
-
-```python
-parse_fn = make_openai_parse_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    effort="high",
-    parts_to_parse={"node_text"},
-)
-```
-
-To use Gemini instead, use `make_gemini_parse_fn`:
-
-```python
-from flowde.parsing_fns.gemini_parse import make_gemini_parse_fn
-
-parse_fn = make_gemini_parse_fn(
-    input_text=input_text,
-    model="gemini-3.1-flash-lite",
-    effort="high",
-    parts_to_parse={"node_text"},
-)
-```
-
-See (insert API ref docs here) for details about params.
-
-### Bring your own parsing function
-
-You do not have to use the default OpenAI or Gemini parsing helpers. Any
-function with the same interface can be used.
-
-A custom parsing function must accept an image path and an optional partial
-flowchart, and return a Pydantic model:
-
-```python
-from pathlib import Path
-
-from pydantic import BaseModel
-
-
-def my_parse_fn(
-    img_path: Path,
-    partial_flowchart: BaseModel | None = None,
-) -> BaseModel:
-    ...
-```
-
-The `partial_flowchart` argument is optional. If no partial flowchart data is
-provided, `flowde` calls the parsing function with only the image.
-
-## Run parsing
-
-After defining `parse_fn`, pass it to one of the parsing pipeline functions.
-
-Most users should use `parse_imgs`. This takes a directory of PNG images, parses
-each image, and saves the parsed JSON outputs to a directory.
-
-### Parse images from a directory
+### 1. Parse node text
 
 ```python
 from pathlib import Path
 
 from flowde.parse_imgs import parse_imgs
+from flowde.parsing_fns.openai_parse import make_openai_parse_fn
 
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-flowcharts"),
+img_dir = Path("results/rotation/rotated_images")
+parts_dir = Path("results/parsing")
+
+nodes_fn = make_openai_parse_fn(
+    input_text=(
+        "Parse the text of every node. Use consecutive node numbers starting "
+        "at 1 and keep separate flowchart branches separate."
+    ),
+    model="gpt-5.6-luna",
+    effort="medium",
+    parts_to_parse={"node_text"},
+)
+
+nodes = parse_imgs(
+    parse_fn=nodes_fn,
+    img_dir=img_dir,
+    save_dir=parts_dir / "node_text",
     n_jobs=1,
 )
 ```
 
-The input directory should contain the PNG images at the top level. `parse_imgs`
-searches for files matching `*.png` directly inside `img_dir`.
-
-For example:
-
-```text
-data/
-└── rotated-flowchart-images/
-    ├── paper-1_0.png
-    ├── paper-2_0.png
-    └── paper-3_0.png
-```
-
-Parsed outputs are saved as JSON files in `save_dir`. The output filenames use
-the image stem:
-
-```text
-data/
-└── parsed-flowcharts/
-    ├── paper-1_0.json
-    ├── paper-2_0.json
-    └── paper-3_0.json
-```
-
-The returned `responses` list contains the parsed Pydantic model for each image,
-in sorted path order.
-
-### Parse only part of a flowchart
-
-Use `parts_to_parse` when creating the parsing function.
-
-For example, to parse only node text:
-
-```python
-from flowde.parsing_fns.openai_parse import make_openai_parse_fn
-from flowde.parse_imgs import parse_imgs
-
-parse_fn = make_openai_parse_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    effort="high",
-    parts_to_parse={"node_text"},
-)
-
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-node-text"),
-)
-```
-
-This produces JSON files containing only the requested fields.
-
-For `parts_to_parse={"node_text"}`, the output will contain nodes with node
-numbers and text:
+The `parts_to_parse={"node_text"}` argument tells
+[`make_openai_parse_fn()`](../reference/helpers.md#flowde.parsing_fns.openai_parse.make_openai_parse_fn)
+to create a parser that returns only node numbers and text. For example, a
+two-node diagram could produce:
 
 ```json
 {
   "nodes": [
-    {
-      "node_number": 1,
-      "text": "Assessed for eligibility (n = 120)"
-    },
-    {
-      "node_number": 2,
-      "text": "Randomised (n = 100)"
-    }
+    { "node_number": 1, "text": "Assessed for eligibility (n = 120)" },
+    { "node_number": 2, "text": "Randomised (n = 100)" }
   ]
 }
 ```
 
-### Parse using existing partial flowcharts
+`node_text` is the parsing-part name. `nodes` is the JSON field holding the
+node objects. This example saves the node-text JSON files in
+`results/parsing/node_text`.
 
-You can provide previously parsed parts as context for another parsing step.
+You can choose from four parsing parts:
 
-For example, after parsing node text, you can use those node files when parsing
-labels:
+| `parts_to_parse` value | Fields in the result                              |
+| ---------------------- | ------------------------------------------------- |
+| `"node_text"`          | `nodes`, containing `node_number` and `text`      |
+| `"labels"`             | `nodes`, containing `node_number` and `labels`    |
+| `"flow"`               | `nodes`, containing `node_number` and `points_to` |
+| `"additional_texts"`   | The top-level `additional_texts` list             |
 
-```python
-from pathlib import Path
+You can request several parts together, such as `{"node_text", "labels"}`.
+Without `parts_to_parse` or a custom `result_structure`, the OpenAI and Gemini
+parser factories request all four parts.
 
-from flowde.parsing_fns.openai_parse import make_openai_parse_fn
-from flowde.parse_imgs import parse_imgs
-
-parse_fn = make_openai_parse_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    effort="high",
-    parts_to_parse={"labels"},
-)
-
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-labels"),
-    nodes_dir=Path("data/parsed-node-text"),
-)
-```
-
-The files in `img_dir`, `save_dir`, and `nodes_dir` must have matching stems.
-
-For example:
-
-```text
-data/
-├── rotated-flowchart-images/
-│   ├── paper-1_0.png
-│   └── paper-2_0.png
-└── parsed-node-text/
-    ├── paper-1_0.json
-    └── paper-2_0.json
-```
-
-This lets `flowde` match each image to the corresponding partial flowchart.
-
-### Parse labels, flow, or additional text
-
-You can provide different partial directories depending on what you want to
-parse.
-
-To parse flow using existing nodes:
+### 2. Parse flow using the saved nodes
 
 ```python
-parse_fn = make_openai_parse_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    effort="high",
+flow_fn = make_openai_parse_fn(
+    input_text=(
+        "Find the outgoing connections for every supplied node. "
+        "Use the supplied node numbers without changing them."
+    ),
+    model="gpt-5.6-luna",
+    effort="medium",
     parts_to_parse={"flow"},
 )
 
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-flow"),
-    nodes_dir=Path("data/parsed-node-text"),
-)
-```
-
-To parse additional text using existing nodes:
-
-```python
-parse_fn = make_openai_parse_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    effort="high",
-    parts_to_parse={"additional_text"},
-)
-
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-additional-text"),
-    nodes_dir=Path("data/parsed-node-text"),
-)
-```
-
-You can also provide multiple existing parts:
-
-```python
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-flow"),
-    nodes_dir=Path("data/parsed-node-text"),
-    labels_dir=Path("data/parsed-labels"),
-    additional_texts_dir=Path("data/parsed-additional-text"),
-)
-```
-
-If any of `labels_dir`, `additional_texts_dir`, or `flow_dir` are provided,
-`nodes_dir` must also be provided. This is because node numbers are needed to
-join the different partial flowchart parts together.
-
-### Parse a subset of images
-
-Use `range_indices` to parse only a slice of the images in a directory.
-
-```python
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-flowcharts"),
-    range_indices=(0, 10),
-)
-```
-
-This parses the images from index `0` up to, but not including, index `10` after
-the image paths have been sorted.
-
-This can be useful for testing a parsing function on a small number of images
-before running it on the full directory.
-
-### Parse an explicit list of images
-
-If you do not want to parse every PNG in a directory, use
-`parse_imgs_from_paths`. This lets you pass the image paths and save paths
-directly.
-
-```python
-from pathlib import Path
-
-from flowde.parse_imgs import parse_imgs_from_paths
-
-img_paths = [
-    Path("data/rotated-flowchart-images/paper-1_0.png"),
-    Path("data/rotated-flowchart-images/paper-2_0.png"),
-]
-
-save_paths = [
-    Path("data/parsed-flowcharts/paper-1_0.json"),
-    Path("data/parsed-flowcharts/paper-2_0.json"),
-]
-
-responses = parse_imgs_from_paths(
-    parse_fn=parse_fn,
-    img_paths=img_paths,
-    save_paths=save_paths,
+flow = parse_imgs(
+    parse_fn=flow_fn,
+    img_dir=img_dir,
+    save_dir=parts_dir / "flow",
+    nodes_dir=parts_dir / "node_text",
     n_jobs=1,
 )
 ```
 
-You can also provide explicit partial paths:
+For each input image, `nodes_dir` supplies the node numbers and text from the
+matching JSON file in `results/parsing/node_text`. The parser receives that
+saved data alongside the image so the prompt can ask for outgoing connections
+using the existing node numbers.
+
+`parts_to_parse={"flow"}` tells the parser to parse only the outgoing connections
+for each node. For example:
+
+```json
+{
+  "nodes": [
+    { "node_number": 1, "points_to": [2] },
+    { "node_number": 2, "points_to": [] }
+  ]
+}
+```
+
+The flow JSON files are saved in `results/parsing/flow`.
+
+### 3. Parse labels and additional text
+
+Likewise, you can parse labels with `parts_to_parse={"labels"}` and additional
+text with `parts_to_parse={"additional_texts"}`. You can pass previously parsed
+parts as context through the following
+[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
+parameters:
+
+| Parameter              | Directory containing              |
+| ---------------------- | --------------------------------- |
+| `nodes_dir`            | Previously parsed nodes           |
+| `labels_dir`           | Previously parsed labels          |
+| `flow_dir`             | Previously parsed flow            |
+| `additional_texts_dir` | Previously parsed additional text |
+
+### Matching images and parsed parts
+
+Each parsed part is saved as a JSON file with the same filename stem as the
+source image. For example, the parts parsed from `paper-1_0.png` are saved as
+`paper-1_0.json` in each part's directory:
+
+```text
+results/
+├── rotation/
+│   └── rotated_images/
+│       ├── paper-1_0.png
+│       └── paper-2_0.png
+└── parsing/
+    ├── node_text/
+    │   ├── paper-1_0.json
+    │   ├── paper-2_0.json
+    │   └── .flowde/
+    ├── flow/
+    │   ├── paper-1_0.json
+    │   ├── paper-2_0.json
+    │   └── .flowde/
+    ├── labels/
+    │   ├── paper-1_0.json
+    │   ├── paper-2_0.json
+    │   └── .flowde/
+    └── additional_texts/
+        ├── paper-1_0.json
+        ├── paper-2_0.json
+        └── .flowde/
+```
+
+### Combine the parsed parts
+
+You can combine the saved node text, labels, connections and additional text
+into one JSON file per image:
 
 ```python
-responses = parse_imgs_from_paths(
-    parse_fn=parse_fn,
-    img_paths=img_paths,
-    save_paths=save_paths,
-    nodes_paths=[
-        Path("data/parsed-node-text/paper-1_0.json"),
-        Path("data/parsed-node-text/paper-2_0.json"),
-    ],
-    labels_paths=[
-        Path("data/parsed-labels/paper-1_0.json"),
-        Path("data/parsed-labels/paper-2_0.json"),
-    ],
+from flowde.combine_parsed_parts import combine_parsed_parts
+
+combined = combine_parsed_parts(
+    nodes_dir=parts_dir / "node_text",
+    flow_dir=parts_dir / "flow",
+    labels_dir=parts_dir / "labels",
+    additional_texts_dir=parts_dir / "additional_texts",
+    save_dir=parts_dir / "combined",
 )
 ```
 
-All provided path lists must have the same length and matching stems.
+To replace an earlier set of combined results, you can add
+`on_existing="overwrite"`. See the
+[`combine_parsed_parts()`](../reference/helpers.md#flowde.combine_parsed_parts.combine_parsed_parts)
+API reference for full details of the parameters and validation rules.
 
-### Parallelism
+## Use a custom output schema
 
-Both `parse_imgs` and `parse_imgs_from_paths` accept an `n_jobs` parameter to
-control the number of parallel processes of `parse_fn` to run.
-
-By default, they will try to use all CPU cores available. If your `parse_fn` is
-memory heavy, or if it calls an external API, you may need to manually reduce
-the number of jobs.
+You can request a different JSON format by defining a Pydantic schema.
+This example asks for a title and a count of the diagram's boxes:
 
 ```python
-from pathlib import Path
+from pydantic import BaseModel, ConfigDict
 
-from flowde.parse_imgs import parse_imgs
 
-responses = parse_imgs(
-    parse_fn=parse_fn,
-    img_dir=Path("data/rotated-flowchart-images"),
-    save_dir=Path("data/parsed-flowcharts"),
-    n_jobs=1,
+class DiagramSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str
+    number_of_boxes: int
+
+
+summary_fn = make_openai_parse_fn(
+    input_text="Give the diagram a short title and count its boxes.",
+    model="gpt-5.6-luna",
+    effort="medium",
+    result_structure=DiagramSummary,
 )
 ```
 
-## Output validation
+`result_structure=DiagramSummary` tells
+[`make_openai_parse_fn()`](../reference/helpers.md#flowde.parsing_fns.openai_parse.make_openai_parse_fn)
+to create a parser with `title` and `number_of_boxes` in its results. A custom
+schema replaces the standard flowchart format, so `result_structure` and
+`parts_to_parse` cannot be supplied together. See the
+[factory API reference](../reference/helpers.md#flowde.parsing_fns.openai_parse.make_openai_parse_fn)
+for the parameters.
 
-The default OpenAI and Gemini parsing helpers build a Pydantic response schema
-from `parts_to_parse`.
+Flowde's parsing benchmark expects the standard flowchart format, so arbitrary
+custom results such as `DiagramSummary` need their own evaluation method.
 
-For example:
+## Bring your own parsing function
 
-```python
-parts_to_parse={"node_text"}
-```
-
-requires a response containing only node text fields, while:
-
-```python
-parts_to_parse={"node_text", "labels", "flow", "additional_text"}
-```
-
-requires a complete flowchart response.
-
-Extra fields are not allowed in the parsed output. This helps ensure that each
-parsing step returns only the fields requested for that step.
+You can write your own parser and pass it to
+[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
+as `parse_fn`. See the
+[custom parsing tutorial](custom-functions.md#a-parsing-function)
+for the requirements your function must meet and a complete working example.
 
 ## Next step
 
-After parsing, use the benchmarking tools to compare parsed flowcharts against
-ground-truth flowchart data.
+You can [benchmark the parsed results](../benchmarking/parsing.md) against
+manually annotated ground truth.

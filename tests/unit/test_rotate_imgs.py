@@ -233,7 +233,9 @@ def test_can_start_in_empty_directory(tmp_path, on_existing):
     ) == [0]
 
 
-@pytest.mark.parametrize("extra", ["notes.txt", "rotated_images/notes.txt"])
+@pytest.mark.parametrize(
+    "extra", ["notes.json", "notes.txt", "rotated_images/notes.txt"]
+)
 def test_overwrite_preserves_unrecorded_files(tmp_path, extra):
     source = create_image(tmp_path / "0.png")
     output = tmp_path / "output"

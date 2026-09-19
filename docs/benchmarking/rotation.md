@@ -15,8 +15,9 @@ Rotation benchmarks compare two JSON files:
 - a ground-truth file containing the true rotation labels;
 - a prediction file containing the predicted rotation labels.
 
-The prediction file can be created automatically by passing `json_path` to
-`rotate_imgs` or `rotate_imgs_from_paths`.
+Rotation saves predictions automatically to `save_dir / "rotations.json"`.
+Pass that file to the benchmark as `pred_path`. The benchmark reads saved JSON
+and makes no model requests.
 
 Both files should contain a list of objects with the following keys:
 
@@ -33,15 +34,9 @@ Both files should contain a list of objects with the following keys:
 ]
 ```
 
-The `label` should be the clockwise rotation needed to correct the image
-orientation. Rotation labels must be one of:
-
-```text
-0
-90
-180
-270
-```
+The `label` is the clockwise rotation, in degrees, needed to correct the image
+orientation: `0`, `90`, `180` or `270`. Ground-truth labels describe the
+corrections needed by the original input images.
 
 The benchmark expects the true and predicted files to contain the same images in
 the same order. The parent directories do not have to match, but the image
@@ -61,9 +56,11 @@ true: data/ground-truth-rotations/paper-1_0.png
 pred: data/predicted-rotations/paper-2_0.png
 ```
 
-## Run the rotation benchmark
+## Rotation benchmark
 
-Use `RotationBenchmark` to evaluate predicted rotation labels:
+You can use
+[`RotationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.rotation.rotation_benchmark.RotationBenchmark)
+to evaluate predicted rotation labels:
 
 ```python
 from pathlib import Path
@@ -79,73 +76,50 @@ benchmark = RotationBenchmark(
 The benchmark loads both JSON files, checks that they are valid, and compares
 the predicted rotation labels with the true rotation labels.
 
-## Results
+The benchmark uses the labels `(0, 90, 180, 270)` automatically and includes
+every angle in its counts and confusion matrix, even when no image has that
+label. A prediction counts as correct only when the predicted angle exactly
+matches the ground-truth angle.
+
+See the
+[`RotationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.rotation.rotation_benchmark.RotationBenchmark)
+API reference for full details of the parameters and results.
+
+### Rotation benchmark results
 
 After creating the benchmark object, you can inspect the results through its
 properties.
 
-| Property                          | Description                                                                          |
-| --------------------------------- | ------------------------------------------------------------------------------------ |
-| `len(benchmark)`                  | Number of images in the benchmark.                                                   |
-| `benchmark.result_list`           | All rotation results, one per image.                                                 |
-| `benchmark.correct_predictions`   | Results where `pred` matches `true`.                                                 |
-| `benchmark.incorrect_predictions` | Results where `pred` does not match `true`.                                          |
-| `benchmark.accuracy`              | Proportion of images where the predicted rotation matches the true rotation.         |
-| `benchmark.img_paths`             | Image paths used in the benchmark.                                                   |
-| `benchmark.trues`                 | True rotation labels, in benchmark order.                                            |
-| `benchmark.preds`                 | Predicted rotation labels, in benchmark order.                                       |
-| `benchmark.labels`                | The supported rotation labels: `0`, `90`, `180`, and `270`.                          |
-| `benchmark.confusion_matrix`      | Nested dictionary where rows are true rotations and columns are predicted rotations. |
-| `benchmark.num_per_true_class`    | Number of examples for each true rotation.                                           |
-| `benchmark.num_per_pred_class`    | Number of predictions made for each rotation.                                        |
-| `benchmark.per_class_accuracy`    | For each true rotation, the proportion of examples classified correctly.             |
+| Property                          | Description                                                                                                               |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `len(benchmark)`                  | Number of images in the benchmark.                                                                                        |
+| `benchmark.result_list`           | All rotation results, one per image.                                                                                      |
+| `benchmark.correct_predictions`   | Results where `pred` matches `true`.                                                                                      |
+| `benchmark.incorrect_predictions` | Results where `pred` does not match `true`.                                                                               |
+| `benchmark.accuracy`              | Proportion of images where the predicted angle matches the ground-truth angle.                                            |
+| `benchmark.img_paths`             | Image paths used in the benchmark.                                                                                        |
+| `benchmark.trues`                 | Ground-truth angles, in benchmark order.                                                                                  |
+| `benchmark.preds`                 | Predicted angles, in benchmark order.                                                                                     |
+| `benchmark.labels`                | The supported rotation labels: `(0, 90, 180, 270)`.                                                                       |
+| `benchmark.confusion_matrix`      | Number of images for each ground-truth angle and predicted angle pair.                                                    |
+| `benchmark.num_per_true_class`    | Number of images requiring each ground-truth angle.                                                                       |
+| `benchmark.num_per_pred_class`    | Number of images assigned each predicted angle.                                                                           |
+| `benchmark.per_class_accuracy`    | For each ground-truth angle, the proportion of images with a correct prediction; `0.0` when no image requires that angle. |
 
 For example, you can print the overall accuracy and class-level summaries:
 
 ```python
 print(f"Accuracy: {benchmark.accuracy:.3f}")
+print(benchmark.confusion_matrix)
 print(benchmark.num_per_true_class)
 print(benchmark.num_per_pred_class)
 print(benchmark.per_class_accuracy)
 ```
 
-The confusion matrix shows which rotations are being confused with each other:
-
-```python
-print(benchmark.confusion_matrix)
-```
-
-This returns a nested dictionary where the outer keys are true rotation labels
-and the inner keys are predicted rotation labels:
-
-```python
-{
-    0: {
-        0: 20,
-        90: 1,
-        180: 0,
-        270: 0,
-    },
-    90: {
-        0: 2,
-        90: 18,
-        180: 0,
-        270: 1,
-    },
-    180: {
-        0: 0,
-        90: 0,
-        180: 15,
-        270: 2,
-    },
-    270: {
-        0: 1,
-        90: 0,
-        180: 3,
-        270: 17,
-    },
-}
-```
+The confusion matrix is a nested dictionary indexed by ground-truth angle,
+then predicted angle. For example, `benchmark.confusion_matrix[90][0]` counts
+images that needed a 90-degree clockwise correction but received a prediction
+of `0`.
 
 You can also inspect the individual incorrect predictions:
 
@@ -157,10 +131,16 @@ for result in benchmark.incorrect_predictions:
 ```
 
 Each item in `result_list`, `correct_predictions`, and `incorrect_predictions`
-is a `SingleClassificationResult` with:
+is a
+[`SingleClassificationResult`](../reference/benchmarks.md#flowde.benchmarks.classification.classification_bench_types.SingleClassificationResult)
+with:
 
-| Attribute  | Description                  |
-| ---------- | ---------------------------- |
-| `img_path` | Path to the rotated image.   |
-| `true`     | Ground-truth rotation label. |
-| `pred`     | Predicted rotation label.    |
+| Attribute  | Description                                    |
+| ---------- | ---------------------------------------------- |
+| `img_path` | Image path from the ground-truth file.         |
+| `true`     | Ground-truth clockwise correction, in degrees. |
+| `pred`     | Predicted clockwise correction, in degrees.    |
+
+See the
+[`RotationBenchmark`](../reference/benchmarks.md#flowde.benchmarks.rotation.rotation_benchmark.RotationBenchmark)
+API reference for full details of the parameters and results.

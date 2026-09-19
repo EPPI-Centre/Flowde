@@ -2,7 +2,7 @@ import pytest
 
 from flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn import (
     levenshtein_fn,
-    levenshtein_with_nfc_and_space_normalisation,
+    levenshtein_with_text_normalisation,
 )
 
 
@@ -261,13 +261,13 @@ def test_levenshtein_fn_raises_if_both_texts_are_none():
         ),
     ],
 )
-def test_levenshtein_with_nfc_and_space_normalisation_returns_expected_distance(
+def test_levenshtein_with_text_normalisation_returns_expected_distance(
     true_text,
     pred_text,
     expected,
 ):
     assert (
-        levenshtein_with_nfc_and_space_normalisation(
+        levenshtein_with_text_normalisation(
             true_text=true_text,
             pred_text=pred_text,
         )
@@ -275,11 +275,11 @@ def test_levenshtein_with_nfc_and_space_normalisation_returns_expected_distance(
     )
 
 
-def test_levenshtein_with_nfc_and_space_normalisation_raises_if_both_texts_are_none():
-    with pytest.raises(ValueError) as exc_info:
-        levenshtein_with_nfc_and_space_normalisation(
+def test_levenshtein_with_text_normalisation_raises_if_both_texts_are_none():
+    with pytest.raises(
+        ValueError, match=r"Both true_text and pred_text cannot be None\."
+    ):
+        levenshtein_with_text_normalisation(
             true_text=None,
             pred_text=None,
         )
-
-    assert "Both true_text and pred_text cannot be None." in str(exc_info.value)

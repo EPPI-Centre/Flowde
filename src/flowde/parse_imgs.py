@@ -171,6 +171,136 @@ def parse_imgs(
     show_usage: bool = True,
     on_existing: ExistingRun = "error",
 ) -> list[BaseModel]:
+    """
+    Parse images in a directory into JSON files, optionally using saved context.
+
+    Parameters
+    ----------
+    parse_fn : ParsingFunction
+        Function accepting an `img_path` keyword argument and, when context is
+        supplied, a `partial_flowchart` keyword argument containing a Pydantic
+        model. `img_path` is a `Path` to the image being parsed; the partial
+        model contains previously parsed parts for that same image. Without
+        saved context, Flowde passes only `img_path`.
+
+        The function must return an instance of the Pydantic class exposed
+        as `parse_fn.result_structure`, not a dictionary, JSON string or `None`.
+        The class can describe standard flowchart parts or a custom output
+        format. The parser must raise an exception if parsing fails. Flowde
+        saves each returned model as a same-stem JSON file in `save_dir`.
+
+        Built-in factories declare their settings;
+        custom functions must declare their settings and result class with
+        [`model_function()`][flowde.model_function].
+    img_dir : Path
+        Directory containing input images. Subdirectories are not searched.
+        Matching paths are sorted before applying `range_indices`. Filename stems
+        must be unique across all matching images, including different extensions,
+        because each stem determines an output JSON filename.
+    save_dir : Path
+        Dedicated output directory, created if needed. Each image produces a JSON
+        file with the same stem, such as `diagram.png` producing `diagram.json`.
+        Run metadata is saved in `.flowde/run.state`. Input images, partial JSONs
+        and files referenced by the parser's declared settings must be outside
+        this directory.
+    nodes_dir : Path | None, optional
+        Directory of node-text JSONs supplied as context alongside the images.
+        Each JSON contains `nodes` with `node_number` and `text` fields.
+        Defaults to `None`, meaning no saved context is supplied. Required if
+        `labels_dir`, `additional_texts_dir` or `flow_dir` is provided.
+    labels_dir : Path | None, optional
+        Directory of label JSONs to add to the context from `nodes_dir`.
+        Each JSON contains `nodes` with `node_number` and `labels` fields.
+        Defaults to `None`, meaning no saved labels are included in the context.
+    additional_texts_dir : Path | None, optional
+        Directory of additional-text JSONs to add to the context from `nodes_dir`.
+        Each JSON contains an `additional_texts` list. Defaults to `None`, meaning
+        no saved additional text is included in the context.
+    flow_dir : Path | None, optional
+        Directory of connection JSONs to add to the context from `nodes_dir`.
+        Each JSON contains `nodes` with `node_number` and `points_to` fields.
+        Defaults to `None`, meaning no saved connections are included in the
+        context.
+    range_indices : tuple[int | None, int | None] | None, optional
+        A `(start, stop)` slice of the sorted image paths. `start` is included
+        and `stop` is excluded; `(0, 10)` selects up to the first ten images.
+        Either bound can be `None`, and negative indices follow Python slicing
+        rules. Defaults to `None`, which selects all matching images. The same
+        slice is applied to supplied context files after checking their filenames
+        against all matching images. An empty selection raises an error.
+    n_jobs : int, optional
+        Number of images that can be parsed concurrently. Defaults to the number
+        of CPU cores. `1` processes images sequentially in the calling process;
+        larger values use worker processes. This value can change when resuming
+        a run.
+    img_extensions : set[str] | None, optional
+        Image extensions to select, without leading dots, such as
+        `{"png", "jpg", "webp"}`. Defaults to `None`, which selects PNG files.
+        The supplied parser must support the selected image formats.
+    show_usage : bool, optional
+        Whether to display token usage and estimated costs reported by the
+        parser. Defaults to `True`. `False` hides those figures while retaining
+        the progress display and saved usage reports. This value can change
+        when resuming a run.
+    on_existing : {"error", "resume", "overwrite"}, optional
+        How to handle an existing run in `save_dir`. Defaults to `"error"`.
+
+        - `"error"`: start in a new or empty directory; reject existing work.
+        - `"resume"`: require a saved parsing run with matching parser settings.
+          Restore saved results for unchanged images and assembled partial
+          context, and parse selected images without saved results.
+        - `"overwrite"`: remove the previous run's tracked outputs and saved state,
+          then start a new run. Also works in a new or empty directory.
+          Unrelated files in an existing output directory cause an error.
+
+    Returns
+    -------
+    list[BaseModel]
+        One Pydantic result per image selected by this call, in sorted image-path
+        order. Each result uses `parse_fn.result_structure`. Includes results
+        restored from a previous run. With `range_indices`, the returned list
+        covers only the selected slice; JSON files for earlier slices remain
+        saved in `save_dir`.
+
+    Raises
+    ------
+    FileExistsError
+        If `save_dir` contains existing work and `on_existing="error"`.
+    ValueError
+        If `img_dir` is invalid, no images are selected, image stems are not
+        unique, context files do not match the images or required part schemas,
+        node numbers cannot be joined, inputs are inside `save_dir`, or the saved
+        run fails compatibility or integrity checks.
+    TypeError
+        If `parse_fn.result_structure` is not a Pydantic class or the parser
+        returns a value that is not an instance of that class, including `None`.
+    RuntimeError
+        If another Flowde call is already using the same `save_dir`.
+
+    Notes
+    -----
+    Each supplied context directory must contain exactly one top-level `*.json`
+    file per matching input image, with the same stem and no extra JSON files.
+    Filename and file-count checks cover all matching images before slicing,
+    including images outside `range_indices`.
+
+    Context files contain the fields for their individual parts, without the
+    benchmark ground truth's `options` wrapper. Selected node-text files must
+    contain at least one node, numbered consecutively from `1`. Selected label
+    and flow files must contain the same node numbers as the node-text file.
+    The parts are joined into the `partial_flowchart` passed to the parser.
+
+    Context files supply input to the parser; they are not automatically merged
+    into its output. The output fields are defined by `parse_fn.result_structure`.
+    For built-in parsers, the factory's `parts_to_parse` or `result_structure`
+    argument chooses those fields.
+
+    On resume, missing output JSONs are recreated from the results recorded in
+    `.flowde/run.state` without another parsing request. Edited saved outputs or
+    changes to previously parsed input images or their assembled partial context
+    cause an error.
+
+    """
     if not img_dir.is_dir():
         msg = f"Image directory {img_dir} does not exist or is not a directory."
         raise ValueError(msg)

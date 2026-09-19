@@ -117,6 +117,54 @@ class PredDiagramSources:
 
 
 class Node(BaseModel):
+    """
+    Represent one predicted or ground-truth node inside a parsing benchmark.
+
+    Benchmark loaders attach the flowchart identifier and Ground-Truth Option
+    index to the node fields read from JSON. Node numbers identify nodes within
+    a diagram; predicted and ground-truth versions of a node may have different
+    numbers.
+
+    Attributes
+    ----------
+    node_number : int
+        Node identifier. Must be less than `1000`; the containing `Diagram`
+        checks uniqueness and applies the ground-truth numbering rules.
+    text : str
+        Non-empty node text as loaded, before any distance-function
+        normalisation.
+    labels : list[str] | None
+        Non-empty label strings. `[]` means labels were parsed and none were
+        found; `None`, the default, means labels were not parsed.
+    points_to : list[int] | None
+        Destination node numbers for outgoing connections. `[]` means flow
+        was parsed and the node has no outgoing connections; `None`, the
+        default, means flow was not parsed.
+    diagram_type : {"pred", "true"}
+        Whether the node belongs to a prediction or to ground truth.
+    true_option_idx : int | None
+        Zero-based Ground-Truth Option index. Required for a ground-truth
+        node; must be `None` for a predicted node. Defaults to `None`.
+    parent_img_code : str
+        Filename stem identifying the source flowchart.
+    text_done : bool
+        Whether node text is present; always `True` for a valid `Node`.
+    labels_done : bool
+        Whether `labels` is present, including an empty list.
+    flow_done : bool
+        Whether `points_to` is present, including an empty list.
+    is_complete : bool
+        Whether text, labels and flow are all present.
+
+    Raises
+    ------
+    pydantic.ValidationError
+        If a field has an invalid type, text or a label string is empty,
+        `node_number` is at least `1000`, or `true_option_idx` conflicts with
+        `diagram_type`.
+
+    """
+
     model_config = COMMON_CONFIG
 
     node_number: int
@@ -175,6 +223,59 @@ class Node(BaseModel):
 
 
 class Diagram(BaseModel):
+    """
+    Represent one prediction or one accepted ground-truth interpretation.
+
+    A `DiagramMatch` exposes the compared diagrams through `pred_diagram` and
+    `true_diagram`. Diagram fields retain the original text and node numbers;
+    matching and text normalisation do not rewrite the loaded diagrams.
+
+    Attributes
+    ----------
+    nodes : list[Node] | None
+        Non-empty list of nodes, or `None` when no node-based parts were
+        supplied. Defaults to `None`. Parsing benchmarks require predicted
+        node text, so diagrams returned by benchmark methods contain nodes.
+    additional_texts : list[str] | None
+        Non-empty strings outside the nodes. `[]` means additional text was
+        parsed and none was found; `None`, the default, means the part was
+        not parsed.
+    parent_img_code : str
+        Filename stem identifying the source flowchart.
+    diagram_type : {"pred", "true"}
+        Whether the diagram is a prediction or a Ground-Truth Option.
+    true_option_idx : int | None
+        Zero-based Ground-Truth Option index for a ground-truth diagram;
+        `None` for a predicted diagram.
+    text_done : bool
+        Whether nodes and their text are present.
+    labels_done : bool
+        Whether every node has a labels list, including empty lists.
+    flow_done : bool
+        Whether every node has a `points_to` list, including empty lists.
+    additional_texts_done : bool
+        Whether `additional_texts` is present, including an empty list.
+    is_complete : bool
+        Whether node text, labels, flow and additional text are all present.
+
+    Raises
+    ------
+    pydantic.ValidationError
+        If fields are invalid, node numbers repeat, connections refer to
+        absent nodes, or node metadata disagrees with the diagram. Also
+        raised if only some nodes supply labels or flow, or a ground-truth
+        diagram is incomplete, has non-sequential node numbers, or contains
+        a node absent from every connection.
+
+    Notes
+    -----
+    Ground-truth nodes must appear in consecutive node-number order starting
+    at `1`. Predictions may use different numbering. Ground-truth diagrams
+    must contain all four parts; predictions may omit labels, flow or
+    additional text.
+
+    """
+
     model_config = COMMON_CONFIG
 
     nodes: list[Node] | None = Field(default=None, min_length=1)
@@ -634,6 +735,52 @@ class DiagramOptions(BaseModel):
 
 
 class TextListMatch(BaseModel):
+    """
+    Record one paired or unmatched label or additional-text string.
+
+    A pair records which predicted string represents which ground-truth
+    string, even when their text differs. An unmatched record contains text
+    on only one side.
+
+    Attributes
+    ----------
+    true_index : int | None
+        Zero-based position in the ground-truth text list. `None` when a
+        predicted string has no ground-truth match.
+    pred_index : int | None
+        Zero-based position in the predicted text list. `None` when a
+        ground-truth string has no predicted match.
+    true_text : str | None
+        Original ground-truth string, before normalisation; `None` exactly
+        when `true_index` is `None`. Present strings must be non-empty.
+    pred_text : str | None
+        Original predicted string, before normalisation; `None` exactly when
+        `pred_index` is `None`. Present strings must be non-empty.
+    parent_img_code : str | None
+        Source flowchart's filename stem. Additional-text matching sets this
+        field; label matching leaves the default `None` because the containing
+        `NodeMatch` identifies the flowchart.
+    true_option_idx : int | None
+        Selected Ground-Truth Option index, starting at `0`. Additional-text
+        matching sets this field; label matching leaves the default `None`.
+    cost : float
+        Distance-function cost for this string pair or unmatched string.
+        An unmatched string is compared with `None`; the built-in distance
+        functions treat the missing side as an empty string.
+    match_type : {"match", "unmatched_true", "unmatched_pred"}
+        `"match"` when both strings are present; `"unmatched_true"` for a
+        ground-truth string without a prediction; `"unmatched_pred"` for a
+        predicted string without ground truth. `"match"` does not imply
+        identical text or zero cost.
+
+    Raises
+    ------
+    pydantic.ValidationError
+        If a field is invalid, an index and its text disagree about whether
+        the corresponding side is absent, or both sides are absent.
+
+    """
+
     model_config = COMMON_CONFIG
 
     true_index: int | None
@@ -676,6 +823,33 @@ class TextListMatch(BaseModel):
 # TODO: Store the original true and predicted text lists and validate that the
 # matches account for every item in them exactly once.
 class TextListMatches(BaseModel):
+    """
+    Collect comparisons for one node's labels or a diagram's additional text.
+
+    The benchmark matches strings to minimise total cost rather than pairing
+    strings by their list positions. Each record retains the original indices
+    so the source strings can be identified.
+
+    Attributes
+    ----------
+    matches : list[TextListMatch]
+        Paired and unmatched string records. Benchmark-generated collections
+        account for every string in both source lists. Two empty source lists
+        produce an empty collection. Use each record's `true_index` and
+        `pred_index` to identify its original positions.
+    total_cost : float
+        Sum of every record's `cost`, including unmatched strings. An empty
+        collection has cost zero. The property reports a total, not an average.
+
+    Notes
+    -----
+    This class stores the supplied records and computes their total; the
+    class does not perform string matching when constructed. The container
+    does not store source lists or flowchart metadata. For additional text,
+    the individual records hold the flowchart and Ground-Truth Option IDs.
+
+    """
+
     model_config = COMMON_CONFIG
 
     matches: list[TextListMatch]
@@ -686,6 +860,49 @@ class TextListMatches(BaseModel):
 
 
 class NodeMatch(BaseModel):
+    """
+    Record one pair of corresponding nodes or one unmatched node.
+
+    A paired prediction and ground-truth node may have different text or node
+    numbers. The benchmark stores text cost separately from any label costs.
+
+    Attributes
+    ----------
+    true_node : Node | None
+        Node from the selected Ground-Truth Option, or `None` when a predicted
+        node has no ground-truth match.
+    pred_node : Node | None
+        Predicted node, or `None` when a ground-truth node has no prediction.
+    node_text_cost : int | float
+        Cost returned by the benchmark's `distance_fn` for the node text.
+        An unmatched node is compared with a missing text value; built-in
+        distance functions treat the missing value as an empty string.
+        Excludes label and flow costs.
+    label_matches : TextListMatches | None
+        Label comparisons for this Node Match, or `None` before labels have
+        been matched. An empty collection means both nodes have no labels.
+        Label comparisons include labels belonging to unmatched nodes.
+    match_type : {"match", "unmatched_true", "unmatched_pred"}
+        `"match"` for two present nodes; `"unmatched_true"` for a ground-truth
+        node without a prediction; `"unmatched_pred"` for a predicted node
+        without ground truth. A pair need not have zero text cost.
+    parent_img_code : str
+        Source flowchart's filename stem, taken from the ground-truth node
+        when present, otherwise from the predicted node.
+    numbers_only_node_text_cost : float
+        Cost from comparing only the numbers in the two nodes' text with
+        [`number_only_levenshtein()`][flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.number_only_levenshtein].
+        Uses this existing Node Match without changing the nodes or their
+        pairing.
+
+    Raises
+    ------
+    pydantic.ValidationError
+        If a field is invalid, both nodes are absent, or two present nodes
+        have different `parent_img_code` values.
+
+    """
+
     model_config = COMMON_CONFIG
 
     true_node: Node | None
@@ -743,6 +960,58 @@ class NodeMatch(BaseModel):
 
 
 class NodeMatches(BaseModel):
+    """
+    Collect the Node Matches for one flowchart and one Ground-Truth Option.
+
+    Benchmark-generated collections include every ground-truth and predicted
+    node exactly once, either in a pair or as an unmatched node.
+
+    Attributes
+    ----------
+    matches : list[NodeMatch]
+        Paired and unmatched node records. Inspect `true_node` and `pred_node`
+        on each record to identify the nodes; list positions are not node
+        numbers.
+    true_diagram_option_idx : int
+        Index of the selected Ground-Truth Option, starting at `0`.
+    parent_img_code : str
+        Source flowchart's filename stem, taken from the first Node Match.
+        Access raises `ValueError` if `matches` is empty.
+    true_nodes : list[Node]
+        All present ground-truth nodes, including unmatched nodes, in the
+        order of their records in `matches`.
+    pred_nodes : list[Node]
+        All present predicted nodes, including unmatched nodes, in the
+        order of their records in `matches`.
+    total_node_text_cost : float
+        Sum of the records' `node_text_cost` values, including unmatched nodes.
+    total_numbers_only_node_text_cost : float
+        Sum of the records' numbers-only text costs. Uses the existing Node
+        Matches without choosing different pairings or a different option.
+    total_label_error_cost : float
+        Sum of label costs across all Node Matches. Access raises `ValueError`
+        if any record has `label_matches=None`; an empty collection costs zero.
+    flow_score : FlowScores
+        Directed-connection scores calculated from these Node Matches.
+        Requires a `points_to` list on every present node. Matched endpoints
+        use ground-truth node numbers; unmatched predicted endpoints receive
+        generated identifiers starting at `10000`.
+
+    Raises
+    ------
+    pydantic.ValidationError
+        If a field is invalid or a ground-truth or predicted node number
+        appears in more than one record on the same side during validation.
+
+    Notes
+    -----
+    Text costs include unmatched nodes and labels. Flow uses the same Node
+    Matches; accessing `flow_score` does not select new pairings. Cost
+    properties sum the stored records rather than rerunning model requests
+    or matching.
+
+    """
+
     model_config = COMMON_CONFIG
 
     matches: list[NodeMatch]
@@ -769,6 +1038,31 @@ class NodeMatches(BaseModel):
         pred_node_number: int,
         allow_fake_pred_node: bool = False,
     ) -> Node | None:
+        """
+        Find the ground-truth node paired with a predicted node number.
+
+        Parameters
+        ----------
+        pred_node_number : int
+            Identifier of a predicted node recorded in `matches`.
+        allow_fake_pred_node : bool, optional
+            Whether an absent predicted node number should return `None`
+            instead of raising an error. Defaults to `False`. Flow scoring
+            uses this option when looking up predicted connection endpoints.
+
+        Returns
+        -------
+        Node | None
+            The paired ground-truth node. Returns `None` for a recorded
+            unmatched predicted node, or for an absent predicted node number
+            when `allow_fake_pred_node=True`.
+
+        Raises
+        ------
+        ValueError
+            If `pred_node_number` is absent and `allow_fake_pred_node=False`.
+
+        """
         for match in self.matches:
             if (
                 match.pred_node is not None
@@ -787,6 +1081,26 @@ class NodeMatches(BaseModel):
         raise ValueError(msg)
 
     def get_matched_pred_node(self, true_node_number: int) -> Node | None:
+        """
+        Find the predicted node paired with a ground-truth node number.
+
+        Parameters
+        ----------
+        true_node_number : int
+            Identifier of a ground-truth node recorded in `matches`.
+
+        Returns
+        -------
+        Node | None
+            The paired predicted node, or `None` when the recorded ground-truth
+            node is unmatched.
+
+        Raises
+        ------
+        ValueError
+            If `true_node_number` does not appear in `matches`.
+
+        """
         for match in self.matches:
             if (
                 match.true_node is not None
@@ -944,6 +1258,48 @@ class NodeMatches(BaseModel):
 
 
 class DiagramMatch(BaseModel):
+    """
+    Collect a complete prediction's comparison with one Ground-Truth Option.
+
+    Both diagrams contain node text, labels, flow and additional text. The
+    result exposes the loaded diagrams, their matching records, and the text
+    and flow scores calculated from those records.
+
+    Attributes
+    ----------
+    node_matches : NodeMatches
+        Every paired and unmatched node, with label matches for each record.
+        `true_diagram_option_idx` identifies the selected Ground-Truth Option.
+    additional_text_matches : TextListMatches
+        Paired and unmatched additional-text strings from both diagrams.
+    pred_diagram : Diagram
+        Complete predicted diagram, retaining its original node numbers and
+        text.
+    true_diagram : Diagram
+        Complete ground-truth diagram selected from the accepted options.
+        `true_option_idx` is its zero-based option index.
+    total_node_text_cost : float
+        Sum of paired and unmatched node-text costs.
+    total_label_error_cost : float
+        Sum of paired and unmatched label costs, including labels on unmatched
+        nodes.
+    total_additional_text_cost : float
+        Sum of paired and unmatched additional-text costs.
+    total_text_cost : float
+        Sum of node-text, label and additional-text costs. Excludes flow scores.
+    flow_score : FlowScores
+        Directed-connection scores after applying `node_matches`.
+
+    Raises
+    ------
+    pydantic.ValidationError
+        If a field is invalid, either diagram is incomplete, the diagrams
+        refer to different flowcharts or have incorrect `diagram_type`
+        values, or the node and additional-text records do not account for
+        the contents of the compared diagrams.
+
+    """
+
     model_config = COMMON_CONFIG
 
     node_matches: NodeMatches
@@ -1125,6 +1481,49 @@ class DiagramMatch(BaseModel):
 
 
 class FlowScores(BaseModel):
+    """
+    Store directed-connection counts and scores for one matched flowchart.
+
+    The benchmark calculates these fields after matching predicted nodes to
+    ground-truth nodes. Connection direction matters: `1 -> 2` differs from
+    `2 -> 1`.
+
+    Attributes
+    ----------
+    tp : int
+        Number of connections present in both the prediction and ground truth.
+    fp : int
+        Number of predicted connections absent from ground truth.
+    fn : int
+        Number of ground-truth connections absent from the prediction.
+    precision : float
+        Correct connections divided by predicted connections:
+        `tp / (tp + fp)`. Zero when the prediction has no connections.
+    recall : float
+        Correct connections divided by ground-truth connections:
+        `tp / (tp + fn)`. Zero when ground truth has no connections.
+    f1 : float
+        Harmonic mean of precision and recall. Zero when both are zero.
+    jaccard : float
+        Correct connections divided by all distinct connections in either
+        diagram: `tp / (tp + fp + fn)`. Ranges from `0.0` to `1.0`; higher is
+        better. Two empty connection sets score `1.0`.
+    missing_edges : set[tuple[int, int]]
+        Missing ground-truth connections as `(source, destination)` pairs
+        of ground-truth node numbers.
+    extra_edges : set[tuple[int, int]]
+        Predicted connections absent from ground truth, expressed using
+        matched ground-truth node numbers. Unmatched predicted endpoints use
+        generated identifiers starting at `10000`, not original node numbers.
+
+    Notes
+    -----
+    A `FlowScores` object stores supplied values; constructing the object does
+    not calculate metrics from `tp`, `fp` and `fn`. Benchmark methods calculate
+    the metrics before constructing the object.
+
+    """
+
     model_config = COMMON_CONFIG
 
     tp: int

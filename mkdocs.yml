@@ -1,10 +1,18 @@
 site_name: flowde
+site_url: https://eppi-centre.github.io/Flowde/
 site_description: >
-  Tools for extracting structured flowchart data from CONSORT-style diagrams.
+  Extract, classify, rotate and parse flowcharts, with worked CONSORT examples
+  and benchmarks against ground truth.
 repo_url: https://github.com/EPPI-Centre/Flowde
 repo_name: GitHub
 edit_uri: edit/main/docs/
 strict: true
+
+watch:
+  - src
+
+exclude_docs: |
+  /AGENTS.md
 
 theme:
   name: readthedocs
@@ -12,9 +20,26 @@ theme:
 
 plugins:
   - search
-  # - git-revision-date-localized:
-  #     enable_creation_date: true
-  #     type: date
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            separate_signature: true
+            merge_init_into_class: true
+            members: false
+            heading_level: 3
+
+validation:
+  links:
+    not_found: warn
+    anchors: warn
+    unrecognized_links: warn
 
 extra_css:
   - stylesheets/extra.css
@@ -38,8 +63,11 @@ nav:
           - Image classification: pipeline/classification.md
           - Image rotation: pipeline/rotation.md
           - Flowchart parsing: pipeline/parsing.md
+          - Stopping and resuming: pipeline/resuming.md
+          - Tokens and costs: pipeline/usage.md
+          - Few-shot examples: pipeline/few-shot.md
+      - Custom functions: pipeline/custom-functions.md
       - Benchmarking:
-          - Overview: benchmarking/index.md
           - Classification: benchmarking/classification.md
           - Rotation: benchmarking/rotation.md
           - Parsing: benchmarking/parsing.md
@@ -47,3 +75,9 @@ nav:
           - Overview: recipes/index.md
           - End-to-end:
               - CONSORT: recipes/consort.md
+  - API Reference:
+      - Overview: reference/index.md
+      - Pipeline functions: reference/pipeline.md
+      - Function factories and helpers: reference/helpers.md
+      - Data types: reference/data-types.md
+      - Benchmarks: reference/benchmarks.md

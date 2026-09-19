@@ -7,7 +7,7 @@ from flowde.benchmarks.parsing.check_parsing_bench_data import (
 )
 from flowde.benchmarks.parsing.parsing_bench import ParsingBenchmark
 from flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn import (
-    levenshtein_with_nfc_and_space_normalisation,
+    levenshtein_with_text_normalisation,
 )
 from flowde.utils import parse_bool
 
@@ -87,7 +87,7 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     benchmark = ParsingBenchmark(
         pred_diagrams_dir=pred_diagrams_dirs,
-        distance_fn=levenshtein_with_nfc_and_space_normalisation,
+        distance_fn=levenshtein_with_text_normalisation,
         allow_missing_pred_diagrams=args.allow_missing_pred_diagrams,
         true_nodes_dir=args.true_nodes_dir,
         true_labels_dir=args.true_labels_dir,

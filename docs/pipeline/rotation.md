@@ -1,294 +1,148 @@
 # Image rotation
 
-Rotation is the third stage of the core pipeline. It takes images as input,
-predicts the clockwise rotation needed to orient each image correctly, and then
-optionally saves the rotated images.
+Rotation predicts the correction needed to orient an image correctly and saves
+a corrected copy. In the core pipeline, rotation follows
+[classification](classification.md) and prepares the selected images for
+parsing.
 
-In a typical workflow, we
-[classify images](./classification.md#image-classification) to keep only the
-relevant flowchart images, then use rotation to correct their orientation before
-parsing. Of course, the order of rotation and classification is interchangeable.
+## Rotate images from a directory
 
-## Define a rotation classification function
-
-Before running rotation, define the function that will predict the rotation
-angle for each image.
-
-A rotation classification function takes the path to one image and returns one
-of the following labels: `0`, `90`, `180`, `270`. These labels represent the
-**clockwise angle** used to rotate the image into the correct orientation.
-
-Rotation uses the same classification-function pattern as
-[image classification](./classification.md#image-classification). The difference
-is that the output label is always a rotation angle.
-
-### Use a default LLM classification function
-
-<!-- markdownlint-disable MD046 -->
-<!-- prettier-ignore-start -->
-
-!!! note "Default classification with Gemini or OpenAI"
-    To use the default OpenAI or Gemini helpers, follow the
-    [setup default parsing and classification](./setup-default-funcs.md#setup-default-parsing-and-classification)
-    steps.
-
-<!-- prettier-ignore-end -->
-
-<!-- markdownlint-enable MD046 -->
-
-For example, to define an OpenAI rotation classification function:
+[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs)
+takes a directory of images and saves correction angles and corrected copies
+into one dedicated output directory.
 
 ```python
-from pydantic import BaseModel
+from pathlib import Path
 
-from flowde.classify_fns.classify_types import RotationLabel
+from flowde.classify_fns.classify_types import RotationClassification
 from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
-
-
-class RotationClassification(BaseModel):
-    label: RotationLabel # RotationLabel = Literal[0, 90, 180, 270]
-
-input_text = """
-Return the clockwise angle required to correctly orient the image,
-such that the majority of text reads left to right, top to bottom.
-"""
-
-classify_fn = make_openai_classify_fn(
-    input_text=input_text,
-    model="gpt-5.4-mini",
-    result_structure=RotationClassification,
-    effort="high",
-)
-```
-
-To use Gemini instead, use `make_gemini_classify_fn`:
-
-```python
-from flowde.classify_fns.gemini_classify_fn import make_gemini_classify_fn
-
-classify_fn = make_gemini_classify_fn(
-    input_text=input_text,
-    model="gemini-3.1-flash-lite",
-    result_structure=RotationClassification,
-    effort="high",
-)
-```
-
-See (insert API ref docs here) for details about params.
-
-### Bring your own rotation classification function
-
-A custom rotation classification function must accept an image path and return
-one of `0`, `90`, `180`, or `270`:
-
-```python
-from pathlib import Path
-
-from flowde.classify_fns.classify_types import RotationLabel
-
-
-def classify_rotation(img_path: Path) -> RotationLabel:
-    ...
-```
-
-## Run rotation
-
-After defining `classify_fn`, pass it to one of the rotation pipeline functions.
-
-Most users should use `rotate_imgs`. This takes a directory of PNG images,
-predicts the rotation angle for each image, and optionally saves the rotated
-images.
-
-### Rotate images from a directory
-
-```python
-from pathlib import Path
-
 from flowde.rotate_imgs import rotate_imgs
 
-rotation_labels = rotate_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/flowchart-images"),
-    save_dir=Path("data/rotated-flowchart-images"),
-    json_path=Path("data/rotation-labels.json"),
+img_dir = Path("results/classification/positive_images")
+save_dir = Path("results/rotation")
+
+rotation_fn = make_openai_classify_fn(
+    input_text=(
+        "Return the clockwise angle needed to orient this image correctly, "
+        "so the majority of text reads left to right and top to bottom. "
+        "Return one of 0, 90, 180 or 270 degrees."
+    ),
+    model="gpt-5.6-luna",
+    effort="medium",
+    result_structure=RotationClassification,
+)
+
+angles = rotate_imgs(
+    classify_fn=rotation_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    n_jobs=1,
 )
 ```
 
-The input directory should contain the PNG images at the top level.
-`rotate_imgs` searches for files matching `*.png` directly inside `img_dir`.
+[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs)
+processes `*.png` files inside `img_dir`, in sorted path order.
+Subdirectories are not searched. The returned `angles` list contains one
+correction angle per processed image: `angles[0]` corresponds to the first
+sorted image path, `angles[1]` to the second sorted image path, and so on.
 
-For example:
+The example above uses OpenAI and requires the
+[OpenAI setup](setup-default-funcs.md#set-up-openai).
+For `classify_fn`, you can use an OpenAI classifier created with
+[`make_openai_classify_fn()`](../reference/helpers.md#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn),
+a Gemini classifier created with
+[`make_gemini_classify_fn()`](../reference/helpers.md#flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn),
+or [your own rotation classifier](custom-functions.md#a-rotation-function).
+The [provider setup guide](setup-default-funcs.md#use-azure-openai) also covers
+Azure OpenAI.
+
+The example sets `result_structure` to
+[`RotationClassification`](../reference/data-types.md#flowde.classify_fns.classify_types.RotationClassification)
+to restrict the classifier's labels to `0`, `90`, `180` or `270`. These labels
+specify **clockwise corrections in degrees**: `90` means rotate the input image
+clockwise by 90 degrees.
+
+You can also rotate extracted images before classification by using the
+extraction output directory as `img_dir`.
+
+See the
+[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs)
+and
+[`make_openai_classify_fn()`](../reference/helpers.md#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn)
+API references for full details of all parameters.
+
+## Rotation results
+
+Flowde saves the correction angles and corrected image copies:
 
 ```text
-data/
-└── flowchart-images/
-    ├── paper-1_0.png
-    ├── paper-2_0.png
-    └── paper-3_0.png
+results/rotation/
+├── rotations.json
+├── rotated_images/
+│   ├── paper-1_0.png
+│   └── paper-2_0.png
+└── .flowde/
+    ├── run.state
+    └── run.lock
 ```
 
-When `save_dir` is provided, rotated images are saved to that directory using
-the same filenames:
-
-```text
-data/
-└── rotated-flowchart-images/
-    ├── paper-1_0.png
-    ├── paper-2_0.png
-    └── paper-3_0.png
-```
-
-### Save rotation labels to JSON
-
-Pass `json_path` to save the predicted rotation labels:
-
-```python
-rotation_labels = rotate_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/flowchart-images"),
-    json_path=Path("data/rotation-labels.json"),
-)
-```
-
-The JSON file contains the image path and predicted rotation label for each
-image:
+`rotations.json` records the input image path and correction angle:
 
 ```json
 [
   {
-    "img_path": "data/flowchart-images/paper-1_0.png",
+    "img_path": "results/classification/positive_images/paper-1_0.png",
     "label": 0
   },
   {
-    "img_path": "data/flowchart-images/paper-2_0.png",
+    "img_path": "results/classification/positive_images/paper-2_0.png",
     "label": 90
   }
 ]
 ```
 
-### Save rotated images to a new directory
+Every successfully processed image has a copy in
+`save_dir / "rotated_images"`, including images labelled `0` that need no
+rotation. The copies retain their filenames, and the original images in
+`img_dir` remain unchanged.
 
-To save rotated images without modifying the original images, pass `save_dir`:
+`.flowde/run.state` records which images have been processed, their correction
+angles, the rotation settings and file fingerprints. Flowde uses this metadata
+to resume the run and detect changes to the input images or saved results.
 
-```python
-rotation_labels = rotate_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/flowchart-images"),
-    save_dir=Path("data/rotated-flowchart-images"),
-    json_path=Path("data/rotation-labels.json"),
-)
-```
+## Resume rotation
 
-This is usually the safest option because it keeps the original extracted images
-unchanged.
-
-### Rotate images in place
-
-If you want to overwrite the original image files, pass `save_in_place=True`:
+To continue an unfinished rotation run whose results are saved in `save_dir`,
+you can set `on_existing="resume"`:
 
 ```python
-rotation_labels = rotate_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/flowchart-images"),
-    json_path=Path("data/rotation-labels.json"),
-    save_in_place=True,
-)
-```
-
-When `save_in_place=True`, you cannot also provide `save_dir`.
-
-<!-- markdownlint-disable MD046 -->
-<!-- prettier-ignore-start -->
-
-!!! warning "Rotating in place overwrites the original files"
-    Use `save_in_place=True` only if you are sure you do not need to keep the
-    original image orientation.
-
-<!-- prettier-ignore-end -->
-
-<!-- markdownlint-enable MD046 -->
-
-### Predict rotation without saving images
-
-If you only want the predicted rotation labels, omit both `save_dir` and
-`save_in_place`:
-
-```python
-rotation_labels = rotate_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/flowchart-images"),
-    json_path=Path("data/rotation-labels.json"),
-)
-```
-
-This classifies the rotation angle for each image and optionally saves the
-labels to JSON, but does not write rotated image files.
-
-### Rotate an explicit list of images
-
-If you do not want to process every PNG in a directory, use
-`rotate_imgs_from_paths`. This lets you pass the image paths directly.
-
-```python
-from pathlib import Path
-
-from flowde.rotate_imgs import rotate_imgs_from_paths
-
-img_paths = [
-    Path("data/flowchart-images/paper-1_0.png"),
-    Path("data/flowchart-images/paper-2_0.png"),
-]
-
-save_paths = [
-    Path("data/rotated-flowchart-images/paper-1_0.png"),
-    Path("data/rotated-flowchart-images/paper-2_0.png"),
-]
-
-rotation_labels = rotate_imgs_from_paths(
-    classify_fn=classify_fn,
-    img_paths=img_paths,
-    save_paths=save_paths,
-    json_path=Path("data/rotation-labels.json"),
-)
-```
-
-`img_paths` and `save_paths` must have the same length. Each input image is
-rotated and saved to the corresponding save path.
-
-You can also rotate the explicit paths in place:
-
-```python
-rotation_labels = rotate_imgs_from_paths(
-    classify_fn=classify_fn,
-    img_paths=img_paths,
-    json_path=Path("data/rotation-labels.json"),
-    save_in_place=True,
-)
-```
-
-When `save_in_place=True`, you cannot also provide `save_paths`.
-
-### Parallelism
-
-Both `rotate_imgs` and `rotate_imgs_from_paths` accept an `n_jobs` parameter to
-control the number of parallel processes used when predicting rotation labels.
-By default, they will try to use all CPU cores available.
-
-```python
-from pathlib import Path
-
-from flowde.rotate_imgs import rotate_imgs
-
-rotation_labels = rotate_imgs(
-    classify_fn=classify_fn,
-    img_dir=Path("data/flowchart-images"),
-    save_dir=Path("data/rotated-flowchart-images"),
-    json_path=Path("data/rotation-labels.json"),
+angles = rotate_imgs(
+    classify_fn=rotation_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
     n_jobs=1,
+    on_existing="resume",
 )
 ```
+
+The `.flowde/run.state` file inside `save_dir` stores the rotation run's state.
+Flowde uses this record to resume unfinished work and check the integrity of the run.
+Resume raises an error if the classifier's settings have changed, or if
+previously processed input images or saved outputs have been edited.
+
+To use different settings, you can start a run in a new `save_dir` or replace
+the previous run with `on_existing="overwrite"`. See
+[managing runs](resuming.md) for the full rules.
+
+## Bring your own rotation function
+
+You can write your own rotation classifier and pass it to
+[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs)
+as `classify_fn`. See the
+[custom rotation tutorial](custom-functions.md#a-rotation-function)
+for the requirements your function must meet and a complete working example.
 
 ## Next step
 
-After rotation, use the parsing stage to extract structured data from the
-correctly oriented flowchart images.
+You can use `save_dir / "rotated_images"` as the input directory for
+[image parsing](parsing.md).

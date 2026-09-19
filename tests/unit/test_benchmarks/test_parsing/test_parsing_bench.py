@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -9,6 +10,10 @@ from flowde.benchmarks.parsing.parsing_bench_types import (
     PredDiagramSources,
     PredDiagramStructure,
 )
+from flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn import (
+    levenshtein_fn,
+    levenshtein_with_text_normalisation,
+)
 
 # TODO: Should add some actual non-monkeypatch orchestration tests with real values,
 # just to be 100% sure we wired them properly.
@@ -16,6 +21,97 @@ from flowde.benchmarks.parsing.parsing_bench_types import (
 
 def dummy_distance_fn(*, true_text: str | None, pred_text: str | None) -> int:
     return 0
+
+
+@pytest.mark.parametrize(
+    (
+        "distance_fn",
+        "expected_node_cost",
+        "expected_label_cost",
+        "expected_additional_text_cost",
+    ),
+    [
+        pytest.param(None, 1, 0, 0, id="omitted-uses-normalised-text"),
+        pytest.param(levenshtein_fn, 3, 1, 4, id="explicit-raw-distance"),
+        pytest.param(
+            levenshtein_with_text_normalisation, 1, 0, 0, id="explicit-new-name"
+        ),
+    ],
+)
+def test_parsing_benchmark_default_and_explicit_text_distances(
+    tmp_path,
+    distance_fn,
+    expected_node_cost,
+    expected_label_cost,
+    expected_additional_text_cost,
+):
+    prediction_dir = tmp_path / "predictions"
+    truth_dir = tmp_path / "truth"
+    prediction_dir.mkdir()
+    (prediction_dir / "a.json").write_text(
+        json.dumps(
+            {
+                "nodes": [
+                    {
+                        "node_number": 1,
+                        "text": "Screened (n=11)",
+                        "labels": ["Follow\N{EN DASH}up"],
+                        "points_to": [2],
+                    },
+                    {
+                        "node_number": 2,
+                        "text": "Analysed",
+                        "labels": [],
+                        "points_to": [],
+                    },
+                ],
+                "additional_texts": [" Figure   1 "],
+            }
+        ),
+        encoding="utf-8",
+    )
+    truth_parts = {
+        "nodes": {
+            "nodes": [
+                {"node_number": 1, "text": "Screened (n = 10)"},
+                {"node_number": 2, "text": "Analysed"},
+            ]
+        },
+        "labels": {
+            "nodes": [
+                {"node_number": 1, "labels": ["Follow-up"]},
+                {"node_number": 2, "labels": []},
+            ]
+        },
+        "flow": {
+            "nodes": [
+                {"node_number": 1, "points_to": [2]},
+                {"node_number": 2, "points_to": []},
+            ]
+        },
+        "additional_texts": {"additional_texts": ["Figure 1"]},
+    }
+    for part, data in truth_parts.items():
+        directory = truth_dir / part
+        directory.mkdir(parents=True)
+        (directory / "a.json").write_text(
+            json.dumps({"options": [data]}), encoding="utf-8"
+        )
+
+    distance_kwargs = {} if distance_fn is None else {"distance_fn": distance_fn}
+    benchmark = benchmark_module.ParsingBenchmark(
+        pred_diagrams_dir=prediction_dir,
+        true_nodes_dir=truth_dir / "nodes",
+        true_labels_dir=truth_dir / "labels",
+        true_flow_dir=truth_dir / "flow",
+        true_additional_texts_dir=truth_dir / "additional_texts",
+        expected_num_diagrams=1,
+        **distance_kwargs,
+    )
+
+    assert benchmark.total_node_text_cost() == expected_node_cost
+    assert benchmark.total_label_cost() == expected_label_cost
+    assert benchmark.total_additional_text_cost() == expected_additional_text_cost
 
 
 def make_pred_diagram(parent_img_code: str):
