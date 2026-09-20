@@ -41,6 +41,20 @@ extract_imgs(
 searches for `*.pdf` files directly inside `pdf_dir`, sorts the
 paths and processes those PDFs. Subdirectories are not searched.
 
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+!!! note "Note: concurrency"
+
+    `n_jobs` controls how many calls to `extract_fn` can run concurrently and
+    defaults to `1`. Parallel execution in
+    [`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)
+    uses separate Python processes. Increasing `n_jobs` can therefore speed up
+    extraction, but also greatly increase CPU and memory usage.
+
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
+
 See the
 [`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)
 and

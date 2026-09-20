@@ -65,6 +65,21 @@ clockwise by 90 degrees.
 You can also rotate extracted images before classification by using the
 extraction output directory as `img_dir`.
 
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+!!! note "Note: concurrency"
+
+    `max_concurrent_jobs` controls how many calls to `classify_fn` can run
+    concurrently and defaults to `10`. Parallel execution in
+    [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs)
+    uses threads, allowing concurrency to greatly exceed the CPU core count
+    when waiting for API responses. Choose `max_concurrent_jobs` based on your
+    API limits.
+
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
+
 See the
 [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs)
 and

@@ -68,6 +68,21 @@ creates a binary classification function by default, returning `0` or `1`.
 You can change the allowed labels through its `result_structure` parameter;
 see [multiclass classification](#multiclass-classification).
 
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+!!! note "Note: concurrency"
+
+    `max_concurrent_jobs` controls how many calls to `classify_fn` can run
+    concurrently and defaults to `10`. Parallel execution in
+    [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs)
+    uses threads, allowing concurrency to greatly exceed the CPU core count
+    when waiting for API responses. Choose `max_concurrent_jobs` based on your
+    API limits.
+
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
+
 See the
 [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs)
 and
