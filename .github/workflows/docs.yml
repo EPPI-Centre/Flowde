@@ -25,4 +25,5 @@ jobs:
         run: uv run --group docs mkdocs build --strict
 
       - name: Deploy docs
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: uv run --group docs mkdocs gh-deploy --force
