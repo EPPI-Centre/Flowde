@@ -1,4 +1,3 @@
-from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Any
 
@@ -25,7 +24,7 @@ def rotate_imgs_from_paths(
     img_paths: list[Path],
     save_dir: Path,
     *,
-    n_jobs: int = cpu_count(),
+    max_concurrent_jobs: int = 10,
     show_usage: bool = True,
     on_existing: ExistingRun = "error",
 ) -> list[RotationLabel]:
@@ -46,8 +45,14 @@ def rotate_imgs_from_paths(
     save_dir : Path
         Dedicated directory containing `rotations.json`, corrected copies in
         `rotated_images`, and run metadata in `.flowde`. Inputs must be outside it.
-    n_jobs : int, optional
-        Number of parallel model calls. Defaults to the number of CPU cores.
+    max_concurrent_jobs : int, optional
+        Maximum number of images handled concurrently by threads in a separate
+        worker process, by default 10. Must be a positive integer; 1 handles one
+        image at a time.
+        Custom functions must support concurrent calls when this exceeds 1.
+        Even at 1, worker mutations do not update objects in the caller; see
+        [custom functions](../pipeline/custom-functions.md#concurrent-image-calls).
+        This setting can change when resuming a run.
     show_usage : bool, optional
         Show reported token usage and estimated costs. Defaults to `True`.
     on_existing : {"error", "resume", "overwrite"}, optional
@@ -94,7 +99,8 @@ def rotate_imgs_from_paths(
         settings=settings,
         encode=angle,
         decode=angle,
-        n_jobs=n_jobs,
+        n_jobs=max_concurrent_jobs,
+        threaded=True,
         show_usage=show_usage,
         on_existing=on_existing,
     )
@@ -108,7 +114,7 @@ def rotate_imgs(
     save_dir: Path,
     *,
     range_indices: tuple[int | None, int | None] | None = None,
-    n_jobs: int = cpu_count(),
+    max_concurrent_jobs: int = 10,
     show_usage: bool = True,
     on_existing: ExistingRun = "error",
 ) -> list[RotationLabel]:
@@ -143,11 +149,14 @@ def rotate_imgs(
         Either bound can be `None`, and negative indices follow Python slicing
         rules. Defaults to `None`, which selects all matching images. An empty
         selection raises an error.
-    n_jobs : int, optional
-        Number of angle predictions that can run concurrently. Defaults to the
-        number of CPU cores. `1` processes images sequentially in the calling
-        process; larger values use worker processes. This value can change
-        when resuming a run.
+    max_concurrent_jobs : int, optional
+        Maximum number of images handled concurrently by threads in a separate
+        worker process, by default 10. Must be a positive integer; 1 handles one
+        image at a time.
+        Custom functions must support concurrent calls when this exceeds 1.
+        Even at 1, worker mutations do not update objects in the caller; see
+        [custom functions](../pipeline/custom-functions.md#concurrent-image-calls).
+        This setting can change when resuming a run.
     show_usage : bool, optional
         Whether to display token usage and estimated costs reported by the
         classifier. Defaults to `True`. `False` hides those figures while
@@ -215,7 +224,7 @@ def rotate_imgs(
         classify_fn=classify_fn,
         img_paths=img_paths,
         save_dir=save_dir,
-        n_jobs=n_jobs,
+        max_concurrent_jobs=max_concurrent_jobs,
         show_usage=show_usage,
         on_existing=on_existing,
     )

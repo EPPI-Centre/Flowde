@@ -131,10 +131,14 @@ def test_send_openai_request_builds_client_request_and_returns_text(
 
     if from_azure:
         openai_client_constructor.assert_called_once_with(
-            api_key="fake-azure-key", base_url="https://azure.example/openai/v1/"
+            api_key="fake-azure-key",
+            base_url="https://azure.example/openai/v1/",
+            timeout=300,
         )
     else:
-        openai_client_constructor.assert_called_once_with(api_key="fake-openai-key")
+        openai_client_constructor.assert_called_once_with(
+            api_key="fake-openai-key", timeout=300
+        )
     client.responses.parse.assert_called_once_with(
         model="gpt-test-model",
         text_format=DummyResultStructure,
@@ -181,11 +185,15 @@ def test_openai_vision_input_list_without_partial_flowchart(
 
     if from_azure:
         openai_client_constructor.assert_called_once_with(
-            api_key="fake-azure-key", base_url="https://azure.example/openai/v1/"
+            api_key="fake-azure-key",
+            base_url="https://azure.example/openai/v1/",
+            timeout=300,
         )
         vision_upload.assert_not_called()
     else:
-        openai_client_constructor.assert_called_once_with(api_key="fake-openai-key")
+        openai_client_constructor.assert_called_once_with(
+            api_key="fake-openai-key", timeout=300
+        )
         vision_upload.assert_called_once_with(
             img_path, openai_client_constructor.return_value
         )

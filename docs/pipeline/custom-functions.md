@@ -1,17 +1,16 @@
 # Custom processing functions
 
 You can replace the default extraction, classification, rotation or parsing
-functions with your own while still using Flowde's directory handling,
-parallel processing, automatic result saving and support for stopping and
-resuming runs.
+functions with your own while still using Flowde's directory handling, parallel
+processing, automatic result saving and support for stopping and resuming runs.
 
 ## Declare settings
 
 To use Flowde's automatic result saving and support for stopping and resuming
 runs, **you must declare the settings that affect your custom function's
 results** using
-[`model_function()`](../reference/helpers.md#flowde.model_function).
-For example, the [page extractor below](#an-extraction-function) uses this
+[`model_function()`](../reference/helpers.md#flowde.model_function). For
+example, the [page extractor below](#an-extraction-function) uses this
 declaration:
 
 ```python
@@ -76,8 +75,8 @@ API reference for full details of the `extract_fn` requirements.
 You can pass a custom classifier as `classify_fn` to
 [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs).
 For example, the following classifier returns `1` for images that are at least
-500 pixels wide and 500 pixels tall, and `0` if either dimension is below
-500 pixels:
+500 pixels wide and 500 pixels tall, and `0` if either dimension is below 500
+pixels:
 
 ```python
 from pathlib import Path
@@ -110,7 +109,7 @@ labels = classify_imgs(
     img_dir=Path("results/extraction"),
     save_dir=Path("results/size-classification"),
     positive_classes={1},
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -131,16 +130,16 @@ You can supply `result_structure` through
 the returned labels. The example uses
 [`BinaryClassification`](../reference/data-types.md#flowde.classify_fns.classify_types.BinaryClassification),
 which permits only the integers `0` and `1`. Without `result_structure`, Flowde
-checks that the label is a string, integer or boolean but does not restrict
-the allowed values.
+checks that the label is a string, integer or boolean but does not restrict the
+allowed values.
 
 ### A rotation function
 
 You can pass a custom rotation classifier as `classify_fn` to
-[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs).
-For example, the following function returns `90` for images that are wider
-than they are tall, and `0` for portrait or square images. Flowde uses these
-angles to rotate landscape images into portrait orientation:
+[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs). For
+example, the following function returns `90` for images that are wider than they
+are tall, and `0` for portrait or square images. Flowde uses these angles to
+rotate landscape images into portrait orientation:
 
 ```python
 from pathlib import Path
@@ -167,7 +166,7 @@ angles = rotate_imgs(
     classify_fn=rotation_fn,
     img_dir=Path("results/extraction"),
     save_dir=Path("results/portrait-rotation"),
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -176,21 +175,22 @@ The custom rotation classifier must:
 - Accept an `img_path` argument.
 - Return a clockwise correction in degrees as an `int`: `0`, `90`, `180` or
   `270`.
-- Raise an exception if angle prediction fails. Returning `None` raises an error.
+- Raise an exception if angle prediction fails. Returning `None` raises an
+  error.
 
 See the
-[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs)
-API reference for full details of the `classify_fn` requirements.
+[`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs) API
+reference for full details of the `classify_fn` requirements.
 
-Flowde applies the returned angles, saves image copies in `rotated_images`
-and records the angles in `rotations.json`, both inside `save_dir`.
+Flowde applies the returned angles, saves image copies in `rotated_images` and
+records the angles in `rotations.json`, both inside `save_dir`.
 
 ### A parsing function
 
 You can pass a custom parser as `parse_fn` to
-[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs).
-For example, the following parser reads each image's width, height and colour
-mode into a custom Pydantic result:
+[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs). For
+example, the following parser reads each image's width, height and colour mode
+into a custom Pydantic result:
 
 ```python
 from pathlib import Path
@@ -228,7 +228,7 @@ results = parse_imgs(
     parse_fn=parse_fn,
     img_dir=Path("results/extraction"),
     save_dir=Path("results/image-details"),
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -237,30 +237,27 @@ The custom parser must:
 - Accept `img_path` as a keyword argument.
 - Declare a Pydantic result class through `result_structure` in
   [`model_function()`](../reference/helpers.md#flowde.model_function).
-- Return an instance of the declared result class, rather than a dictionary
-  or JSON string.
+- Return an instance of the declared result class, rather than a dictionary or
+  JSON string.
 - Raise an exception if parsing fails. Returning `None` raises an error.
 
-See the
-[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
+See the [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
 API reference for full details of the `parse_fn` requirements.
 
 The example uses a custom result class as its `result_structure`. For the
-standard flowchart format,
-you can use
+standard flowchart format, you can use
 [`build_partial_flowchart_schema()`](../reference/helpers.md#flowde.parsing_fns.parsing_types.build_partial_flowchart_schema)
 to create a result class containing node text, labels, flow or additional text.
 
 To support [previously parsed parts](parsing.md#parse-parts-separately), your
 parser must also accept `partial_flowchart` as a keyword argument. Flowde
-supplies a Pydantic model containing the saved parts for the image being
-parsed. Without saved parts, Flowde passes only `img_path`.
+supplies a Pydantic model containing the saved parts for the image being parsed.
+Without saved parts, Flowde passes only `img_path`.
 
 ## Errors, workers and usage
 
-Your function must raise an exception if processing fails. Flowde stops
-starting further PDFs or images after detecting the error.
-
+Your function must raise an exception if processing fails. Flowde stops starting
+further PDFs or images after detecting the error.
 
 You can use
 [`report_usage()`](../reference/data-types.md#flowde.usage.report_usage) inside

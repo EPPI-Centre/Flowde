@@ -28,6 +28,7 @@ authors = [
     {name = "Sam Molyneux"}
 ]
 dependencies = [
+    "cloudpickle",
     "joblib",
     "pillow",
     "pydantic",

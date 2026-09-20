@@ -45,6 +45,7 @@ def _get_claude_client() -> AnthropicFoundry:
     return AnthropicFoundry(
         api_key=os.getenv("ANTHROPIC_FOUNDRY_API_KEY"),
         base_url=os.getenv("ANTHROPIC_FOUNDRY_BASE_URL"),
+        timeout=300,
     )
 
 

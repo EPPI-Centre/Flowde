@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +19,7 @@ def classify_imgs_from_paths(
     save_dir: Path,
     *,
     positive_classes: set[ClassificationLabel] | None = None,
-    n_jobs: int = cpu_count(),
+    max_concurrent_jobs: int = 10,
     show_usage: bool = True,
     on_existing: ExistingRun = "error",
 ) -> list[LabelType]:
@@ -33,6 +32,10 @@ def classify_imgs_from_paths(
     Custom functions declare settings with `model_function()`; built-in factories
     already attach their settings.
     Return labels in the supplied image order, including restored results.
+
+    Image functions run in threads in a separate worker process, even with
+    `max_concurrent_jobs=1`. See [`classify_imgs()`][flowde.classify_imgs.classify_imgs]
+    for concurrency and custom-function requirements.
     """
     if not img_paths:
         msg = "img_paths cannot be empty."
@@ -74,7 +77,8 @@ def classify_imgs_from_paths(
         settings=settings,
         encode=label,
         decode=label,
-        n_jobs=n_jobs,
+        n_jobs=max_concurrent_jobs,
+        threaded=True,
         show_usage=show_usage,
         on_existing=on_existing,
     )
@@ -100,7 +104,7 @@ def classify_imgs(
     *,
     positive_classes: set[ClassificationLabel] | None = None,
     range_indices: tuple[int | None, int | None] | None = None,
-    n_jobs: int = cpu_count(),
+    max_concurrent_jobs: int = 10,
     show_usage: bool = True,
     on_existing: ExistingRun = "error",
 ) -> list[LabelType]:
@@ -137,11 +141,14 @@ def classify_imgs(
         Either bound can be `None`, and negative indices follow Python slicing
         rules. Defaults to `None`, which selects all matching images. An empty
         selection raises an error.
-    n_jobs : int, optional
-        Number of images that can be classified concurrently. Defaults to the
-        number of CPU cores. `1` processes images sequentially in the calling
-        process; larger values use worker processes. This value can change
-        when resuming a run.
+    max_concurrent_jobs : int, optional
+        Maximum number of images handled concurrently by threads in a separate
+        worker process, by default 10. Must be a positive integer; 1 handles one
+        image at a time.
+        Custom functions must support concurrent calls when this exceeds 1.
+        Even at 1, worker mutations do not update objects in the caller; see
+        [custom functions](../pipeline/custom-functions.md#concurrent-image-calls).
+        This setting can change when resuming a run.
     show_usage : bool, optional
         Whether to display token usage and estimated costs reported by the
         classifier. Defaults to `True`. `False` hides those figures while
@@ -206,7 +213,7 @@ def classify_imgs(
         img_paths=img_paths,
         save_dir=save_dir,
         positive_classes=positive_classes,
-        n_jobs=n_jobs,
+        max_concurrent_jobs=max_concurrent_jobs,
         show_usage=show_usage,
         on_existing=on_existing,
     )

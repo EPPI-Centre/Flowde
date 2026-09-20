@@ -1,7 +1,6 @@
 import json
 import re
 from pathlib import Path
-from unittest.mock import Mock
 
 import pytest
 from pydantic import BaseModel
@@ -54,7 +53,9 @@ def parse_should_not_be_called(**kwargs):
     raise AssertionError("parse_fn should not be called")
 
 
-def test_parse_imgs_from_paths_names_outputs_and_resumes_in_input_order(tmp_path):
+def test_parse_imgs_from_paths_names_outputs_and_resumes_in_input_order(
+    tmp_path, calls
+):
     img_paths = [
         tmp_path / "second-set" / "diagram.v2.png",
         tmp_path / "first-set" / "a.jpg",
@@ -62,14 +63,19 @@ def test_parse_imgs_from_paths_names_outputs_and_resumes_in_input_order(tmp_path
     for img_path in img_paths:
         create_test_file(img_path)
     save_dir = tmp_path / "nested" / "parsed"
+
+    def parse(img_path):
+        calls.append(img_path.name)
+        return parse_img_without_partial(img_path)
+
     parser = model_function(
-        Mock(wraps=parse_img_without_partial),
+        parse,
         result_structure=ParsedFlowchart,
         parser="filename",
     )
 
     results = parse_imgs_module.parse_imgs_from_paths(
-        parser, img_paths, save_dir, n_jobs=1
+        parser, img_paths, save_dir, max_concurrent_jobs=1
     )
 
     assert [result.img_name for result in results] == ["diagram.v2.png", "a.jpg"]
@@ -77,19 +83,20 @@ def test_parse_imgs_from_paths_names_outputs_and_resumes_in_input_order(tmp_path
         path.name: json.loads(path.read_text())["img_name"]
         for path in save_dir.glob("*.json")
     } == {"diagram.v2.json": "diagram.v2.png", "a.json": "a.jpg"}
-    parser.reset_mock()
+    assert list(calls) == ["diagram.v2.png", "a.jpg"]
+    del calls[:]
 
     restored = parse_imgs_module.parse_imgs_from_paths(
-        parser, img_paths, save_dir, n_jobs=1, on_existing="resume"
+        parser, img_paths, save_dir, max_concurrent_jobs=1, on_existing="resume"
     )
 
     assert restored == results
-    parser.assert_not_called()
+    assert list(calls) == []
 
 
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
+@pytest.mark.parametrize("max_concurrent_jobs", [1, 2], ids=["sequential", "parallel"])
 def test_parse_imgs_from_paths_writes_parse_results_without_partial_flowcharts(
-    tmp_path, n_jobs
+    tmp_path, max_concurrent_jobs
 ):
     img_paths = [
         tmp_path / "imgs" / "diagram_1.png",
@@ -104,7 +111,7 @@ def test_parse_imgs_from_paths_writes_parse_results_without_partial_flowcharts(
         parse_fn=parse_img_without_partial,
         img_paths=img_paths,
         save_dir=save_dir,
-        n_jobs=n_jobs,
+        max_concurrent_jobs=max_concurrent_jobs,
     )
 
     assert [response.model_dump() for response in result] == [
@@ -128,7 +135,7 @@ def test_parse_imgs_from_paths_writes_parse_results_without_partial_flowcharts(
     }
 
 
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
+@pytest.mark.parametrize("max_concurrent_jobs", [1, 2], ids=["sequential", "parallel"])
 @pytest.mark.parametrize(
     (
         "include_labels",
@@ -149,7 +156,7 @@ def test_parse_imgs_from_paths_writes_parse_results_without_partial_flowcharts(
 def test_parse_imgs_from_paths_writes_parse_results_with_partial_flowcharts(
     tmp_path,
     monkeypatch,
-    n_jobs,
+    max_concurrent_jobs,
     include_labels,
     include_additional_texts,
     include_flow,
@@ -234,7 +241,7 @@ def test_parse_imgs_from_paths_writes_parse_results_with_partial_flowcharts(
         labels_paths=labels_paths,
         additional_texts_paths=additional_texts_paths,
         flow_paths=flow_paths,
-        n_jobs=n_jobs,
+        max_concurrent_jobs=max_concurrent_jobs,
     )
 
     assert [response.model_dump() for response in result] == [
@@ -279,7 +286,7 @@ def test_parse_imgs_from_paths_writes_parse_results_with_partial_flowcharts(
     }
 
 
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
+@pytest.mark.parametrize("max_concurrent_jobs", [1, 2], ids=["sequential", "parallel"])
 @pytest.mark.parametrize(
     (
         "img_filenames",
@@ -442,7 +449,7 @@ def test_parse_imgs_from_paths_writes_parse_results_with_partial_flowcharts(
 )
 def test_parse_imgs_from_paths_validation_errors_do_not_write_outputs(
     tmp_path,
-    n_jobs,
+    max_concurrent_jobs,
     img_filenames,
     nodes_filenames,
     labels_filenames,
@@ -488,7 +495,7 @@ def test_parse_imgs_from_paths_validation_errors_do_not_write_outputs(
             labels_paths=labels_paths,
             additional_texts_paths=additional_texts_paths,
             flow_paths=flow_paths,
-            n_jobs=n_jobs,
+            max_concurrent_jobs=max_concurrent_jobs,
         )
 
     msg = str(exc_info.value)
@@ -517,7 +524,7 @@ def test_parse_imgs_controls_usage_display(tmp_path, capsys, show_usage):
         parse_fn=parse_with_usage,
         img_dir=img_dir,
         save_dir=save_dir,
-        n_jobs=1,
+        max_concurrent_jobs=1,
         show_usage=show_usage,
     )
 
@@ -529,10 +536,10 @@ def test_parse_imgs_controls_usage_display(tmp_path, capsys, show_usage):
     assert ("Tokens:" in text) == show_usage
 
 
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
+@pytest.mark.parametrize("max_concurrent_jobs", [1, 2], ids=["sequential", "parallel"])
 def test_parse_imgs_writes_parse_results_without_partial_flowcharts(
     tmp_path: Path,
-    n_jobs: int,
+    max_concurrent_jobs: int,
 ) -> None:
     img_dir = tmp_path / "imgs"
     save_dir = tmp_path / "parsed"
@@ -544,7 +551,7 @@ def test_parse_imgs_writes_parse_results_without_partial_flowcharts(
         parse_fn=parse_img_without_partial,
         img_dir=img_dir,
         save_dir=save_dir,
-        n_jobs=n_jobs,
+        max_concurrent_jobs=max_concurrent_jobs,
     )
 
     assert [response.model_dump() for response in result] == [
@@ -581,10 +588,10 @@ def test_parse_imgs_writes_parse_results_without_partial_flowcharts(
     } == expected_paths
 
 
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
+@pytest.mark.parametrize("max_concurrent_jobs", [1, 2], ids=["sequential", "parallel"])
 def test_parse_imgs_ignores_non_png_files(
     tmp_path: Path,
-    n_jobs: int,
+    max_concurrent_jobs: int,
 ) -> None:
     img_dir = tmp_path / "imgs"
     save_dir = tmp_path / "parsed"
@@ -597,7 +604,7 @@ def test_parse_imgs_ignores_non_png_files(
         parse_fn=parse_img_without_partial,
         img_dir=img_dir,
         save_dir=save_dir,
-        n_jobs=n_jobs,
+        max_concurrent_jobs=max_concurrent_jobs,
     )
 
     assert [response.model_dump() for response in result] == [
@@ -686,7 +693,7 @@ def test_parse_imgs_rejects_duplicate_image_stems(tmp_path, range_indices):
             save_dir=save_dir,
             img_extensions={"jpg", "png"},
             range_indices=range_indices,
-            n_jobs=1,
+            max_concurrent_jobs=1,
         )
 
     assert "diagram.jpg" in str(raised.value)
@@ -708,7 +715,7 @@ def test_parse_imgs_from_paths_rejects_duplicate_image_stems(tmp_path):
             parse_fn=parse_should_not_be_called,
             img_paths=img_paths,
             save_dir=save_path.parent,
-            n_jobs=1,
+            max_concurrent_jobs=1,
         )
 
     assert save_path.read_text(encoding="utf-8") == original_result
@@ -725,7 +732,7 @@ def test_parse_imgs_writes_distinct_results_for_mixed_image_formats(tmp_path):
         img_dir=img_dir,
         save_dir=save_dir,
         img_extensions={"jpg", "png"},
-        n_jobs=1,
+        max_concurrent_jobs=1,
     )
 
     assert [result.img_name for result in results] == ["diagram_1.jpg", "diagram_2.png"]
@@ -749,7 +756,7 @@ def test_parse_imgs_ignores_duplicate_stems_in_unselected_formats(tmp_path):
         parse_fn=parse_img_without_partial,
         img_dir=img_dir,
         save_dir=save_dir,
-        n_jobs=1,
+        max_concurrent_jobs=1,
     )
 
     assert [result.img_name for result in results] == ["diagram.png"]
@@ -846,7 +853,7 @@ def test_parse_imgs_passes_sorted_paths_to_parse_imgs_from_paths(
         labels_dir=labels_dir,
         additional_texts_dir=additional_texts_dir,
         flow_dir=flow_dir,
-        n_jobs=3,
+        max_concurrent_jobs=3,
         show_usage=show_usage,
     )
 
@@ -884,7 +891,7 @@ def test_parse_imgs_passes_sorted_paths_to_parse_imgs_from_paths(
             flow_dir / "diagram_2.json",
             flow_dir / "diagram_3.json",
         ],
-        "n_jobs": 3,
+        "max_concurrent_jobs": 3,
         "show_usage": show_usage,
         "on_existing": "error",
     }
@@ -1005,7 +1012,7 @@ def test_parse_imgs_passes_range_indices_to_parse_imgs_from_paths(
         additional_texts_dir=additional_texts_dir,
         flow_dir=flow_dir,
         range_indices=range_indices,
-        n_jobs=3,
+        max_concurrent_jobs=3,
     )
 
     assert [response.model_dump() for response in result] == [
@@ -1040,7 +1047,7 @@ def test_parse_imgs_passes_range_indices_to_parse_imgs_from_paths(
             if flow_dir is not None
             else None
         ),
-        "n_jobs": 3,
+        "max_concurrent_jobs": 3,
         "show_usage": True,
         "on_existing": "error",
     }

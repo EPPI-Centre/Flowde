@@ -38,7 +38,7 @@ responses = parse_imgs(
     parse_fn=parse_fn,
     img_dir=img_dir,
     save_dir=save_dir,
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -63,6 +63,21 @@ Azure OpenAI.
 creates a parser for the complete flowchart format by default. You can instead
 [parse selected parts](#parse-parts-separately), such as node text or connections,
 or [use a custom output schema](#use-a-custom-output-schema).
+
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+!!! note "Note: concurrency"
+
+    `max_concurrent_jobs` controls how many calls to `parse_fn` can run
+    concurrently and defaults to `10`. Parallel execution in
+    [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
+    uses threads, allowing concurrency to greatly exceed the CPU core count
+    when waiting for API responses. Choose `max_concurrent_jobs` based on your
+    API limits.
+
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
 
 See the
 [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)
@@ -362,7 +377,7 @@ responses = parse_imgs(
     parse_fn=parse_fn,
     img_dir=img_dir,
     save_dir=save_dir,
-    n_jobs=1,
+    max_concurrent_jobs=1,
     on_existing="resume",
 )
 ```
@@ -422,7 +437,7 @@ nodes = parse_imgs(
     parse_fn=nodes_fn,
     img_dir=img_dir,
     save_dir=parts_dir / "node_text",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -475,7 +490,7 @@ flow = parse_imgs(
     img_dir=img_dir,
     save_dir=parts_dir / "flow",
     nodes_dir=parts_dir / "node_text",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 

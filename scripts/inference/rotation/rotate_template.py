@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 DATASET_DIR = REPO_ROOT / "data" / "training-smoking-cessation"
 IMG_DIR = DATASET_DIR / "extraction" / "paddle_layout_detect_p3"
 SAVE_DIR = DATASET_DIR / "rotation" / "template_example"
-N_JOBS = 1
+MAX_CONCURRENT_JOBS = 1
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -48,15 +48,15 @@ def main(argv: Sequence[str] | None = None) -> None:
         help="How to handle an output directory containing previous work.",
     )
     parser.add_argument(
-        "--n-jobs",
+        "--max-concurrent-jobs",
         type=int,
-        default=N_JOBS,
-        help=f"Number of parallel model calls (default: {N_JOBS}).",
+        default=MAX_CONCURRENT_JOBS,
+        help=f"Number of parallel model calls (default: {MAX_CONCURRENT_JOBS}).",
     )
     args = parser.parse_args(argv)
 
-    if args.n_jobs < 1:
-        parser.error("--n-jobs must be at least 1.")
+    if args.max_concurrent_jobs < 1:
+        parser.error("--max-concurrent-jobs must be at least 1.")
 
     classify_fn = make_gemini_classify_fn(
         input_text=INPUT_TEXT,
@@ -77,7 +77,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         img_dir=args.img_dir,
         save_dir=args.save_dir,
         on_existing=args.on_existing,
-        n_jobs=args.n_jobs,
+        max_concurrent_jobs=args.max_concurrent_jobs,
     )
 
 
