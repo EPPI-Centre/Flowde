@@ -102,11 +102,11 @@ context has no effect. See
 These protocols describe the callable interfaces that Flowde's processing
 functions must follow. Custom functions do not need to inherit from a protocol.
 
-| Pipeline stage | Function contract | Result for one input file |
-| --- | --- | --- |
-| Extraction | [`ExtractImgsFunction`](data-types.md#flowde.extract_fns.extract_types.ExtractImgsFunction) | Write PNG files for one PDF into the supplied directory; return `None`. |
-| Classification and rotation | [`ClassificationFunction`](data-types.md#flowde.classify_fns.classify_types.ClassificationFunction) | Return one label, or a clockwise correction angle for rotation. |
-| Parsing | [`ParsingFunction`](data-types.md#flowde.parsing_fns.parsing_types.ParsingFunction) | Return a Pydantic model matching the callable's `result_structure` class. |
+| Pipeline stage              | Function contract                                                                                   | Result for one input file                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Extraction                  | [`ExtractImgsFunction`](data-types.md#flowde.extract_fns.extract_types.ExtractImgsFunction)         | Write PNG files for one PDF into the supplied directory; return `None`.   |
+| Classification and rotation | [`ClassificationFunction`](data-types.md#flowde.classify_fns.classify_types.ClassificationFunction) | Return one label, or a clockwise correction angle for rotation.           |
+| Parsing                     | [`ParsingFunction`](data-types.md#flowde.parsing_fns.parsing_types.ParsingFunction)                 | Return a Pydantic model matching the callable's `result_structure` class. |
 
 The contracts below describe the arguments, return values and requirements
 for each callable. See the [custom-function guide](../pipeline/custom-functions.md)

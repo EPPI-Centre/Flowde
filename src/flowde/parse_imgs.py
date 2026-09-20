@@ -1,4 +1,3 @@
-from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Any
 
@@ -23,12 +22,18 @@ def parse_imgs_from_paths(
     labels_paths: list[Path] | None = None,
     additional_texts_paths: list[Path] | None = None,
     flow_paths: list[Path] | None = None,
-    n_jobs: int = cpu_count(),
+    max_concurrent_jobs: int = 10,
     *,
     show_usage: bool = True,
     on_existing: ExistingRun = "error",
 ) -> list[BaseModel]:
-    """Parse explicit image paths into same-stem JSON files inside `save_dir`."""
+    """
+    Parse explicit image paths into same-stem JSON files inside `save_dir`.
+
+    Image functions run in threads in a separate worker process, even with
+    `max_concurrent_jobs=1`. See [`parse_imgs()`][flowde.parse_imgs.parse_imgs]
+    for concurrency and custom-function requirements.
+    """
     validate_unique_stems(img_paths)
 
     validate_same_path_lengths(
@@ -148,7 +153,8 @@ def parse_imgs_from_paths(
         settings=settings,
         encode=encode,
         decode=lambda value: structure.model_validate_json(json_bytes(value)),
-        n_jobs=n_jobs,
+        n_jobs=max_concurrent_jobs,
+        threaded=True,
         show_usage=show_usage,
         on_existing=on_existing,
     )
@@ -165,7 +171,7 @@ def parse_imgs(
     additional_texts_dir: Path | None = None,
     flow_dir: Path | None = None,
     range_indices: tuple[int | None, int | None] | None = None,
-    n_jobs: int = cpu_count(),
+    max_concurrent_jobs: int = 10,
     img_extensions: set[str] | None = None,
     *,
     show_usage: bool = True,
@@ -228,11 +234,14 @@ def parse_imgs(
         rules. Defaults to `None`, which selects all matching images. The same
         slice is applied to supplied context files after checking their filenames
         against all matching images. An empty selection raises an error.
-    n_jobs : int, optional
-        Number of images that can be parsed concurrently. Defaults to the number
-        of CPU cores. `1` processes images sequentially in the calling process;
-        larger values use worker processes. This value can change when resuming
-        a run.
+    max_concurrent_jobs : int, optional
+        Maximum number of images handled concurrently by threads in a separate
+        worker process, by default 10. Must be a positive integer; 1 handles one
+        image at a time.
+        Custom functions must support concurrent calls when this exceeds 1.
+        Even at 1, worker mutations do not update objects in the caller; see
+        [custom functions](../pipeline/custom-functions.md#concurrent-image-calls).
+        This setting can change when resuming a run.
     img_extensions : set[str] | None, optional
         Image extensions to select, without leading dots, such as
         `{"png", "jpg", "webp"}`. Defaults to `None`, which selects PNG files.
@@ -383,7 +392,7 @@ def parse_imgs(
         labels_paths=labels_paths,
         additional_texts_paths=additional_texts_paths,
         flow_paths=flow_paths,
-        n_jobs=n_jobs,
+        max_concurrent_jobs=max_concurrent_jobs,
         show_usage=show_usage,
         on_existing=on_existing,
     )

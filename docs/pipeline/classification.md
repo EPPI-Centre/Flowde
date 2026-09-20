@@ -39,7 +39,7 @@ labels = classify_imgs(
     img_dir=img_dir,
     save_dir=save_dir,
     positive_classes={1},
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -114,7 +114,7 @@ labels = classify_imgs(
     img_dir=img_dir,
     save_dir=save_dir,
     positive_classes={1},
-    n_jobs=1,
+    max_concurrent_jobs=1,
     on_existing="resume",
 )
 ```

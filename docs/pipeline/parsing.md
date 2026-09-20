@@ -38,7 +38,7 @@ responses = parse_imgs(
     parse_fn=parse_fn,
     img_dir=img_dir,
     save_dir=save_dir,
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -362,7 +362,7 @@ responses = parse_imgs(
     parse_fn=parse_fn,
     img_dir=img_dir,
     save_dir=save_dir,
-    n_jobs=1,
+    max_concurrent_jobs=1,
     on_existing="resume",
 )
 ```
@@ -422,7 +422,7 @@ nodes = parse_imgs(
     parse_fn=nodes_fn,
     img_dir=img_dir,
     save_dir=parts_dir / "node_text",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -475,7 +475,7 @@ flow = parse_imgs(
     img_dir=img_dir,
     save_dir=parts_dir / "flow",
     nodes_dir=parts_dir / "node_text",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 

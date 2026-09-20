@@ -23,6 +23,6 @@ if __name__ == "__main__":
         img_dir=IMG_DIR,
         save_dir=REPO_ROOT / "example_runs" / "classification_10_images",
         range_indices=(0, 10),
-        n_jobs=2,
+        max_concurrent_jobs=2,
     )
     print(labels)

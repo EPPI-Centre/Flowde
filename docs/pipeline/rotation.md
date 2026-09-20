@@ -36,7 +36,7 @@ angles = rotate_imgs(
     classify_fn=rotation_fn,
     img_dir=img_dir,
     save_dir=save_dir,
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -120,7 +120,7 @@ angles = rotate_imgs(
     classify_fn=rotation_fn,
     img_dir=img_dir,
     save_dir=save_dir,
-    n_jobs=1,
+    max_concurrent_jobs=1,
     on_existing="resume",
 )
 ```

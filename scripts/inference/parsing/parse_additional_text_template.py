@@ -24,7 +24,7 @@ NODES_DIR = PRED_DIR / PARSED_NODES_DATASET
 LABELS_DIR = PRED_DIR / PARSED_LABELS_DATASET
 START_INDEX = None
 STOP_INDEX = None
-N_JOBS = 1
+MAX_CONCURRENT_JOBS = 1
 
 INPUT_TEXT = """
 I am sending you an image of a particpant flow diagram, the nodes and the
@@ -165,10 +165,10 @@ def main(argv: Sequence[str] | None = None) -> None:
         ),
     )
     parser.add_argument(
-        "--n-jobs",
+        "--max-concurrent-jobs",
         type=int,
-        default=N_JOBS,
-        help=f"Number of parallel model calls (default: {N_JOBS}).",
+        default=MAX_CONCURRENT_JOBS,
+        help=f"Number of parallel model calls (default: {MAX_CONCURRENT_JOBS}).",
     )
     parser.add_argument(
         "--on-existing",
@@ -178,8 +178,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     args = parser.parse_args(argv)
 
-    if args.n_jobs < 1:
-        parser.error("--n-jobs must be at least 1.")
+    if args.max_concurrent_jobs < 1:
+        parser.error("--max-concurrent-jobs must be at least 1.")
 
     parse_fn = make_gemini_parse_fn(
         input_text=INPUT_TEXT,
@@ -202,7 +202,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         nodes_dir=args.nodes_dir,
         labels_dir=args.labels_dir,
         range_indices=(args.start_index, args.stop_index),
-        n_jobs=args.n_jobs,
+        max_concurrent_jobs=args.max_concurrent_jobs,
         on_existing=args.on_existing,
     )
 

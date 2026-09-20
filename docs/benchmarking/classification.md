@@ -83,31 +83,31 @@ API reference for full details of the parameters and results.
 After creating the benchmark object, you can inspect the results through its
 properties.
 
-| Property                                                                 | Description                                                                       |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| `len(benchmark)`                                                         | Number of classified images in the benchmark.                                     |
-| `benchmark.result_list`                                                  | All classification results, one per image.                                        |
-| `benchmark.correct_predictions`                                          | Results where `pred` matches `true`.                                              |
-| `benchmark.incorrect_predictions`                                        | Results where `pred` does not match `true`.                                       |
-| `benchmark.accuracy`                                                     | Proportion of images where the predicted label matches the true label.            |
-| `benchmark.img_paths`                                                    | Image paths used in the benchmark.                                                |
-| `benchmark.trues`                                                        | True labels, in benchmark order.                                                  |
-| `benchmark.preds`                                                        | Predicted labels, in benchmark order.                                             |
-| `benchmark.tp`                                                           | True positives: predicted `1`, true label `1`.                                    |
-| `benchmark.fp`                                                           | False positives: predicted `1`, true label `0`.                                   |
-| `benchmark.fn`                                                           | False negatives: predicted `0`, true label `1`.                                   |
-| `benchmark.tn`                                                           | True negatives: predicted `0`, true label `0`.                                    |
-| `benchmark.num_tp`                                                       | Number of true positives.                                                         |
-| `benchmark.num_fp`                                                       | Number of false positives.                                                        |
-| `benchmark.num_fn`                                                       | Number of false negatives.                                                        |
-| `benchmark.num_tn`                                                       | Number of true negatives.                                                         |
-| `benchmark.precision`                                                    | Of the images predicted positive, the proportion that were truly positive.        |
-| `benchmark.recall`                                                       | Of the truly positive images, the proportion predicted positive.                  |
-| `benchmark.f1_score`                                                     | Harmonic mean of precision and recall.                                            |
-| `benchmark.tpr`                                                          | True positive rate. This is the same as `recall`.                                 |
-| `benchmark.fpr`                                                          | False positive rate: proportion of true negatives incorrectly predicted positive. |
-| `benchmark.specificity`                                                  | True negative rate: proportion of true negatives correctly predicted negative.    |
-| `benchmark.tnr`                                                          | True negative rate. This is the same as `specificity`.                            |
+| Property                          | Description                                                                       |
+| --------------------------------- | --------------------------------------------------------------------------------- |
+| `len(benchmark)`                  | Number of classified images in the benchmark.                                     |
+| `benchmark.result_list`           | All classification results, one per image.                                        |
+| `benchmark.correct_predictions`   | Results where `pred` matches `true`.                                              |
+| `benchmark.incorrect_predictions` | Results where `pred` does not match `true`.                                       |
+| `benchmark.accuracy`              | Proportion of images where the predicted label matches the true label.            |
+| `benchmark.img_paths`             | Image paths used in the benchmark.                                                |
+| `benchmark.trues`                 | True labels, in benchmark order.                                                  |
+| `benchmark.preds`                 | Predicted labels, in benchmark order.                                             |
+| `benchmark.tp`                    | True positives: predicted `1`, true label `1`.                                    |
+| `benchmark.fp`                    | False positives: predicted `1`, true label `0`.                                   |
+| `benchmark.fn`                    | False negatives: predicted `0`, true label `1`.                                   |
+| `benchmark.tn`                    | True negatives: predicted `0`, true label `0`.                                    |
+| `benchmark.num_tp`                | Number of true positives.                                                         |
+| `benchmark.num_fp`                | Number of false positives.                                                        |
+| `benchmark.num_fn`                | Number of false negatives.                                                        |
+| `benchmark.num_tn`                | Number of true negatives.                                                         |
+| `benchmark.precision`             | Of the images predicted positive, the proportion that were truly positive.        |
+| `benchmark.recall`                | Of the truly positive images, the proportion predicted positive.                  |
+| `benchmark.f1_score`              | Harmonic mean of precision and recall.                                            |
+| `benchmark.tpr`                   | True positive rate. This is the same as `recall`.                                 |
+| `benchmark.fpr`                   | False positive rate: proportion of true negatives incorrectly predicted positive. |
+| `benchmark.specificity`           | True negative rate: proportion of true negatives correctly predicted negative.    |
+| `benchmark.tnr`                   | True negative rate. This is the same as `specificity`.                            |
 
 For example, you can print the main benchmark metrics:
 
@@ -180,21 +180,21 @@ API reference for full details of the parameters and results.
 After creating the benchmark object, you can inspect the results through its
 properties.
 
-| Property                                                                 | Description                                                                    |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| `len(benchmark)`                                                         | Number of classified images in the benchmark.                                  |
-| `benchmark.result_list`                                                  | All classification results, one per image.                                     |
-| `benchmark.correct_predictions`                                          | Results where `pred` matches `true`.                                           |
-| `benchmark.incorrect_predictions`                                        | Results where `pred` does not match `true`.                                    |
-| `benchmark.accuracy`                                                     | Proportion of images where the predicted label matches the true label.         |
-| `benchmark.img_paths`                                                    | Image paths used in the benchmark.                                             |
-| `benchmark.trues`                                                        | True labels, in benchmark order.                                               |
-| `benchmark.preds`                                                        | Predicted labels, in benchmark order.                                          |
-| `benchmark.labels`                                                       | Class labels supplied through `labels`.                                       |
-| `benchmark.confusion_matrix`                                             | Number of images for each true-label and predicted-label pair.                 |
-| `benchmark.num_per_true_class`                                           | Number of images with each ground-truth label.                                 |
-| `benchmark.num_per_pred_class`                                           | Number of images assigned each predicted label.                               |
-| `benchmark.per_class_accuracy`                                           | For each ground-truth class, the proportion of images classified correctly.    |
+| Property                          | Description                                                                 |
+| --------------------------------- | --------------------------------------------------------------------------- |
+| `len(benchmark)`                  | Number of classified images in the benchmark.                               |
+| `benchmark.result_list`           | All classification results, one per image.                                  |
+| `benchmark.correct_predictions`   | Results where `pred` matches `true`.                                        |
+| `benchmark.incorrect_predictions` | Results where `pred` does not match `true`.                                 |
+| `benchmark.accuracy`              | Proportion of images where the predicted label matches the true label.      |
+| `benchmark.img_paths`             | Image paths used in the benchmark.                                          |
+| `benchmark.trues`                 | True labels, in benchmark order.                                            |
+| `benchmark.preds`                 | Predicted labels, in benchmark order.                                       |
+| `benchmark.labels`                | Class labels supplied through `labels`.                                     |
+| `benchmark.confusion_matrix`      | Number of images for each true-label and predicted-label pair.              |
+| `benchmark.num_per_true_class`    | Number of images with each ground-truth label.                              |
+| `benchmark.num_per_pred_class`    | Number of images assigned each predicted label.                             |
+| `benchmark.per_class_accuracy`    | For each ground-truth class, the proportion of images classified correctly. |
 
 For example, you can print the overall accuracy and class-level summaries:
 

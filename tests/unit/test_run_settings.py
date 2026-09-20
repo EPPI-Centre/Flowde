@@ -35,7 +35,7 @@ class Answer(BaseModel):
         "gemini-parse",
     ],
 )
-def provider(request, monkeypatch, tmp_path):
+def provider(request, monkeypatch, tmp_path, calls):
     name, azure, task = request.param
     module_name = (
         f"flowde.classify_fns.{name}_classify_fn"
@@ -47,7 +47,12 @@ def provider(request, monkeypatch, tmp_path):
     sender = Mock(
         return_value='{"label": 1}' if task == "classify" else '{"answer": "yes"}'
     )
-    monkeypatch.setattr(module, f"send_{name}_request", sender)
+
+    def send(**kwargs):
+        calls.append(kwargs)
+        return sender(**kwargs)
+
+    monkeypatch.setattr(module, f"send_{name}_request", send)
     images = tmp_path / "images"
     images.mkdir()
     (images / "image.png").write_text("image")
@@ -56,14 +61,15 @@ def provider(request, monkeypatch, tmp_path):
         options["result_structure"] = Answer
     factory = getattr(module, f"make_{name}_{task}_fn")
     api = classify_imgs if task == "classify" else parse_imgs
-    return name, factory, api, options, sender, images
+    return name, factory, api, options, sender, images, calls
 
 
 def test_factory_settings_allow_resume_without_custom_metadata(provider, tmp_path):
-    _, factory, api, options, sender, images = provider
+    _, factory, api, options, sender, images, calls = provider
     first = factory("Read this", "model", **options)
-    expected = api(first, images, tmp_path / "output", n_jobs=1)
+    expected = api(first, images, tmp_path / "output", max_concurrent_jobs=1)
     sender.reset_mock()
+    del calls[:]
     # Worker count and cost overrides affect execution/reporting, not the answer.
     resumed = factory(
         "Read this",
@@ -73,11 +79,17 @@ def test_factory_settings_allow_resume_without_custom_metadata(provider, tmp_pat
         **options,
     )
 
-    result = api(resumed, images, tmp_path / "output", on_existing="resume", n_jobs=2)
+    result = api(
+        resumed,
+        images,
+        tmp_path / "output",
+        on_existing="resume",
+        max_concurrent_jobs=2,
+    )
 
     assert result == expected
     assert resumed.result_structure is first.result_structure
-    sender.assert_not_called()
+    assert list(calls) == []
 
 
 @pytest.mark.parametrize(
@@ -87,47 +99,52 @@ def test_factory_settings_allow_resume_without_custom_metadata(provider, tmp_pat
     indirect=True,
 )
 def test_azure_resume_allows_a_different_endpoint(provider, tmp_path, monkeypatch):
-    _, factory, api, options, sender, images = provider
+    _, factory, api, options, sender, images, calls = provider
     monkeypatch.setenv("AZURE_API_BASE", "https://first.example")
     output = tmp_path / "output"
     first = factory("Read this", "model", effort="low", **options)
-    expected = api(first, images, output, n_jobs=1)
+    expected = api(first, images, output, max_concurrent_jobs=1)
 
     monkeypatch.setenv("AZURE_API_BASE", "https://second.example")
     (images / "new-image.png").write_text("new image")
     sender.reset_mock()
+    del calls[:]
     resumed = factory("Read this", "model", effort="low", **options)
-    result = api(resumed, images, output, on_existing="resume", n_jobs=1)
+    result = api(resumed, images, output, on_existing="resume", max_concurrent_jobs=1)
 
     assert result == [expected[0], expected[0]]
-    sender.assert_called_once()  # Only the new image needs a model request.
+    assert len(calls) == 1  # Only the new image needs a model request.
 
 
 def test_provider_failures_raise_and_leave_the_image_unfinished(provider, tmp_path):
-    name, factory, api, options, sender, images = provider
-    error = (
-        BadRequestError(
-            "bad request",
-            response=httpx.Response(
-                400, request=httpx.Request("POST", "https://unused.example")
-            ),
-            body={},
-        )
-        if name == "openai"
-        else RuntimeError("bad request")
-    )
-    sender.side_effect = error
+    name, factory, api, options, sender, images, calls = provider
+
+    def fail(**kwargs):
+        if name == "openai":
+            raise BadRequestError(
+                "bad request",
+                response=httpx.Response(
+                    400, request=httpx.Request("POST", "https://unused.example")
+                ),
+                body={},
+            )
+        raise RuntimeError("bad request")
+
+    sender.side_effect = fail
     fn = factory("Read this", "model", **options)
     output = tmp_path / "output"
 
-    with pytest.raises(type(error), match="bad request") as raised:
-        api(fn, images, output, n_jobs=1)
+    error_type = BadRequestError if name == "openai" else RuntimeError
+    with pytest.raises(error_type, match="bad request") as raised:
+        api(fn, images, output, max_concurrent_jobs=1)
 
-    assert raised.value is error
+    if name == "openai":
+        assert raised.value.status_code == 400
+        assert raised.value.body == {}
     assert list(output.glob("*.json")) == []
     sender.side_effect = None
-    api(fn, images, output, on_existing="resume", n_jobs=1)
-    assert sender.call_count == 2
+    api(fn, images, output, on_existing="resume", max_concurrent_jobs=1)
+    assert len(calls) == 2
 
 
 @pytest.mark.parametrize(
@@ -142,7 +159,7 @@ def test_provider_failures_raise_and_leave_the_image_unfinished(provider, tmp_pa
     ],
 )
 def test_resume_rejects_changes_that_affect_model_answers(
-    tmp_path, monkeypatch, change
+    tmp_path, monkeypatch, change, calls
 ):
     images = tmp_path / "images"
     images.mkdir()
@@ -158,7 +175,12 @@ def test_resume_rejects_changes_that_affect_model_answers(
     ]
     monkeypatch.setattr(module, "openai_vision_input_list", Mock(return_value=[]))
     sender = Mock(return_value='{"answer": "yes"}')
-    monkeypatch.setattr(module, "send_openai_request", sender)
+
+    def send(**kwargs):
+        calls.append(kwargs)
+        return sender(**kwargs)
+
+    monkeypatch.setattr(module, "send_openai_request", send)
     options = {
         "input_text": "Read this",
         "model": "model",
@@ -168,8 +190,11 @@ def test_resume_rejects_changes_that_affect_model_answers(
         "from_azure": True,
     }
     output = tmp_path / "output"
-    parse_imgs(module.make_openai_parse_fn(**options), images, output, n_jobs=1)
+    parse_imgs(
+        module.make_openai_parse_fn(**options), images, output, max_concurrent_jobs=1
+    )
     sender.reset_mock()
+    del calls[:]
 
     if change == "prompt":
         options["input_text"] = "Different task"
@@ -192,6 +217,6 @@ def test_resume_rejects_changes_that_affect_model_answers(
             images,
             output,
             on_existing="resume",
-            n_jobs=1,
+            max_concurrent_jobs=1,
         )
-    sender.assert_not_called()
+    assert list(calls) == []

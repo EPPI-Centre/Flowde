@@ -1,5 +1,4 @@
 import json
-from unittest.mock import Mock
 
 import pytest
 
@@ -26,17 +25,21 @@ def classifier():
     return model_function(classify, labels="filename")
 
 
-@pytest.mark.parametrize("n_jobs", [1, 2], ids=["sequential", "parallel"])
+@pytest.mark.parametrize("max_concurrent_jobs", [1, 2], ids=["sequential", "parallel"])
 @pytest.mark.parametrize(
     "positive_classes", [None, {1, 2}], ids=["labels-only", "copy-positives"]
 )
 def test_classification_saves_ordered_labels_and_selected_images(
-    images, classifier, tmp_path, n_jobs, positive_classes
+    images, classifier, tmp_path, max_concurrent_jobs, positive_classes
 ):
     output = tmp_path / "output"
 
     result = classify_imgs(
-        classifier, images, output, positive_classes=positive_classes, n_jobs=n_jobs
+        classifier,
+        images,
+        output,
+        positive_classes=positive_classes,
+        max_concurrent_jobs=max_concurrent_jobs,
     )
 
     assert result == [1, 2, 0]
@@ -64,7 +67,10 @@ def test_explicit_paths_preserve_the_supplied_return_order(
     images, classifier, tmp_path
 ):
     result = classify_imgs_from_paths(
-        classifier, [images / "c.png", images / "a.png"], tmp_path / "output", n_jobs=1
+        classifier,
+        [images / "c.png", images / "a.png"],
+        tmp_path / "output",
+        max_concurrent_jobs=1,
     )
     assert result == [0, 1]
 
@@ -72,23 +78,28 @@ def test_explicit_paths_preserve_the_supplied_return_order(
 @pytest.mark.parametrize(
     "label", [False, "relevant", 2], ids=["boolean", "string", "integer"]
 )
-def test_custom_label_types_survive_resume(images, tmp_path, label):
-    classify = model_function(Mock(return_value=label), label=label)
+def test_custom_label_types_survive_resume(images, tmp_path, label, calls):
+    def classify(path):
+        calls.append(path.name)
+        return label
+
+    classify = model_function(classify, label=label)
     output = tmp_path / "output"
     options = {
         "positive_classes": {label},
-        "n_jobs": 1,
+        "max_concurrent_jobs": 1,
     }
     # Mock would otherwise invent an attribute that ordinary functions don't have.
     classify.result_structure = None
     classify_imgs(classify, images, output, **options)
-    classify.reset_mock()
+    assert len(calls) == 3
+    del calls[:]
 
     result = classify_imgs(classify, images, output, on_existing="resume", **options)
 
     assert result == [label] * 3
     assert all(type(value) is type(label) for value in result)
-    classify.assert_not_called()
+    assert list(calls) == []
     assert len(list((output / "positive_images").glob("*.png"))) == 3
 
 
@@ -99,7 +110,9 @@ def test_custom_label_types_survive_resume(images, tmp_path, label):
 )
 def test_resumed_slices_keep_earlier_json_entries(images, classifier, tmp_path, ranges):
     output = tmp_path / "output"
-    classify_imgs(classifier, images, output, range_indices=ranges[0], n_jobs=1)
+    classify_imgs(
+        classifier, images, output, range_indices=ranges[0], max_concurrent_jobs=1
+    )
 
     result = classify_imgs(
         classifier,
@@ -107,7 +120,7 @@ def test_resumed_slices_keep_earlier_json_entries(images, classifier, tmp_path, 
         output,
         range_indices=ranges[1],
         on_existing="resume",
-        n_jobs=1,
+        max_concurrent_jobs=1,
     )
 
     assert result == [1, 2, 0][slice(*ranges[1])]
@@ -128,7 +141,7 @@ def test_classify_imgs_controls_usage_display(images, tmp_path, capsys, show_usa
         classify,
         images,
         tmp_path / "output",
-        n_jobs=1,
+        max_concurrent_jobs=1,
         show_usage=show_usage,
     )
 

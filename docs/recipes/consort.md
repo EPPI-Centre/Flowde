@@ -74,7 +74,7 @@ labels = classify_imgs(
     img_dir=extraction_dir,
     save_dir=classification_dir,
     positive_classes={1},
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 
 consort_dir = classification_dir / "positive_images"
@@ -98,7 +98,7 @@ angles = rotate_imgs(
     classify_fn=rotation_fn,
     img_dir=consort_dir,
     save_dir=rotation_dir,
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 
 rotated_dir = rotation_dir / "rotated_images"
@@ -128,7 +128,7 @@ nodes = parse_imgs(
     parse_fn=nodes_fn,
     img_dir=rotated_dir,
     save_dir=parsed_dir / "node_text",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -149,7 +149,7 @@ flow = parse_imgs(
     img_dir=rotated_dir,
     save_dir=parsed_dir / "flow",
     nodes_dir=parsed_dir / "node_text",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -171,7 +171,7 @@ node_labels = parse_imgs(
     save_dir=parsed_dir / "labels",
     nodes_dir=parsed_dir / "node_text",
     flow_dir=parsed_dir / "flow",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 
@@ -194,7 +194,7 @@ additional_texts = parse_imgs(
     nodes_dir=parsed_dir / "node_text",
     flow_dir=parsed_dir / "flow",
     labels_dir=parsed_dir / "labels",
-    n_jobs=1,
+    max_concurrent_jobs=1,
 )
 ```
 

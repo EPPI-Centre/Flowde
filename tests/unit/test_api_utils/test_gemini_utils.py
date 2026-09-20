@@ -33,8 +33,9 @@ class FakeModels:
 class FakeGenAIClient:
     created_clients = []
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, http_options):
         self.api_key = api_key
+        self.http_options = http_options
         self.models = FakeModels(self)
         FakeGenAIClient.created_clients.append(self)
 
@@ -71,6 +72,7 @@ def test_send_gemini_request_builds_client_config_and_returns_text(
     client = FakeGenAIClient.created_clients[0]
 
     assert client.api_key == "fake-api-key"
+    assert client.http_options.timeout == 300_000
     assert client.generate_content_model == "gemini-test-model"
     assert client.generate_content_contents == input_list
 
@@ -85,8 +87,9 @@ def test_send_gemini_request_builds_client_config_and_returns_text(
 class FakeVisionClient:
     created_clients = []
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, http_options):
         self.api_key = api_key
+        self.http_options = http_options
         FakeVisionClient.created_clients.append(self)
 
 
@@ -135,6 +138,7 @@ def test_gemini_vision_input_list_without_partial_flowchart(monkeypatch):
     client = FakeVisionClient.created_clients[0]
 
     assert client.api_key == "fake-api-key"
+    assert client.http_options.timeout == 300_000
     assert uploaded["img_path"] == img_path
     assert uploaded["client"] is client
 
