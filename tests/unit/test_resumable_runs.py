@@ -64,7 +64,7 @@ def run(task, fn, images, output, **options):
         "parsing": parse_imgs,
         "rotation": rotate_imgs,
     }[task]
-    return api(fn, images, output, **{"n_jobs": 1, **options})
+    return api(fn, images, output, **{"max_concurrent_jobs": 1, **options})
 
 
 def names(task, results):
@@ -89,9 +89,10 @@ def saved_names(task, output):
     )
 
 
-def test_failure_preserves_successes_and_resume_skips_them(task, images, tmp_path):
+def test_failure_preserves_successes_and_resume_skips_them(
+    task, images, tmp_path, calls
+):
     output = tmp_path / "output"
-    calls = []
 
     def fail_on_b(path):
         calls.append(path.stem)
@@ -104,7 +105,7 @@ def test_failure_preserves_successes_and_resume_skips_them(task, images, tmp_pat
     with pytest.raises(RuntimeError, match="quota exhausted"):
         run(task, make_function(task, fail_on_b), images, output)
 
-    assert calls == ["a", "b"]
+    assert list(calls) == ["a", "b"]
     assert saved_names(task, output) == ["a"]
     state = json.loads((output / ".flowde" / "run.state").read_text())
     assert (
@@ -112,7 +113,7 @@ def test_failure_preserves_successes_and_resume_skips_them(task, images, tmp_pat
         == "quota exhausted"
     )
 
-    calls.clear()
+    del calls[:]
     result = run(
         task,
         make_function(task, lambda path: calls.append(path.stem)),
@@ -121,7 +122,7 @@ def test_failure_preserves_successes_and_resume_skips_them(task, images, tmp_pat
         on_existing="resume",
     )
 
-    assert calls == ["b", "c"]
+    assert list(calls) == ["b", "c"]
     assert names(task, result) == ["a", "b", "c"]
     assert saved_names(task, output) == ["a", "b", "c"]
 
@@ -160,7 +161,7 @@ def read_run_state(monkeypatch):
 
 @pytest.mark.parametrize("provider", ["custom", "openai", "gemini"])
 def test_parallel_failure_saves_the_other_active_image_and_starts_no_more(
-    task, images, tmp_path, provider, read_run_state
+    task, images, tmp_path, provider, read_run_state, calls
 ):
     output = tmp_path / "output"
     started = tmp_path / "b-started"
@@ -200,11 +201,10 @@ def test_parallel_failure_saves_the_other_active_image_and_starts_no_more(
         "gemini": ClientError,
     }[provider]
     with pytest.raises(error_type, match="first image failed"):
-        run(task, make_function(task, process), images, output, n_jobs=2)
+        run(task, make_function(task, process), images, output, max_concurrent_jobs=2)
 
     assert saved_names(task, output) == ["b"]
     assert not (tmp_path / "unexpected-third-request").exists()
-    calls = []
     result = run(
         task,
         make_function(task, lambda path: calls.append(path.stem)),
@@ -212,7 +212,7 @@ def test_parallel_failure_saves_the_other_active_image_and_starts_no_more(
         output,
         on_existing="resume",
     )
-    assert calls == ["a", "c"]
+    assert list(calls) == ["a", "c"]
     assert names(task, result) == ["a", "b", "c"]
 
 
@@ -297,7 +297,7 @@ def directory_contents(directory):
         pytest.param({"version": 999}, id="unsupported-version"),
     ],
 )
-def test_overwrite_requires_a_valid_run_record(images, tmp_path, state_contents):
+def test_overwrite_requires_a_valid_run_record(images, tmp_path, state_contents, calls):
     output = tmp_path / "output"
     run("parsing", make_function("parsing"), images, output)
     state_path = output / ".flowde" / "run.state"
@@ -310,20 +310,19 @@ def test_overwrite_requires_a_valid_run_record(images, tmp_path, state_contents)
     else:
         state_path.write_text(state_contents)
     before = directory_contents(output)
-    calls = Mock()
 
     with pytest.raises(
         ValueError, match=r"a valid Flowde \.flowde/run\.state is required"
     ):
         run(
             "parsing",
-            make_function("parsing", calls),
+            make_function("parsing", lambda path: calls.append(path.stem)),
             images,
             output,
             on_existing="overwrite",
         )
 
-    calls.assert_not_called()
+    assert list(calls) == []
     assert directory_contents(output) == before
 
 
@@ -337,7 +336,7 @@ def test_overwrite_requires_a_valid_run_record(images, tmp_path, state_contents)
     ],
 )
 def test_overwrite_refuses_unrecorded_contents_before_deleting_anything(
-    images, tmp_path, unrecorded_path
+    images, tmp_path, unrecorded_path, calls
 ):
     output = tmp_path / "output"
     run(
@@ -353,40 +352,48 @@ def test_overwrite_refuses_unrecorded_contents_before_deleting_anything(
     else:
         extra.mkdir()
     before = directory_contents(output)
-    calls = Mock()
 
     with pytest.raises(ValueError, match="unexpected file or directory") as raised:
         run(
             "classification",
-            make_function("classification", calls),
+            make_function("classification", lambda path: calls.append(path.stem)),
             images,
             output,
             on_existing="overwrite",
         )
 
     assert str(Path(unrecorded_path)) in str(raised.value)
-    calls.assert_not_called()
+    assert list(calls) == []
     assert directory_contents(output) == before
 
 
-def test_overwrite_refuses_unrecorded_json_for_every_stage(task, images, tmp_path):
+def test_overwrite_refuses_unrecorded_json_for_every_stage(
+    task, images, tmp_path, calls
+):
     output = tmp_path / "output"
     run(task, make_function(task), images, output)
     (output / "notes.json").write_text('{"notes": "User-owned data"}')
     before = directory_contents(output)
-    calls = Mock()
 
     with pytest.raises(ValueError, match=r"unexpected file or directory notes\.json"):
-        run(task, make_function(task, calls), images, output, on_existing="overwrite")
+        run(
+            task,
+            make_function(task, lambda path: calls.append(path.stem)),
+            images,
+            output,
+            on_existing="overwrite",
+        )
 
-    calls.assert_not_called()
+    assert list(calls) == []
     assert directory_contents(output) == before
 
 
 @pytest.mark.parametrize(
     "absolute", [False, True], ids=["parent-path", "absolute-path"]
 )
-def test_overwrite_rejects_recorded_paths_outside_the_run(images, tmp_path, absolute):
+def test_overwrite_rejects_recorded_paths_outside_the_run(
+    images, tmp_path, absolute, calls
+):
     output = tmp_path / "output"
     run("parsing", make_function("parsing"), images, output)
     outside = tmp_path / "outside.json"
@@ -398,25 +405,26 @@ def test_overwrite_rejects_recorded_paths_outside_the_run(images, tmp_path, abso
     state["artifacts"][unsafe_path] = state["artifacts"].pop("a.json")
     state_path.write_text(json.dumps(state))
     before = directory_contents(output)
-    calls = Mock()
 
     with pytest.raises(
         ValueError, match=r"a valid Flowde \.flowde/run\.state is required"
     ):
         run(
             "parsing",
-            make_function("parsing", calls),
+            make_function("parsing", lambda path: calls.append(path.stem)),
             images,
             output,
             on_existing="overwrite",
         )
 
-    calls.assert_not_called()
+    assert list(calls) == []
     assert directory_contents(output) == before
     assert outside.read_text() == "Unrelated work"
 
 
-def test_overwrite_refuses_a_recorded_output_replaced_by_a_symlink(images, tmp_path):
+def test_overwrite_refuses_a_recorded_output_replaced_by_a_symlink(
+    images, tmp_path, calls
+):
     output = tmp_path / "output"
     run("parsing", make_function("parsing"), images, output)
     outside = tmp_path / "outside.json"
@@ -425,18 +433,17 @@ def test_overwrite_refuses_a_recorded_output_replaced_by_a_symlink(images, tmp_p
     saved_json.unlink()
     saved_json.symlink_to(outside)
     before = directory_contents(output)
-    calls = Mock()
 
     with pytest.raises(ValueError, match=r"unexpected file or directory b\.json"):
         run(
             "parsing",
-            make_function("parsing", calls),
+            make_function("parsing", lambda path: calls.append(path.stem)),
             images,
             output,
             on_existing="overwrite",
         )
 
-    calls.assert_not_called()
+    assert list(calls) == []
     assert saved_json.is_symlink()
     assert directory_contents(output) == before
     assert outside.read_text() == "Unrelated work"
@@ -452,38 +459,42 @@ def test_resume_requires_a_saved_run_even_in_an_existing_directory(
 
 
 def test_completed_input_changes_are_rejected_before_new_requests(
-    task, images, tmp_path
+    task, images, tmp_path, calls
 ):
     output = tmp_path / "output"
     run(task, make_function(task), images, output)
     (images / "a.png").write_text("changed image")
-    calls = Mock()
 
     with pytest.raises(ValueError, match="Previously processed image"):
-        run(task, make_function(task, calls), images, output, on_existing="resume")
-    calls.assert_not_called()
+        run(
+            task,
+            make_function(task, lambda path: calls.append(path.stem)),
+            images,
+            output,
+            on_existing="resume",
+        )
+    assert list(calls) == []
 
 
 def test_resume_rejects_a_different_image_with_the_same_output_name(
-    task, images, tmp_path
+    task, images, tmp_path, calls
 ):
     output = tmp_path / "output"
     run(task, make_function(task), images, output)
     other_images = tmp_path / "other-images"
     other_images.mkdir()
     (other_images / "a.png").write_text("a different image")
-    calls = Mock()
 
     with pytest.raises(ValueError, match="already associated with a different image"):
         run(
             task,
-            make_function(task, calls),
+            make_function(task, lambda path: calls.append(path.stem)),
             other_images,
             output,
             on_existing="resume",
         )
 
-    calls.assert_not_called()
+    assert list(calls) == []
     assert saved_names(task, output) == ["a", "b", "c"]
 
 
@@ -550,7 +561,7 @@ def test_usage_from_failed_attempts_is_restored_without_recounting_saved_answers
         images,
         output,
         on_existing="resume",
-        n_jobs=2,
+        max_concurrent_jobs=2,
     )
 
     assert initial_totals == [(1, 200, 2)]
@@ -560,9 +571,9 @@ def test_usage_from_failed_attempts_is_restored_without_recounting_saved_answers
     assert sum(usage["cost"] for usage in usages) == 4
 
 
-def test_none_is_a_failure_and_never_saved_as_a_success(task, images, tmp_path):
+def test_none_is_a_failure_and_never_saved_as_a_success(task, images, tmp_path, calls):
     fn = make_function(task)
-    empty = Mock(return_value=None)
+    empty = Mock(side_effect=lambda img_path: calls.append(img_path.stem))
     empty.run_settings = fn.run_settings
     empty.result_structure = getattr(fn, "result_structure", None)
     output = tmp_path / "output"
@@ -570,17 +581,16 @@ def test_none_is_a_failure_and_never_saved_as_a_success(task, images, tmp_path):
     with pytest.raises(TypeError, match="None is a failure"):
         run(task, empty, images, output)
 
-    empty.assert_called_once()
+    assert list(calls) == ["a"]
     state = json.loads((output / ".flowde" / "run.state").read_text())
     assert not any(item["completed"] for item in state["items"].values())
     assert list(output.glob("*.json")) == []
 
 
 def test_copy_failure_does_not_repeat_a_successful_classification(
-    images, tmp_path, monkeypatch
+    images, tmp_path, monkeypatch, calls
 ):
     output = tmp_path / "output"
-    calls = []
     fn = make_function("classification", lambda path: calls.append(path.stem))
     write = _run_state.atomic_write
 
@@ -592,56 +602,68 @@ def test_copy_failure_does_not_repeat_a_successful_classification(
 
     monkeypatch.setattr(_run_state, "atomic_write", broken_copy)
     with pytest.raises(OSError, match="copy failed"):
-        classify_imgs(fn, images, output, positive_classes={"a"}, n_jobs=1)
-    assert calls == ["a"]
+        classify_imgs(fn, images, output, positive_classes={"a"}, max_concurrent_jobs=1)
+    assert list(calls) == ["a"]
     monkeypatch.setattr(_run_state, "atomic_write", write)
 
     result = classify_imgs(
-        fn, images, output, positive_classes={"a"}, n_jobs=1, on_existing="resume"
+        fn,
+        images,
+        output,
+        positive_classes={"a"},
+        max_concurrent_jobs=1,
+        on_existing="resume",
     )
 
-    assert calls == ["a", "b", "c"]
+    assert list(calls) == ["a", "b", "c"]
     assert result == ["a", "b", "c"]
     assert (output / "positive_images" / "a.png").read_bytes() == (
         images / "a.png"
     ).read_bytes()
 
 
-def test_first_interrupt_saves_current_image_and_stops_before_the_next(
-    task, images, tmp_path
+@pytest.mark.parametrize("force", [False, True], ids=["graceful", "forced"])
+def test_interrupt_saves_finished_work_and_allows_resume(
+    task, images, tmp_path, monkeypatch, force, calls
 ):
     output = tmp_path / "output"
-    calls = []
+    release = tmp_path / "release"
+    receive = _batch.UsageProgress.receive
 
-    def interrupt(path):
+    def interrupt(display, index, usage):
+        receive(display, index, usage)
+        if usage is not None:
+            handler = signal.getsignal(signal.SIGINT)
+            handler(signal.SIGINT, None)
+            if force:
+                handler(signal.SIGINT, None)
+            release.touch()
+
+    monkeypatch.setattr(_batch.UsageProgress, "receive", interrupt)
+
+    def process(path):
         calls.append(path.stem)
-        # Invoke the installed signal handler without interrupting the pytest runner.
-        signal.getsignal(signal.SIGINT)(signal.SIGINT, None)
+        if path.stem == "b":
+            report_usage(RequestUsage(provider="test", model="fake", total_tokens=1))
+            wait_for(release.exists)
 
-    with pytest.raises(KeyboardInterrupt, match="Stopped after saving"):
-        run(task, make_function(task, interrupt), images, output)
-    assert calls == ["a"]
-    assert saved_names(task, output) == ["a"]
-    assert names(
-        task, run(task, make_function(task), images, output, on_existing="resume")
-    ) == ["a", "b", "c"]
-
-
-def test_second_interrupt_escapes_the_current_function(task, images, tmp_path):
-    output = tmp_path / "output"
-
-    def interrupt_twice(path):
-        handler = signal.getsignal(signal.SIGINT)
-        handler(signal.SIGINT, None)
-        handler(signal.SIGINT, None)
-        msg = "Forced interruption did not stop the function"
-        raise AssertionError(msg)
-
-    with pytest.raises(KeyboardInterrupt, match="Forced stop"):
-        run(task, make_function(task, interrupt_twice), images, output)
-    assert names(
-        task, run(task, make_function(task), images, output, on_existing="resume")
-    ) == ["a", "b", "c"]
+    with pytest.raises(
+        KeyboardInterrupt, match="Forced stop" if force else "Stopped after saving"
+    ):
+        run(task, make_function(task, process), images, output)
+    assert list(calls) == ["a", "b"]
+    assert saved_names(task, output) == (["a"] if force else ["a", "b"])
+    monkeypatch.setattr(_batch.UsageProgress, "receive", receive)
+    del calls[:]
+    result = run(
+        task,
+        make_function(task, lambda path: calls.append(path.stem)),
+        images,
+        output,
+        on_existing="resume",
+    )
+    assert names(task, result) == ["a", "b", "c"]
+    assert list(calls) == (["b", "c"] if force else ["c"])
 
 
 def test_overwrite_cannot_delete_source_images(task, images):
@@ -661,14 +683,13 @@ def test_a_second_writer_cannot_open_the_same_run(tmp_path):
         pytest.fail("The second writer acquired the lock")
 
 
-def test_changed_partial_flowchart_is_rejected_before_resuming(images, tmp_path):
+def test_changed_partial_flowchart_is_rejected_before_resuming(images, tmp_path, calls):
     nodes = tmp_path / "nodes"
     nodes.mkdir()
     for image in images.glob("*.png"):
         (nodes / f"{image.stem}.json").write_text(
             '{"nodes": [{"node_number": 1, "text": "Known node"}]}'
         )
-    calls = []
 
     def parse(img_path, partial_flowchart=None):
         calls.append(img_path.name)
@@ -676,8 +697,8 @@ def test_changed_partial_flowchart_is_rejected_before_resuming(images, tmp_path)
 
     parse = model_function(parse, result_structure=Answer)
     output = tmp_path / "output"
-    parse_imgs(parse, images, output, nodes_dir=nodes, n_jobs=1)
-    calls.clear()
+    parse_imgs(parse, images, output, nodes_dir=nodes, max_concurrent_jobs=1)
+    del calls[:]
     (nodes / "a.json").write_text(
         '{"nodes": [{"node_number": 1, "text": "Different known node"}]}'
     )
@@ -689,9 +710,9 @@ def test_changed_partial_flowchart_is_rejected_before_resuming(images, tmp_path)
             output,
             nodes_dir=nodes,
             on_existing="resume",
-            n_jobs=1,
+            max_concurrent_jobs=1,
         )
-    assert calls == []
+    assert list(calls) == []
 
 
 def test_failed_atomic_write_leaves_previous_file_intact(tmp_path, monkeypatch):
@@ -734,10 +755,12 @@ def test_custom_parser_restores_its_declared_type_and_json_fields(images, tmp_pa
         version=1,
     )
     output = tmp_path / "output"
-    first = parse_imgs(parser, images, output, n_jobs=1)
+    first = parse_imgs(parser, images, output, max_concurrent_jobs=1)
     parser.reset_mock()
 
-    restored = parse_imgs(parser, images, output, n_jobs=1, on_existing="resume")
+    restored = parse_imgs(
+        parser, images, output, max_concurrent_jobs=1, on_existing="resume"
+    )
 
     assert restored == first
     assert all(isinstance(result, DatedAnswer) for result in restored)
@@ -762,7 +785,7 @@ def test_custom_parsers_must_declare_the_result_class(images, tmp_path):
     output = tmp_path / "output"
 
     with pytest.raises(TypeError, match=r"parse_fn\.result_structure"):
-        parse_imgs(fn, images, output, n_jobs=1)
+        parse_imgs(fn, images, output, max_concurrent_jobs=1)
 
     assert not output.exists()
 
@@ -775,6 +798,8 @@ def test_overwrite_cannot_delete_examples_referenced_in_settings(images, tmp_pat
     fn = model_function(make_function("classification"), example=example)
 
     with pytest.raises(ValueError, match="contains an input file"):
-        classify_imgs(fn, images, output, on_existing="overwrite", n_jobs=1)
+        classify_imgs(
+            fn, images, output, on_existing="overwrite", max_concurrent_jobs=1
+        )
 
     assert example.read_text() == "example image"

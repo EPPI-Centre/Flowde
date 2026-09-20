@@ -40,19 +40,19 @@ Select a method below for its parameters, return values and error conditions.
 Select a result type to inspect the fields and properties on each returned
 object. Lists follow sorted flowchart filename-stem order.
 
-| Method | Required predicted parts | Return value |
-| --- | --- | --- |
-| [`node_matches(range_indices=None)`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches) | Node text | List of [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches) |
-| [`node_matches_with_flow()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches_with_flow) | Node text and flow | List of [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches) |
-| [`node_and_label_matches()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_and_label_matches) | Node text and labels | List of [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches) |
-| [`additional_text_matches()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.additional_text_matches) | Node text and additional text | List of [`TextListMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches) |
-| [`diagram_matches()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.diagram_matches) | All four parts | List of [`DiagramMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch) |
-| [`total_node_text_cost()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_node_text_cost) | Node text | `float` |
-| [`total_label_cost()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_label_cost) | Node text and labels | `float` |
-| [`total_additional_text_cost()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_additional_text_cost) | Node text and additional text | `float` |
-| [`all_flow_scores()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_scores) | Node text and flow | List of [`FlowScores`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.FlowScores) |
-| [`all_flow_jaccard_scores()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_jaccard_scores) | Node text and flow | `list[float]` |
-| [`avg_flow_jaccard()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.avg_flow_jaccard) | Node text and flow | `float` |
+| Method                                                                                                                              | Required predicted parts      | Return value                                                                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [`node_matches(range_indices=None)`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches)           | Node text                     | List of [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)         |
+| [`node_matches_with_flow()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches_with_flow)         | Node text and flow            | List of [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)         |
+| [`node_and_label_matches()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_and_label_matches)         | Node text and labels          | List of [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)         |
+| [`additional_text_matches()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.additional_text_matches)       | Node text and additional text | List of [`TextListMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches) |
+| [`diagram_matches()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.diagram_matches)                       | All four parts                | List of [`DiagramMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch)       |
+| [`total_node_text_cost()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_node_text_cost)             | Node text                     | `float`                                                                                                  |
+| [`total_label_cost()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_label_cost)                     | Node text and labels          | `float`                                                                                                  |
+| [`total_additional_text_cost()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_additional_text_cost) | Node text and additional text | `float`                                                                                                  |
+| [`all_flow_scores()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_scores)                       | Node text and flow            | List of [`FlowScores`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.FlowScores)           |
+| [`all_flow_jaccard_scores()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_jaccard_scores)       | Node text and flow            | `list[float]`                                                                                            |
+| [`avg_flow_jaccard()`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.avg_flow_jaccard)                     | Node text and flow            | `float`                                                                                                  |
 
 All methods use the available predicted parts to select Node Matches and a
 Ground-Truth Option; see [how diagrams are matched](../benchmarking/parsing.md#how-diagrams-are-matched).
@@ -132,16 +132,16 @@ A match can pair a prediction with ground truth or record an unmatched node
 or string. The following entries describe the stored fields and computed
 properties.
 
-| Type | Contains |
-| --- | --- |
-| [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches) | Node Matches for one flowchart and the selected Ground-Truth Option. |
-| [`NodeMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatch) | One paired or unmatched node, with text cost and optional label matches. |
-| [`TextListMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches) | Comparisons for one node's labels or one flowchart's additional text. |
-| [`TextListMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.TextListMatch) | One paired or unmatched string, with source-list indices and cost. |
-| [`DiagramMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch) | A complete prediction, its selected ground-truth diagram and all part comparisons. |
-| [`FlowScores`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.FlowScores) | Directed-connection counts, metrics, and missing and extra connections. |
-| [`Node`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.Node) | An individual predicted or ground-truth node held inside a match. |
-| [`Diagram`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.Diagram) | The prediction or selected ground-truth diagram held inside a complete comparison. |
+| Type                                                                                             | Contains                                                                           |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [`NodeMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches)         | Node Matches for one flowchart and the selected Ground-Truth Option.               |
+| [`NodeMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.NodeMatch)             | One paired or unmatched node, with text cost and optional label matches.           |
+| [`TextListMatches`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches) | Comparisons for one node's labels or one flowchart's additional text.              |
+| [`TextListMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.TextListMatch)     | One paired or unmatched string, with source-list indices and cost.                 |
+| [`DiagramMatch`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch)       | A complete prediction, its selected ground-truth diagram and all part comparisons. |
+| [`FlowScores`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.FlowScores)           | Directed-connection counts, metrics, and missing and extra connections.            |
+| [`Node`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.Node)                       | An individual predicted or ground-truth node held inside a match.                  |
+| [`Diagram`](benchmarks.md#flowde.benchmarks.parsing.parsing_bench_types.Diagram)                 | The prediction or selected ground-truth diagram held inside a complete comparison. |
 
 You can inspect stored fields with
 [`model_dump()`](https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump)

@@ -197,9 +197,10 @@ def send_openai_request(
         client = OpenAI(
             api_key=os.getenv("AZURE_API_KEY"),
             base_url=os.getenv("AZURE_API_BASE"),
+            timeout=300,
         )
     else:
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), timeout=300)
 
     response = client.responses.parse(
         model=model,
@@ -238,9 +239,10 @@ def openai_vision_input_list(
         client = OpenAI(
             api_key=os.getenv("AZURE_API_KEY"),
             base_url=os.getenv("AZURE_API_BASE"),
+            timeout=300,
         )
     else:
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), timeout=300)
 
     def make_user_content(
         img_path: Path,

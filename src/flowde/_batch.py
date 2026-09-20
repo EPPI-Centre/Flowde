@@ -3,7 +3,7 @@
 import signal
 import sys
 from collections.abc import Callable, Iterator
-from concurrent.futures import FIRST_COMPLETED, Future, wait
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from contextlib import contextmanager
 from functools import partial
 from multiprocessing.managers import SyncManager
@@ -13,6 +13,7 @@ from threading import current_thread, main_thread
 from types import FrameType
 from typing import Any
 
+import cloudpickle
 from joblib import effective_n_jobs
 from joblib.externals.loky import ProcessPoolExecutor
 from joblib.externals.loky.backend.context import get_context
@@ -105,6 +106,40 @@ def _worker(
         raise _TransportError(error) from error
 
 
+def _thread_pool(
+    fn: Callable[..., Any], jobs: Any, answers: Any, events: Any, workers: int
+) -> None:
+    """Execute whole image jobs in threads inside one disposable process."""
+    pool = ThreadPoolExecutor(max_workers=workers)
+    active: dict[Future[Any], str] = {}
+    try:
+        while True:
+            try:
+                payload = jobs.get(timeout=0.05)
+            except Empty:
+                pass
+            else:
+                if payload is None:
+                    break
+                key, kwargs = cloudpickle.loads(payload)
+                active[pool.submit(_worker, fn, kwargs, events, key)] = key
+            for future in list(active):
+                if not future.done():
+                    continue
+                key = active.pop(future)
+                try:
+                    result, error = future.result(), None
+                except BaseException as caught:  # noqa: BLE001 - Transfer worker failures to the caller.
+                    result, error = None, caught
+                # Manager queues use ordinary pickle; preserve notebook-defined
+                # result classes and the SDK exception transport used by loky.
+                answers.put((key, cloudpickle.dumps((result, error))))
+    finally:
+        # On a transport failure, let the outer future report it immediately;
+        # the parent then kills this process, including any remaining threads.
+        pool.shutdown(wait=False)
+
+
 def _parallel(
     fn: Callable[..., Any],
     pending_items: list[dict[str, Any]],
@@ -114,10 +149,12 @@ def _parallel(
     report: Callable[[str, RequestUsage], None],
     commit: Callable[[str, Any], None],
     fail: Callable[[str, BaseException], None],
+    threaded: bool = False,
 ) -> None:
-    manager = SyncManager(ctx=get_context())
-    pool = None
+    manager = None
+    pool: ProcessPoolExecutor | None = None
     active: dict[Future[Any], str] = {}
+    thread_futures: dict[str, Future[Any]] = {}
     remaining = iter(pending_items)
     force = True
 
@@ -130,18 +167,47 @@ def _parallel(
             report(key, usage)
 
     try:
+        manager = SyncManager(ctx=get_context())
         manager.start(initializer=_ignore_interrupts)
         events = manager.Queue()
-        pool = ProcessPoolExecutor(max_workers=workers, initializer=_ignore_interrupts)
+        pool = ProcessPoolExecutor(
+            max_workers=1 if threaded else workers, initializer=_ignore_interrupts
+        )
+        if threaded:
+            jobs, answers = manager.Queue(), manager.Queue()
+            child = pool.submit(_thread_pool, fn, jobs, answers, events, workers)
         while True:
             while not stop.requested and len(active) < workers:
                 item = next(remaining, None)
                 if item is None:
                     break
-                future = pool.submit(_worker, fn, item["kwargs"], events, item["key"])
+                if threaded:
+                    future: Future[Any] = Future()
+                    thread_futures[item["key"]] = future
+                    jobs.put(cloudpickle.dumps((item["key"], item["kwargs"])))
+                else:
+                    future = pool.submit(
+                        _worker, fn, item["kwargs"], events, item["key"]
+                    )
                 active[future] = item["key"]
             if not active:
                 break
+            if threaded:
+                if child.done():
+                    child.result()  # Propagate startup, transport or process failures.
+                    msg = "Image worker stopped before returning its active results."
+                    raise RuntimeError(msg)
+                while True:
+                    try:
+                        key, payload = answers.get_nowait()
+                    except Empty:
+                        break
+                    result, error = cloudpickle.loads(payload)
+                    future = thread_futures.pop(key)
+                    if error is None:
+                        future.set_result(result)
+                    else:
+                        future.set_exception(error)
             done, _ = wait(active, timeout=0.05, return_when=FIRST_COMPLETED)
             drain()
             for future in done:
@@ -151,13 +217,16 @@ def _parallel(
                 except (Exception, KeyboardInterrupt) as error:  # noqa: BLE001 - Re-raised after active work is saved.
                     fail(key, error)
         drain()
+        if threaded:
+            jobs.put(None)
+            child.result()
         force = False
     finally:
         try:
             if pool is not None:
                 pool.shutdown(wait=True, kill_workers=force)
         finally:
-            if hasattr(manager, "shutdown"):
+            if manager is not None and hasattr(manager, "shutdown"):
                 manager.shutdown()
 
 
@@ -173,10 +242,17 @@ def run_batch(
     n_jobs: int,
     show_usage: bool,
     on_existing: ExistingRun,
+    threaded: bool = False,
     state_factory: Callable[..., RunState] = RunState,
 ) -> list[Any]:
     protect_inputs(save_dir, referenced_files(settings))
-    workers = effective_n_jobs(n_jobs)
+    if threaded:
+        if type(n_jobs) is not int or n_jobs < 1:
+            msg = "max_concurrent_jobs must be a positive integer."
+            raise ValueError(msg)
+        workers = n_jobs
+    else:
+        workers = effective_n_jobs(n_jobs)
     item_name = "PDFs" if kind == "extraction" else "images"
     with output_lock(save_dir), _controlled_interrupt(item_name) as stop:
         state = state_factory(save_dir, kind, settings, on_existing)
@@ -235,7 +311,7 @@ def run_batch(
 
         pending = [item for item in inputs if item["key"] not in results]
         try:
-            if workers > 1 and pending:
+            if pending and (workers > 1 or threaded):
                 _parallel(
                     fn,
                     pending,
@@ -244,6 +320,7 @@ def run_batch(
                     report=report,
                     commit=commit,
                     fail=fail,
+                    threaded=threaded,
                 )
             else:
                 for item in pending:

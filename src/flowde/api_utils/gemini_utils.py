@@ -8,6 +8,7 @@ from google.genai.types import (
     Content,
     File,
     GenerateContentConfig,
+    HttpOptions,
     MediaResolution,
     Part,
     ThinkingConfig,
@@ -87,7 +88,10 @@ def send_gemini_request(
     token_prices: TokenPrices | None = None,
 ) -> str | None:
     load_dotenv()
-    client = genai.Client(api_key=os.getenv("GOOGLE_GENAI_API_KEY"))
+    client = genai.Client(
+        api_key=os.getenv("GOOGLE_GENAI_API_KEY"),
+        http_options=HttpOptions(timeout=300_000),
+    )
 
     config = GenerateContentConfig(
         media_resolution=MediaResolution.MEDIA_RESOLUTION_HIGH,
@@ -120,7 +124,10 @@ def gemini_vision_input_list(
 ) -> list[Content]:
     """Build worked example exchanges followed by the target, with instructions once."""
     load_dotenv()
-    client = genai.Client(api_key=os.getenv("GOOGLE_GENAI_API_KEY"))
+    client = genai.Client(
+        api_key=os.getenv("GOOGLE_GENAI_API_KEY"),
+        http_options=HttpOptions(timeout=300_000),
+    )
 
     def make_user_parts(
         img_path: Path,

@@ -328,7 +328,7 @@ def test_overwrite_replaces_results_and_removes_only_recorded_obsolete_jsons(
     for directory in part_dirs.values():
         (directory / "b.json").unlink()
     node_file = part_dirs["nodes_dir"] / "a.json"
-    changed = json.loads(node_file.read_text())
+    changed = json.loads(node_file.read_text(encoding="utf-8"))
     changed["nodes"][0]["text"] = "Updated analysis"
     write_json(node_file, changed)
     inputs_before = snapshot(tmp_path / "parts")
@@ -339,7 +339,10 @@ def test_overwrite_replaces_results_and_removes_only_recorded_obsolete_jsons(
 
     assert len(results) == 1
     assert results[0].model_dump()["nodes"][1]["text"] == "Updated analysis"
-    assert json.loads((save_dir / "a.json").read_text()) == results[0].model_dump()
+    assert (
+        json.loads((save_dir / "a.json").read_text(encoding="utf-8"))
+        == results[0].model_dump()
+    )
     assert not (save_dir / "b.json").exists()
     assert sorted(path.name for path in save_dir.iterdir()) == [".flowde", "a.json"]
     assert output_record(save_dir)["outputs"] == ["a.json"]
@@ -470,7 +473,8 @@ def test_overwrite_recreates_missing_or_edited_recorded_results(
     assert output_record(save_dir)["outputs"] == ["a.json", "b.json"]
     for name, result in zip(("a", "b"), results, strict=True):
         assert (
-            json.loads((save_dir / f"{name}.json").read_text()) == result.model_dump()
+            json.loads((save_dir / f"{name}.json").read_text(encoding="utf-8"))
+            == result.model_dump()
         )
 
 
@@ -600,7 +604,7 @@ def test_failed_write_preserves_complete_files_and_can_be_rerun(
         previous_obsolete = (save_dir / "obsolete.json").read_bytes()
     for name in ("a", "b"):
         path = part_dirs["nodes_dir"] / f"{name}.json"
-        value = json.loads(path.read_text())
+        value = json.loads(path.read_text(encoding="utf-8"))
         value["nodes"][1]["text"] = f"Updated {name}"
         write_json(path, value)
     original_replace = Path.replace
@@ -618,7 +622,7 @@ def test_failed_write_preserves_complete_files_and_can_be_rerun(
                 **part_dirs, save_dir=save_dir, on_existing="overwrite"
             )
 
-    first_result = json.loads((save_dir / "a.json").read_text())
+    first_result = json.loads((save_dir / "a.json").read_text(encoding="utf-8"))
     assert first_result["nodes"][0]["text"] == "Updated a"
     if existing_output:
         assert (save_dir / "b.json").read_bytes() == previous_b
@@ -645,7 +649,8 @@ def test_failed_write_preserves_complete_files_and_can_be_rerun(
     assert output_record(save_dir)["outputs"] == ["a.json", "b.json"]
     for name, result in zip(("a", "b"), results, strict=True):
         assert (
-            json.loads((save_dir / f"{name}.json").read_text()) == result.model_dump()
+            json.loads((save_dir / f"{name}.json").read_text(encoding="utf-8"))
+            == result.model_dump()
         )
 
 
@@ -687,7 +692,8 @@ def test_failed_initial_record_write_leaves_results_unchanged_and_can_be_retried
     assert output_record(save_dir)["outputs"] == ["a.json", "b.json"]
     for name, result in zip(("a", "b"), results, strict=True):
         assert (
-            json.loads((save_dir / f"{name}.json").read_text()) == result.model_dump()
+            json.loads((save_dir / f"{name}.json").read_text(encoding="utf-8"))
+            == result.model_dump()
         )
 
 
@@ -731,8 +737,8 @@ def test_failed_cleanup_retains_output_ownership_and_can_be_retried(
             )
 
     expected = {
-        "a": json.loads((save_dir / "a.json").read_text()),
-        "c": json.loads((save_dir / "c.json").read_text()),
+        "a": json.loads((save_dir / "a.json").read_text(encoding="utf-8")),
+        "c": json.loads((save_dir / "c.json").read_text(encoding="utf-8")),
     }
     assert expected["a"]["nodes"][0]["text"] == "a: allocated — 50"
     assert expected["c"]["nodes"][0]["text"] == "b: allocated — 50"
@@ -755,7 +761,7 @@ def test_failed_cleanup_retains_output_ownership_and_can_be_retried(
     assert output_record(save_dir)["outputs"] == ["a.json", "c.json"]
     for name, result in zip(("a", "c"), results, strict=True):
         assert (
-            json.loads((save_dir / f"{name}.json").read_text())
+            json.loads((save_dir / f"{name}.json").read_text(encoding="utf-8"))
             == expected[name]
             == result.model_dump()
         )

@@ -1,9 +1,9 @@
 # Stopping and resuming
 
 When you run image extraction, classification, rotation or parsing, Flowde
-records the settings, input files and output files belonging to the run in
-the `.flowde/run.state` file inside `save_dir`. Flowde can use this record
-to continue unfinished work with `on_existing="resume"`, or to identify the
+records the settings, input files and output files belonging to the run in the
+`.flowde/run.state` file inside `save_dir`. Flowde can use this record to
+continue unfinished work with `on_existing="resume"`, or to identify the
 previous run's output files before replacing the run with
 `on_existing="overwrite"`.
 
@@ -18,13 +18,13 @@ previous run's output files before replacing the run with
 ## Resume an unfinished run
 
 A run can stop before completion if an API request fails. After resolving the
-error, you can continue the unfinished run by setting `on_existing="resume"`
-in any of the core pipeline functions:
+error, you can continue the unfinished run by setting `on_existing="resume"` in
+any of the core pipeline functions:
 [`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs),
 [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs),
 [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs) and
-[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs).
-Each function records completed work in the `.flowde/run.state` file inside
+[`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs). Each
+function records completed work in the `.flowde/run.state` file inside
 `save_dir` as the run progresses. Flowde uses the saved record to recover
 completed work and check that the run can safely continue.
 
@@ -37,7 +37,7 @@ labels = classify_imgs(
     img_dir=img_dir,
     save_dir=save_dir,
     positive_classes={1},
-    n_jobs=1,
+    max_concurrent_jobs=1,
     on_existing="resume",
 )
 ```
@@ -87,23 +87,23 @@ In the table below, `classify_fn` and `parse_fn` are created with the
 
 #### Files checked when resuming
 
-| Files                                                                      | Cannot change                              | Applies to                                                                                                                                                                                                                            |
-| -------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PDFs selected from `pdf_dir`                                               | PDF file paths and contents.               | [`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)                                                                                                                                                         |
-| Images selected from `img_dir`                                             | Image file paths and contents.             | [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs), [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs), [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs) |
-| JSON files supplied through `nodes_dir`                                    | Previously parsed node numbers and text.   | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                               |
-| JSON files supplied through `labels_dir`                                   | Previously parsed node numbers and labels. | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                               |
-| JSON files supplied through `flow_dir`                                     | Previously parsed node numbers and flow.   | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                               |
-| JSON files supplied through `additional_texts_dir`                         | Previously parsed additional text.         | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                               |
-| All output files in `save_dir`                                         | Saved file contents.                       | [`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs), [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs), [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs), [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs) |
+| Files                                              | Cannot change                              | Applies to                                                                                                                                                                                                                                                                                                           |
+| -------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PDFs selected from `pdf_dir`                       | PDF file paths and contents.               | [`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs)                                                                                                                                                                                                                                        |
+| Images selected from `img_dir`                     | Image file paths and contents.             | [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs), [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs), [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                |
+| JSON files supplied through `nodes_dir`            | Previously parsed node numbers and text.   | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                                                                                                              |
+| JSON files supplied through `labels_dir`           | Previously parsed node numbers and labels. | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                                                                                                              |
+| JSON files supplied through `flow_dir`             | Previously parsed node numbers and flow.   | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                                                                                                              |
+| JSON files supplied through `additional_texts_dir` | Previously parsed additional text.         | [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs)                                                                                                                                                                                                                                              |
+| All output files in `save_dir`                     | Saved file contents.                       | [`extract_imgs()`](../reference/pipeline.md#flowde.extract_imgs.extract_imgs), [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs), [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs), [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs) |
 
 ## Overwrite an existing run
 
 With `on_existing="overwrite"`, Flowde removes all output files recorded during
-the previous run.
-Flowde then starts a new run with the current inputs and settings. The previous
-run's saved results and usage history are cleared. Unrecorded files or unrelated
-directories in `save_dir` cause an error before any previous outputs are deleted.
+the previous run. Flowde then starts a new run with the current inputs and
+settings. The previous run's saved results and usage history are cleared.
+Unrecorded files or unrelated directories in `save_dir` cause an error before
+any previous outputs are deleted.
 
 ## Stop a run
 
