@@ -47,9 +47,9 @@ output JSON and its fingerprints as results are published.
 
 On resume and overwrite, Flowde validates all expected internal records,
 including records outside the selected slice. Missing or invalid records cause
-an error; Flowde does not reconstruct them from output files. This differs from a missing public
-output: saved image results can recreate missing JSONs or image copies, while
-missing extracted PNGs require re-extracting the source PDF.
+an error; Flowde does not reconstruct them from output files. This differs from
+a missing public output: saved image results can recreate missing JSONs or image
+copies, while missing extracted PNGs require re-extracting the source PDF.
 
 ## Extraction
 
