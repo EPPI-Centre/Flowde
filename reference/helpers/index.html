@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/reference/helpers/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Function factories and helpers - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Function factories and helpers";
+        var mkdocs_page_input_path = "reference/helpers.md";
+        var mkdocs_page_url = "/Flowde/reference/helpers/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pipeline/custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Function factories and helpers</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#paddle-extraction">Paddle extraction</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn">make_paddle_layout_extract_fn</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openai-classification-and-rotation">OpenAI classification and rotation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn">make_openai_classify_fn</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gemini-classification-and-rotation">Gemini classification and rotation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn">make_gemini_classify_fn</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#openai-parsing">OpenAI parsing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.parsing_fns.openai_parse.make_openai_parse_fn">make_openai_parse_fn</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gemini-parsing">Gemini parsing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.parsing_fns.gemini_parse.make_gemini_parse_fn">make_gemini_parse_fn</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#shared-model-factory-parameters">Shared model-factory parameters</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#connection-check">Connection check</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.api_utils.openai_utils.check_openai_connection">check_openai_connection</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#parsing-helpers">Parsing helpers</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.combine_parsed_parts.combine_parsed_parts">combine_parsed_parts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.parsing_fns.parsing_types.build_partial_flowchart_schema">build_partial_flowchart_schema</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.parsing_fns.parsing_types.build_a_partial_flowchart">build_a_partial_flowchart</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.utils.pretty_json">pretty_json</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#custom-function-settings">Custom function settings</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.model_function">model_function</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#supplied-consort-prompts">Supplied CONSORT prompts</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+      <li class="breadcrumb-item active">Function factories and helpers</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/reference/helpers.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="function-factories-and-helpers">Function factories and helpers</h1>
+<p>Factories create the callable passed into a pipeline stage. Creating a callable
+does not run the dataset. Factory settings are recorded so a resumed run can
+reject incompatible changes.</p>
+<h2 id="paddle-extraction">Paddle extraction</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.extract_fns.paddle_layout_detect_extraction.make_paddle_layout_extract_fn" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">make_paddle_layout_extract_fn</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">make_paddle_layout_extract_fn(device: str = 'gpu', cpu_threads: int = 10, batch_size: int = 1, dpi: int = 144, padding: int = 3) -&gt; ExtractImgsFunction</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Create a PaddleOCR layout extractor that saves image regions from PDFs.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>device</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;gpu&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Device passed to PaddleOCR, for example <code>"cpu"</code> or <code>"gpu"</code>. Defaults
+to <code>"gpu"</code>. GPU execution requires a compatible GPU build of
+PaddlePaddle and an available GPU.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>cpu_threads</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>10</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>CPU inference thread setting passed to PaddleOCR. Defaults to <code>10</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>batch_size</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>1</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of page images per layout prediction batch. Defaults to <code>1</code>.
+This does not control the number of PDFs processed concurrently;
+<code>n_jobs</code> in <a class="autorefs autorefs-internal" title="extract_imgs" href="../pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>
+controls concurrent PDFs.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>dpi</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>144</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Resolution used to render PDF pages for the saved crops. Defaults
+to <code>144</code>. This does not set the layout model's input resolution.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>padding</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>3</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Margin around each detected box, in pixels of PaddleOCR's page image
+before scaling to the rendered page. Defaults to <code>3</code>. Crops are
+clipped to the rendered page boundaries.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="ExtractImgsFunction (flowde.extract_fns.extract_types.ExtractImgsFunction)" href="../data-types/#flowde.extract_fns.extract_types.ExtractImgsFunction">ExtractImgsFunction</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Callable accepting <code>pdf_path</code> and <code>save_dir</code> as <code>Path</code> arguments.
+The callable saves regions labelled <code>image</code> as top-level PNGs named
+<code>&lt;pdf_stem&gt;_&lt;counter&gt;.png</code> and returns <code>None</code>. The counter starts at
+zero and runs across all extracted images in the PDF, rather than
+restarting on each page.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>The layout model is loaded when the returned callable first processes a
+PDF; creating the callable does not load the model. The first extraction
+may download model files. Each worker process caches one model for reuse
+while <code>device</code> and <code>cpu_threads</code> remain unchanged.</p>
+<p>Start with <code>n_jobs=1</code> in <a class="autorefs autorefs-internal" title="extract_imgs" href="../pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>:
+each additional worker may load its own model and increase memory use.
+Larger batch sizes or thread counts
+do not guarantee faster extraction because page rendering and PNG writing
+also contribute to processing time.</p>
+<p>The returned callable records all five settings and the installed
+PaddleOCR and PaddleX versions. When resuming with
+<a class="autorefs autorefs-internal" title="extract_imgs" href="../pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>, changes to these
+recorded settings require a new run or <code>on_existing="overwrite"</code>.
+Changing <code>n_jobs</code> is allowed when resuming.</p>
+</details>
+
+    </div>
+
+</div><p>See the <a href="../../pipeline/image-extraction/">extraction guide</a> for a directory-based
+example.</p>
+<h2 id="openai-classification-and-rotation">OpenAI classification and rotation</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.classify_fns.openai_classify_fn.make_openai_classify_fn" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">make_openai_classify_fn</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">make_openai_classify_fn(input_text: str, model: str, result_structure: type[Classification[LabelType]] = BinaryClassification, effort: str = 'high', few_shot_examples: list[VisionFewShotExample] | None = None, from_azure: bool = False, *, token_prices: TokenPrices | None = None) -&gt; ClassificationFunction[LabelType]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Create an image classifier using the OpenAI or Azure OpenAI Responses API.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>input_text</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Instructions sent with each target image. The prompt defines what the
+labels mean, such as <code>1</code> for a flowchart and <code>0</code> for another image.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>model</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>OpenAI model ID, or Azure deployment name when <code>from_azure=True</code>.
+The selected model must support image inputs, structured outputs and
+the requested reasoning effort.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>result_structure</code></b>
+                  (<code><span title="type">type</span>[<span title="flowde.classify_fns.classify_types.Classification">Classification</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]]</code>, default:
+                      <code><span title="flowde.classify_fns.classify_types.BinaryClassification">BinaryClassification</span></code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Pydantic response class containing a <code>label</code> field. Defaults to
+<a href="../data-types/#flowde.classify_fns.classify_types.BinaryClassification"><code>BinaryClassification</code></a>,
+whose labels are the integers <code>0</code> and <code>1</code>. You can supply a different
+classification schema for other labels, or
+<a href="../data-types/#flowde.classify_fns.classify_types.RotationClassification"><code>RotationClassification</code></a>
+for labels of <code>0</code>, <code>90</code>, <code>180</code> or <code>270</code>. For rotation, the prompt should
+request the clockwise correction needed to make the image upright.
+Custom schemas must be compatible with OpenAI's
+<a href="https://developers.openai.com/api/docs/guides/structured-outputs">structured outputs</a>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>effort</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;high&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Value sent as the Responses API's <code>reasoning.effort</code>. Defaults to
+<code>"high"</code>. Supported values depend on the selected model; the factory
+does not check model compatibility before returning the classifier.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>few_shot_examples</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+   (flowde.utils.VisionFewShotExample)" href="../data-types/#flowde.utils.VisionFewShotExample">VisionFewShotExample</a>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Worked examples included before the target image in every request,
+in list order. Each
+<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.utils.VisionFewShotExample"><code>VisionFewShotExample</code></a> supplies an
+image and an <code>expected_output_path</code> pointing to its expected JSON
+response, such as <code>{"label": 1}</code>. The expected response should follow
+<code>result_structure</code>; the expected JSON is not validated against that
+schema before sending. Defaults to <code>None</code>, meaning no worked examples.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>from_azure</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to use Azure OpenAI. Defaults to <code>False</code>, which reads
+<code>OPENAI_API_KEY</code>. <code>True</code> reads <code>AZURE_API_KEY</code> and <code>AZURE_API_BASE</code>.
+The Azure base URL should end in <code>/openai/v1/</code>, without <code>responses</code>.
+Environment settings are also loaded from <code>.env</code> when the returned
+classifier is called.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>token_prices</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+   (flowde.pricing.TokenPrices)" href="../data-types/#flowde.pricing.TokenPrices">TokenPrices</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Optional <a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.pricing.TokenPrices"><code>TokenPrices</code></a> override for usage
+cost estimates, in USD per million tokens. Defaults to <code>None</code>, which
+looks up <code>model</code> in Flowde's bundled OpenAI price table, including for
+Azure. If prices or required usage figures are unavailable, the cost
+estimate is unavailable. An Azure deployment name that differs from
+the model ID may need an explicit override. This affects estimates,
+not provider billing or the classification request.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="ClassificationFunction (flowde.classify_fns.classify_types.ClassificationFunction)" href="../data-types/#flowde.classify_fns.classify_types.ClassificationFunction">ClassificationFunction</a>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Callable accepting <code>img_path: Path</code> and returning the validated <code>label</code>
+value, rather than the complete Pydantic response. With the default
+schema, the return value is integer <code>0</code> or <code>1</code>. The callable exposes
+<code>result_structure</code> and <code>run_settings</code> for Flowde's saved-run checks.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned classifier is called and the model's response is
+not valid JSON matching <code>result_structure</code>.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned classifier cannot read a target image, example image
+or expected-response file.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="json.JSONDecodeError">JSONDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When an example's expected-response file is read during classification
+and does not contain valid JSON.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="openai.OpenAIError">OpenAIError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When calling the returned classifier fails because of credentials,
+connectivity or an API error, including rejected request settings.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Creating the classifier makes no API request and does not check credentials.
+Calling the classifier sends the prompt, target image and any worked examples
+to the provider, then validates the response. Ordinary OpenAI requests upload
+image files; Azure requests include image bytes as base64 data URLs.</p>
+<p>The classifier does not save labels or copy images. You can pass the
+classifier to <a class="autorefs autorefs-internal" title="classify_imgs" href="../pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a> for a
+saved classification run, or to
+<a class="autorefs autorefs-internal" title="rotate_imgs" href="../pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> with a rotation schema and
+prompt. Flowde checks the declared provider, prompt, model, effort, response
+schema and worked examples when resuming a run, including the contents of
+example image and expected-response files.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Create a binary classifier without making a model request:</p>
+<pre><code class="language-python">from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+
+classify_fn = make_openai_classify_fn(
+    input_text=&quot;Return 1 if the image is a flowchart, otherwise return 0.&quot;,
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+)
+</code></pre>
+
+
+    </div>
+
+</div><p>The returned callable takes an image path and returns the validated <code>label</code>,
+not a complete classification model. Use
+<a href="../data-types/#flowde.classify_fns.classify_types.RotationClassification"><code>RotationClassification</code></a>
+as the
+<code>result_structure</code> when the callable will be passed to
+<a href="../pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> .</p>
+<h2 id="gemini-classification-and-rotation">Gemini classification and rotation</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">make_gemini_classify_fn</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">make_gemini_classify_fn(input_text: str, model: str, result_structure: type[Classification[LabelType]] = BinaryClassification, effort: str = 'high', few_shot_examples: list[VisionFewShotExample] | None = None, *, token_prices: TokenPrices | None = None) -&gt; ClassificationFunction[LabelType]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Create an image classifier using Gemini with a structured JSON response.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>input_text</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Instructions sent with each target image. The prompt defines what the
+labels mean, such as <code>1</code> for a flowchart and <code>0</code> for another image.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>model</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Gemini model ID. The selected model must support image inputs,
+structured outputs and the requested thinking level.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>result_structure</code></b>
+                  (<code><span title="type">type</span>[<span title="flowde.classify_fns.classify_types.Classification">Classification</span>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]]</code>, default:
+                      <code><span title="flowde.classify_fns.classify_types.BinaryClassification">BinaryClassification</span></code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Pydantic response class containing a <code>label</code> field. Defaults to
+<a href="../data-types/#flowde.classify_fns.classify_types.BinaryClassification"><code>BinaryClassification</code></a>,
+whose labels are the integers <code>0</code> and <code>1</code>. You can supply a different
+classification schema for other labels, or
+<a href="../data-types/#flowde.classify_fns.classify_types.RotationClassification"><code>RotationClassification</code></a>
+for labels of <code>0</code>, <code>90</code>, <code>180</code> or <code>270</code>. For rotation, the prompt should
+request the clockwise correction needed to make the image upright.
+The class's JSON schema is sent to Gemini as <code>response_json_schema</code>
+and must be supported by the selected model.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>effort</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;high&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Value passed to Gemini's <code>ThinkingConfig</code> as <code>thinking_level</code>. Defaults
+to <code>"high"</code>. Supported values depend on the selected model; the factory
+does not check model compatibility before returning the classifier.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>few_shot_examples</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+   (flowde.utils.VisionFewShotExample)" href="../data-types/#flowde.utils.VisionFewShotExample">VisionFewShotExample</a>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Worked examples included before the target image in every request,
+in list order. Each
+<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.utils.VisionFewShotExample"><code>VisionFewShotExample</code></a> supplies an
+image and an <code>expected_output_path</code> pointing to its expected JSON
+response, such as <code>{"label": 1}</code>. The expected response should follow
+<code>result_structure</code>; the expected JSON is not validated against that
+schema before sending. Defaults to <code>None</code>, meaning no worked examples.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>token_prices</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+   (flowde.pricing.TokenPrices)" href="../data-types/#flowde.pricing.TokenPrices">TokenPrices</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Optional <a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.pricing.TokenPrices"><code>TokenPrices</code></a> override for usage
+cost estimates, in USD per million tokens. Defaults to <code>None</code>, which
+looks up <code>model</code> in Flowde's bundled Gemini price table. If prices or
+required usage figures are unavailable, the cost estimate is unavailable.
+This affects estimates, not provider billing or the classification
+request.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="ClassificationFunction (flowde.classify_fns.classify_types.ClassificationFunction)" href="../data-types/#flowde.classify_fns.classify_types.ClassificationFunction">ClassificationFunction</a>[<span title="flowde.classify_fns.classify_types.LabelType">LabelType</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Callable accepting <code>img_path: Path</code> and returning the validated <code>label</code>
+value, rather than the complete Pydantic response. With the default
+schema, the return value is integer <code>0</code> or <code>1</code>. The callable exposes
+<code>result_structure</code> and <code>run_settings</code> for Flowde's saved-run checks.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned classifier is called and the model's response is
+not valid JSON matching <code>result_structure</code>, or no response text is
+available. Invalid SDK configuration can also raise this error.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned classifier cannot read a target image, example image
+or expected-response file.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="json.JSONDecodeError">JSONDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When an example's expected-response file is read during classification
+and does not contain valid JSON.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="google.genai.errors.APIError">APIError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When calling the returned classifier encounters an API error, such as
+rejected credentials, a model name or request settings.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Creating the classifier makes no API request and does not check credentials.
+When the classifier is called, Flowde loads environment settings from <code>.env</code>
+and reads <code>GOOGLE_GENAI_API_KEY</code>. The request helper uploads the target and
+example images, sends the prompt and any worked examples to Gemini, then
+validates the response. SDK setup, file access and connection errors
+propagate to the caller.</p>
+<p>The classifier does not save labels or copy images. You can pass the
+classifier to <a class="autorefs autorefs-internal" title="classify_imgs" href="../pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a> for a
+saved classification run, or to
+<a class="autorefs autorefs-internal" title="rotate_imgs" href="../pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> with a rotation schema and
+prompt. Flowde checks the declared provider, prompt, model, effort, response
+schema and worked examples when resuming a run, including the contents of
+example image and expected-response files.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Create a binary classifier without making a model request:</p>
+<pre><code class="language-python">from flowde.classify_fns.gemini_classify_fn import make_gemini_classify_fn
+
+classify_fn = make_gemini_classify_fn(
+    input_text=&quot;Return 1 if the image is a flowchart, otherwise return 0.&quot;,
+    model=&quot;gemini-3.1-flash-lite&quot;,
+    effort=&quot;medium&quot;,
+)
+</code></pre>
+
+
+    </div>
+
+</div><p>This factory has the same classification contract as the OpenAI factory.
+<code>effort</code> is passed to Gemini as the thinking level. There is no <code>from_azure</code>
+parameter.</p>
+<h2 id="openai-parsing">OpenAI parsing</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.parsing_fns.openai_parse.make_openai_parse_fn" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">make_openai_parse_fn</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">make_openai_parse_fn(input_text: str, model: str, effort: str = 'high', parts_to_parse: set[ParseType] | None = None, result_structure: type[BaseModel] | None = None, few_shot_examples: list[VisionFewShotExample] | None = None, from_azure: bool = False, *, token_prices: TokenPrices | None = None) -&gt; ParsingFunction</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Create an image parser using the OpenAI or Azure OpenAI Responses API.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>input_text</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Instructions sent with each target image. The prompt describes what to
+extract and how to interpret the diagram. When using earlier node data
+as context, the prompt can ask the model to preserve those node numbers.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>model</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>OpenAI model ID, or Azure deployment name when <code>from_azure=True</code>.
+The selected model must support image inputs, structured outputs and
+the requested reasoning effort.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>effort</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;high&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Value sent as the Responses API's <code>reasoning.effort</code>. Defaults to
+<code>"high"</code>. Supported values depend on the selected model; the factory
+does not check model compatibility before returning the parser.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parts_to_parse</code></b>
+                  (<code><span title="set">set</span>[<span title="flowde.parsing_fns.parsing_types.ParseType">ParseType</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Parts to include in a generated flowchart response schema. You can
+request one or several of the following parts:</p>
+<ul>
+<li><code>"node_text"</code>: <code>nodes</code> with <code>node_number</code> and <code>text</code>.</li>
+<li><code>"labels"</code>: <code>nodes</code> with <code>node_number</code> and <code>labels</code>.</li>
+<li><code>"flow"</code>: <code>nodes</code> with <code>node_number</code> and <code>points_to</code>.</li>
+<li><code>"additional_texts"</code>: a top-level <code>additional_texts</code> list.</li>
+</ul>
+<p>Node-based parts share one <code>nodes</code> list when requested together.
+Unselected fields are omitted, and the generated schema rejects extra
+fields. Defaults to <code>None</code>: all four parts are requested unless a
+custom <code>result_structure</code> is supplied. Cannot be supplied together
+with <code>result_structure</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>result_structure</code></b>
+                  (<code><span title="type">type</span>[<span title="pydantic.BaseModel">BaseModel</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Custom Pydantic response class. Defaults to <code>None</code>, which generates
+the schema from <code>parts_to_parse</code>. A custom class replaces the standard
+flowchart schema and must be compatible with OpenAI's
+<a href="https://developers.openai.com/api/docs/guides/structured-outputs">structured outputs</a>.
+The returned parser validates responses against this class and returns
+an instance of the class. Cannot be supplied with <code>parts_to_parse</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>few_shot_examples</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+   (flowde.utils.VisionFewShotExample)" href="../data-types/#flowde.utils.VisionFewShotExample">VisionFewShotExample</a>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Worked examples included before the target image in every request,
+in list order. Each
+<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.utils.VisionFewShotExample"><code>VisionFewShotExample</code></a> supplies an
+image, an <code>expected_output_path</code> containing the expected JSON response,
+and optionally a <code>partial_flowchart</code> containing context for that example.
+The expected JSON should match the selected parts or custom schema,
+without a benchmark ground truth's <code>options</code> wrapper. The expected
+JSON is not validated against the response schema before sending.
+Defaults to <code>None</code>, meaning no worked examples.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>from_azure</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to use Azure OpenAI. Defaults to <code>False</code>, which reads
+<code>OPENAI_API_KEY</code>. <code>True</code> reads <code>AZURE_API_KEY</code> and <code>AZURE_API_BASE</code>.
+The Azure base URL should end in <code>/openai/v1/</code>, without <code>responses</code>.
+Environment settings are also loaded from <code>.env</code> when the returned
+parser is called.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>token_prices</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+   (flowde.pricing.TokenPrices)" href="../data-types/#flowde.pricing.TokenPrices">TokenPrices</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Optional <a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.pricing.TokenPrices"><code>TokenPrices</code></a> override for usage
+cost estimates, in USD per million tokens. Defaults to <code>None</code>, which
+looks up <code>model</code> in Flowde's bundled OpenAI price table, including for
+Azure. If prices or required usage figures are unavailable, the cost
+estimate is unavailable. An Azure deployment name that differs from
+the model ID may need an explicit override. This affects estimates,
+not provider billing or the parsing request.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="ParsingFunction (flowde.parsing_fns.parsing_types.ParsingFunction)" href="../data-types/#flowde.parsing_fns.parsing_types.ParsingFunction">ParsingFunction</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Callable accepting <code>img_path: Path</code> and optional
+<code>partial_flowchart: BaseModel | None</code>, defaulting to <code>None</code>. The callable
+returns a validated instance of its <code>result_structure</code> class. That class
+is either the supplied custom class or the generated flowchart schema.
+The callable also exposes <code>run_settings</code> for Flowde's saved-run checks.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When both <code>parts_to_parse</code> and <code>result_structure</code> are supplied. This is
+checked when creating the parser, before any request is made.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned parser is called and the model's response is not
+valid JSON matching the chosen response schema.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned parser cannot read a target image, example image or
+expected-response file.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="json.JSONDecodeError">JSONDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When an example's expected-response file is read during parsing and
+does not contain valid JSON.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="openai.OpenAIError">OpenAIError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When calling the returned parser fails because of credentials,
+connectivity or an API error, including rejected request settings.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Creating the parser makes no API request and does not check credentials.
+Calling the parser sends the prompt, target image, optional partial context
+and any worked examples to the provider. Ordinary OpenAI requests upload
+image files; Azure requests include image bytes as base64 data URLs.</p>
+<p>The target's <code>partial_flowchart</code> is serialised as JSON text alongside the
+image. Context supplies information to the model; context fields are not
+automatically merged into the response. The parser's output schema chooses
+which fields to request. The generated flowchart schema does not check that
+returned node numbers match the supplied context or that connections refer
+to existing nodes.</p>
+<p>The parser returns a Pydantic model without saving a JSON file. You can pass
+the parser to <a class="autorefs autorefs-internal" title="parse_imgs" href="../pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a> to process a
+directory and save the results. Flowde checks the declared provider, prompt,
+model, effort, response schema and worked examples when resuming a run,
+including the contents of example image and expected-response files.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Create a parser for node text without making a model request:</p>
+<pre><code class="language-python">from flowde.parsing_fns.openai_parse import make_openai_parse_fn
+
+parse_fn = make_openai_parse_fn(
+    input_text=(
+        &quot;Extract each node's text. Use consecutive node numbers starting at 1.&quot;
+    ),
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+    parts_to_parse={&quot;node_text&quot;},
+)
+</code></pre>
+
+
+    </div>
+
+</div><p>Returns a callable accepting an image path and optional partial-flowchart model.
+The callable returns a validated Pydantic model.</p>
+<h2 id="gemini-parsing">Gemini parsing</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.parsing_fns.gemini_parse.make_gemini_parse_fn" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">make_gemini_parse_fn</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">make_gemini_parse_fn(input_text: str, model: str, effort: str = 'high', parts_to_parse: set[ParseType] | None = None, result_structure: type[BaseModel] | None = None, few_shot_examples: list[VisionFewShotExample] | None = None, *, token_prices: TokenPrices | None = None) -&gt; ParsingFunction</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Create an image parser using Gemini with a structured JSON response.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>input_text</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Instructions sent with each target image. The prompt describes what to
+extract and how to interpret the diagram. When using earlier node data
+as context, the prompt can ask the model to preserve those node numbers.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>model</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Gemini model ID. The selected model must support image inputs,
+structured outputs and the requested thinking level.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>effort</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;high&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Value passed to Gemini's <code>ThinkingConfig</code> as <code>thinking_level</code>. Defaults
+to <code>"high"</code>. Supported values depend on the selected model; the factory
+does not check model compatibility before returning the parser.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>parts_to_parse</code></b>
+                  (<code><span title="set">set</span>[<span title="flowde.parsing_fns.parsing_types.ParseType">ParseType</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Parts to include in a generated flowchart response schema. You can
+request one or several of the following parts:</p>
+<ul>
+<li><code>"node_text"</code>: <code>nodes</code> with <code>node_number</code> and <code>text</code>.</li>
+<li><code>"labels"</code>: <code>nodes</code> with <code>node_number</code> and <code>labels</code>.</li>
+<li><code>"flow"</code>: <code>nodes</code> with <code>node_number</code> and <code>points_to</code>.</li>
+<li><code>"additional_texts"</code>: a top-level <code>additional_texts</code> list.</li>
+</ul>
+<p>Node-based parts share one <code>nodes</code> list when requested together.
+Unselected fields are omitted, and the generated schema rejects extra
+fields. Defaults to <code>None</code>: all four parts are requested unless a
+custom <code>result_structure</code> is supplied. Cannot be supplied together
+with <code>result_structure</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>result_structure</code></b>
+                  (<code><span title="type">type</span>[<span title="pydantic.BaseModel">BaseModel</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Custom Pydantic response class. Defaults to <code>None</code>, which generates
+the schema from <code>parts_to_parse</code>. A custom class replaces the standard
+flowchart schema. The class's JSON schema is sent to Gemini as
+<code>response_json_schema</code> and must be supported by the selected model.
+The returned parser validates responses against this class and returns
+an instance of the class. Cannot be supplied with <code>parts_to_parse</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>few_shot_examples</code></b>
+                  (<code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+   (flowde.utils.VisionFewShotExample)" href="../data-types/#flowde.utils.VisionFewShotExample">VisionFewShotExample</a>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Worked examples included before the target image in every request,
+in list order. Each
+<a class="autorefs autorefs-internal" title="VisionFewShotExample
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.utils.VisionFewShotExample"><code>VisionFewShotExample</code></a> supplies an
+image, an <code>expected_output_path</code> containing the expected JSON response,
+and optionally a <code>partial_flowchart</code> containing context for that example.
+The expected JSON should match the selected parts or custom schema,
+without a benchmark ground truth's <code>options</code> wrapper. The expected
+JSON is not validated against the response schema before sending.
+Defaults to <code>None</code>, meaning no worked examples.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>token_prices</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+   (flowde.pricing.TokenPrices)" href="../data-types/#flowde.pricing.TokenPrices">TokenPrices</a> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Optional <a class="autorefs autorefs-internal" title="TokenPrices
+
+
+  
+      dataclass
+  " href="../data-types/#flowde.pricing.TokenPrices"><code>TokenPrices</code></a> override for usage
+cost estimates, in USD per million tokens. Defaults to <code>None</code>, which
+looks up <code>model</code> in Flowde's bundled Gemini price table. If prices or
+required usage figures are unavailable, the cost estimate is unavailable.
+This affects estimates, not provider billing or the parsing request.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="ParsingFunction (flowde.parsing_fns.parsing_types.ParsingFunction)" href="../data-types/#flowde.parsing_fns.parsing_types.ParsingFunction">ParsingFunction</a></code>
+              –
+              <div class="doc-md-description">
+                <p>Callable accepting <code>img_path: Path</code> and optional
+<code>partial_flowchart: BaseModel | None</code>, defaulting to <code>None</code>. The callable
+returns a validated instance of its <code>result_structure</code> class. That class
+is either the supplied custom class or the generated flowchart schema.
+The callable also exposes <code>run_settings</code> for Flowde's saved-run checks.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When both <code>parts_to_parse</code> and <code>result_structure</code> are supplied. This is
+checked when creating the parser, before any request is made.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned parser is called and the model's response is not
+valid JSON matching the chosen response schema, or no response text is
+available. Invalid SDK configuration can also raise this error.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When the returned parser cannot read a target image, example image or
+expected-response file.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="json.JSONDecodeError">JSONDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When an example's expected-response file is read during parsing and
+does not contain valid JSON.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="google.genai.errors.APIError">APIError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>When calling the returned parser encounters an API error, such as
+rejected credentials, a model name or request settings.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Creating the parser makes no API request and does not check credentials.
+When the parser is called, Flowde loads environment settings from <code>.env</code>
+and reads <code>GOOGLE_GENAI_API_KEY</code>. The request helper uploads the target and
+example images, then sends the prompt, optional partial context and any
+worked examples to Gemini. SDK setup, file access and connection errors
+propagate to the caller.</p>
+<p>The target's <code>partial_flowchart</code> is serialised as JSON text alongside the
+image. Context supplies information to the model; context fields are not
+automatically merged into the response. The parser's output schema chooses
+which fields to request. The generated flowchart schema does not check that
+returned node numbers match the supplied context or that connections refer
+to existing nodes.</p>
+<p>The parser returns a Pydantic model without saving a JSON file. You can pass
+the parser to <a class="autorefs autorefs-internal" title="parse_imgs" href="../pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a> to process a
+directory and save the results. Flowde checks the declared provider, prompt,
+model, effort, response schema and worked examples when resuming a run,
+including the contents of example image and expected-response files.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Create a parser for node text without making a model request:</p>
+<pre><code class="language-python">from flowde.parsing_fns.gemini_parse import make_gemini_parse_fn
+
+parse_fn = make_gemini_parse_fn(
+    input_text=(
+        &quot;Extract each node's text. Use consecutive node numbers starting at 1.&quot;
+    ),
+    model=&quot;gemini-3.1-flash-lite&quot;,
+    effort=&quot;medium&quot;,
+    parts_to_parse={&quot;node_text&quot;},
+)
+</code></pre>
+
+
+    </div>
+
+</div><p>This factory has the same parsing contract as the OpenAI factory. <code>effort</code> is
+passed as the thinking level; <code>from_azure</code> is not supported.</p>
+<h3 id="shared-model-factory-parameters">Shared model-factory parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>input_text</code></td>
+<td>Instructions sent to the model. Use a supplied CONSORT prompt or your own prompt.</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td>Provider model ID. For Azure, use the deployment name.</td>
+</tr>
+<tr>
+<td><code>effort</code></td>
+<td>Reasoning effort or thinking level. Defaults to <code>"high"</code>; choose a value supported by the model.</td>
+</tr>
+<tr>
+<td><code>result_structure</code></td>
+<td>Classification schema or custom parsing Pydantic schema. Classification defaults to <code>BinaryClassification</code>.</td>
+</tr>
+<tr>
+<td><code>parts_to_parse</code></td>
+<td>Parsing only: a set containing any of <code>"node_text"</code>, <code>"labels"</code>, <code>"flow"</code>, <code>"additional_texts"</code>. When neither this parameter nor a custom schema is supplied, all four parts are parsed.</td>
+</tr>
+<tr>
+<td><code>few_shot_examples</code></td>
+<td>Optional list of <code>VisionFewShotExample</code> instances, containing example images and expected responses.</td>
+</tr>
+<tr>
+<td><code>from_azure</code></td>
+<td>OpenAI factories only: use <code>AZURE_API_KEY</code> and <code>AZURE_API_BASE</code>. Defaults to <code>False</code>.</td>
+</tr>
+<tr>
+<td><code>token_prices</code></td>
+<td>Optional <code>TokenPrices</code> used for cost estimates. Does not change provider billing.</td>
+</tr>
+</tbody>
+</table>
+<p>Do not supply both <code>parts_to_parse</code> and <code>result_structure</code>. Use a custom schema
+for an output structure different from Flowde's built-in parts.</p>
+<p>See <a href="../../pipeline/setup-default-funcs/">provider setup</a>,
+<a href="../../pipeline/few-shot/">few-shot examples</a> and
+<a href="../../pipeline/usage/">usage reporting</a>.</p>
+<h2 id="connection-check">Connection check</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.api_utils.openai_utils.check_openai_connection" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">check_openai_connection</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">check_openai_connection(model: str, effort: ReasoningEffort = 'high', from_azure: bool = False, *, timeout: float = 15.0) -&gt; None</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Check credentials, endpoint, and model access with a short text request.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>model</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>OpenAI model ID, or the deployment name when using Azure.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>effort</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;high&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Reasoning effort sent to the model, by default "high".</p>
+              </div>
+            </li>
+            <li>
+              <b><code>from_azure</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Use <code>AZURE_API_KEY</code> and <code>AZURE_API_BASE</code> instead of <code>OPENAI_API_KEY</code>,
+by default False. Settings are also loaded from <code>.env</code>.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>timeout</code></b>
+                  (<code><span title="float">float</span></code>, default:
+                      <code>15.0</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>HTTP request timeout in seconds, by default 15.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>A required credential or Azure endpoint is missing.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="openai.OpenAIError">OpenAIError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The API rejects the request, or the connection fails or times out.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The HTTP status is not 200, or the response contains no completed
+text reply.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Makes one billable request without automatic retries. Returns None and
+prints nothing on success. This checks text generation; image inputs and
+structured outputs are not exercised.</p>
+</details>
+
+    </div>
+
+</div><h2 id="parsing-helpers">Parsing helpers</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.combine_parsed_parts.combine_parsed_parts" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">combine_parsed_parts</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">combine_parsed_parts(nodes_dir: Path, save_dir: Path, *, labels_dir: Path | None = None, flow_dir: Path | None = None, additional_texts_dir: Path | None = None, on_existing: Literal['error', 'overwrite'] = 'error') -&gt; list[BaseModel]</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Combine saved parsing parts into one JSON file per image.</p>
+<p>Match top-level JSON files by filename stem, join their nodes by node
+number, and save the combined results in <code>save_dir</code>. Node text is required;
+labels, flow and additional text are optional. All inputs are validated
+before any output file is written or removed.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>nodes_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing node-text JSON files, each with a <code>nodes</code> list
+of <code>node_number</code> and <code>text</code> values. At least one top-level <code>*.json</code>
+file is required. Files are processed in sorted path order.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>save_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Directory for the combined JSON files. Created, with missing parent
+directories, after validation succeeds. Output filenames match the
+node-text filenames. The directory must not be a symbolic link, be
+an input directory, or contain any supplied input directory or file.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing label JSON files with <code>node_number</code> and <code>labels</code>
+for every node. Defaults to <code>None</code>, which omits labels from the results.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>flow_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing flow JSON files with <code>node_number</code> and
+<code>points_to</code> for every node. Defaults to <code>None</code>, which omits outgoing
+connections from the results.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>additional_texts_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Directory containing JSON files with an <code>additional_texts</code> list.
+Defaults to <code>None</code>, which omits additional text from the results.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>on_existing</code></b>
+                  (<code>(<span title="error">error</span>, <span title="overwrite">overwrite</span>)</code>, default:
+                      <code>&#34;error&#34;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>How to handle an existing output directory. The default, <code>"error"</code>,
+raises an error if <code>save_dir</code> contains any entries. <code>"overwrite"</code>
+replaces recorded combined JSON files and, after all new results are
+saved, removes recorded outputs absent from the current inputs.
+An occupied directory requires a valid <code>.flowde/combined.state</code> record.
+Unrecorded files or directories cause an error before any files are
+changed, even if an unrecorded filename matches a new result. Existing
+output JSON files and metadata must not be symbolic links. An empty
+output directory is allowed with either option. Resuming is not supported.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<span title="pydantic.BaseModel">BaseModel</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Combined Pydantic models in sorted node-text path order. Each model
+contains node numbers and text, plus the parts whose directories were
+supplied. Nodes are sorted by <code>node_number</code>. The saved JSON files
+contain the same data as the returned models.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If node text is omitted, <code>nodes_dir</code> contains no JSON files,
+<code>on_existing</code> is unsupported, output paths violate the protections
+above, the output record is missing or invalid in an occupied directory,
+unrecorded output-directory entries are present, input filenames do not
+match, or node numbers are invalid or inconsistent across parts.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="NotADirectoryError">NotADirectoryError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a supplied input directory does not exist or is not a directory,
+or an existing <code>save_dir</code> is not a directory.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="FileExistsError">FileExistsError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>save_dir</code> is occupied and <code>on_existing="error"</code>.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="IsADirectoryError">IsADirectoryError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a subdirectory in <code>save_dir</code> has a required output filename.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If an input JSON is malformed or does not match its part's schema.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="UnicodeDecodeError">UnicodeDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If an input file cannot be decoded as UTF-8.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If an input cannot be read or an output cannot be written or removed.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Only top-level <code>*.json</code> input files are read; other input files and
+subdirectories, including <code>.flowde</code>, are ignored. Every supplied part directory must
+contain exactly the same filename stems. Each JSON must contain only its
+declared part, without a benchmark ground-truth <code>options</code> wrapper. The
+formats and node-number checks are those of
+<a class="autorefs autorefs-internal" title="build_a_partial_flowchart" href="#flowde.parsing_fns.parsing_types.build_a_partial_flowchart"><code>build_a_partial_flowchart()</code></a>.</p>
+<p>Input-validation errors leave existing output files unchanged and do not
+create a new output directory. Each JSON is written atomically, but the
+whole directory is not a single transaction. Before saving new results,
+<code>.flowde/combined.state</code> records both previous and intended output filenames.
+A write failure or interruption can leave some complete new results saved.
+After saving all results and removing obsolete recorded outputs, the record
+is reduced to the current output filenames. Rerun with
+<code>on_existing="overwrite"</code> to regenerate the combined results. Avoid
+simultaneous calls writing to the same output directory.</p>
+<p>Combining makes no model requests and does not modify the source files.
+The separate <code>.flowde/combined.state</code> file records only output ownership;
+combining does not create resumable pipeline state. Source run records,
+token usage and costs are not combined. Overwrite permits replacing manually
+edited recorded outputs. Older combined directories without an output record
+cannot be overwritten; use a new output directory.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Combine existing node-text and label results:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.combine_parsed_parts import combine_parsed_parts
+
+combined = combine_parsed_parts(
+    nodes_dir=Path(&quot;results/parsing/node_text&quot;),
+    labels_dir=Path(&quot;results/parsing/labels&quot;),
+    save_dir=Path(&quot;results/parsing/combined&quot;),
+)
+</code></pre>
+<p>Add <code>flow_dir</code> and <code>additional_texts_dir</code> to include those parts. To replace
+a previous set of combined results, pass <code>on_existing="overwrite"</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.parsing_fns.parsing_types.build_partial_flowchart_schema" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build_partial_flowchart_schema</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">build_partial_flowchart_schema(parts_to_parse: set[ParseType] | None = None) -&gt; type[BaseModel]</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+    </div>
+
+</div><p>Returns a Pydantic class with exactly the requested fields. Generated schemas
+reject extra fields. <code>None</code> selects all four parsing parts. See the field map
+under <a href="../data-types/#parsing-schemas">parsing schemas</a>.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.parsing_fns.parsing_types.build_a_partial_flowchart" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build_a_partial_flowchart</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">build_a_partial_flowchart(nodes_path: Path, labels_path: Path | None = None, additional_texts_path: Path | None = None, flow_path: Path | None = None) -&gt; BaseModel</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Combine saved parsing parts for one image into a Pydantic model.</p>
+<p>Load the node text and any supplied labels, additional text or flow from
+separate JSON files. Node numbers identify which labels and outgoing
+connections belong to each node. Supplying all four files produces a
+complete flowchart; optional files can be omitted to build a partial one.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>nodes_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to the UTF-8 JSON file containing node numbers and text, with the
+structure <code>{"nodes": [{"node_number": 1, "text": "..."}]}</code>. At least
+one node is required. Node numbers must be unique consecutive integers
+starting at <code>1</code>, although nodes may appear in any order in the file.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>labels_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Path to the UTF-8 JSON file containing labels for the same nodes, with
+the structure <code>{"nodes": [{"node_number": 1, "labels": ["..."]}]}</code>.
+Each node's <code>labels</code> value is a list of strings, which may be empty.
+Defaults to <code>None</code>, which omits labels from the combined model.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>additional_texts_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Path to the UTF-8 JSON file containing text outside the nodes, with
+the structure <code>{"additional_texts": ["..."]}</code>. The list may be empty.
+Defaults to <code>None</code>, which omits <code>additional_texts</code> from the combined
+model.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>flow_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Path to the UTF-8 JSON file containing outgoing connections for the
+same nodes, with the structure
+<code>{"nodes": [{"node_number": 1, "points_to": [2]}]}</code>. Each node's
+<code>points_to</code> list contains the destination node numbers and may be
+empty. Defaults to <code>None</code>, which omits <code>points_to</code> from the combined
+model.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.BaseModel">BaseModel</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Instance of a generated Pydantic model containing <code>nodes</code>, sorted by
+<code>node_number</code>. Every node has <code>node_number</code> and <code>text</code>, plus <code>labels</code>
+and <code>points_to</code> when their files are supplied. The model also contains
+the top-level <code>additional_texts</code> list when its file is supplied.
+Fields for omitted parts are absent. Use <code>model_dump()</code> to obtain a
+dictionary or <code>model_dump_json()</code> to obtain JSON text.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>nodes_path</code> is <code>None</code>, supplied filenames have different stems,
+no nodes are provided, node numbers are not consecutive starting at
+<code>1</code>, or the node-text, label and flow files contain different node
+numbers.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="pydantic.ValidationError">ValidationError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a file contains invalid JSON or does not match its part's schema,
+including missing required fields or extra fields.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a supplied file is missing or cannot be read.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="UnicodeDecodeError">UnicodeDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If a supplied file cannot be decoded as UTF-8.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>All supplied files must have the same filename stem, such as
+<code>paper-1_0.json</code> in separate part directories. Each file must contain only
+the fields for its own part, in the format written by parsing. Benchmark
+ground-truth files with an <code>options</code> wrapper are not accepted.</p>
+<p>Supplied node-text, label and flow files must contain exactly the same
+node numbers. Each file's nodes are sorted before joining, so their
+original order may differ. Additional text belongs to the whole
+flowchart and is not matched to individual nodes. The helper does not
+check whether the numbers in <code>points_to</code> refer to existing nodes.</p>
+<p>The function reads local files and makes no model requests. It returns
+the combined model without writing a file or changing the supplied files.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Combine four existing parsing results for <code>paper-1_0.png</code>, then save the
+combined JSON:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.parsing_fns.parsing_types import build_a_partial_flowchart
+
+parts_dir = Path(&quot;results/parsing&quot;)
+filename = &quot;paper-1_0.json&quot;
+
+diagram = build_a_partial_flowchart(
+    nodes_path=parts_dir / &quot;node_text&quot; / filename,
+    labels_path=parts_dir / &quot;labels&quot; / filename,
+    additional_texts_path=parts_dir / &quot;additional_texts&quot; / filename,
+    flow_path=parts_dir / &quot;flow&quot; / filename,
+)
+
+output_path = parts_dir / &quot;combined&quot; / filename
+output_path.parent.mkdir(parents=True, exist_ok=True)
+output_path.write_text(diagram.model_dump_json(indent=2), encoding=&quot;utf-8&quot;)
+</code></pre>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.utils.pretty_json" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">pretty_json</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pretty_json(obj: Any) -&gt; str</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+    </div>
+
+</div><p>Returns indented JSON text for a Pydantic model, a list of Pydantic models, or
+ordinary JSON-compatible data. Use
+<a href="https://docs.python.org/3/library/functions.html#print"><code>print()</code></a> to display the text
+or
+<a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path.write_text"><code>Path.write_text()</code></a>
+to save the text.</p>
+<h2 id="custom-function-settings">Custom function settings</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.model_function" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">model_function</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">model_function(fn: Function, *, result_structure: type[BaseModel] | None = None, **run_settings: Any) -&gt; Function</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Attach declared settings and an optional result schema to a callable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>fn</code></b>
+                  (<code><span title="flowde._run_settings.Function">Function</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Extraction, classification, rotation, or parsing callable. Its arguments
+and behavior are unchanged.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>result_structure</code></b>
+                  (<code><span title="type">type</span>[<span title="pydantic.BaseModel">BaseModel</span>] | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Pydantic result class. Required by parsing batches unless already attached
+to <code>fn</code>; optional for custom classifiers.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>**run_settings</code></b>
+                  (<code><span title="typing.Any">Any</span></code>, default:
+                      <code>{}</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Settings that affect the answers, such as a prompt, model, threshold, or
+algorithm version. These describe the callable; they do not configure it.
+File inputs should be <code>Path</code> objects so their contents can be checked.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="flowde._run_settings.Function">Function</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The same callable with its <code>run_settings</code> attribute set and, when supplied,
+its <code>result_structure</code> attribute set.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div><p>Use
+<a href="./#flowde.model_function"><code>model_function(fn, result_structure=..., **run_settings)</code></a>
+to declare the
+settings of a custom callable. <code>result_structure</code> is required for parsers.
+Settings describe the callable; they do not configure or change the callable.
+Include a version setting when changing the callable's algorithm should make
+old runs incompatible. Declare input files as <code>Path</code> values so their contents
+are checked on resume. See <a href="../../pipeline/custom-functions/">custom functions</a>.</p>
+<h2 id="supplied-consort-prompts">Supplied CONSORT prompts</h2>
+<table>
+<thead>
+<tr>
+<th>Import</th>
+<th>Intended task</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>flowde.prompts.consort.consort_nodes_prompt</code></td>
+<td>Node text and node numbers</td>
+</tr>
+<tr>
+<td><code>flowde.prompts.consort_labels.consort_labels_prompt</code></td>
+<td>Node labels</td>
+</tr>
+<tr>
+<td><code>flowde.prompts.consort_flow.consort_flow_prompt</code></td>
+<td>Directed flow between nodes</td>
+</tr>
+<tr>
+<td><code>flowde.prompts.consort_add_text.consort_add_text_prompt</code></td>
+<td>Additional text outside nodes and labels</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="../../recipes/consort/">CONSORT recipe</a> demonstrates these parsing prompts
+and combines their outputs. Classification and rotation use short prompts
+written directly in the example; those prompts are not separate package imports.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../pipeline/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../data-types/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

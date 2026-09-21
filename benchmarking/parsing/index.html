@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/benchmarking/parsing/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Parsing - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Parsing";
+        var mkdocs_page_input_path = "benchmarking/parsing.md";
+        var mkdocs_page_url = "/Flowde/benchmarking/parsing/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pipeline/custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Benchmarking</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Parsing</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#input-format">Input format</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#prediction-files">Prediction files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#ground-truth-files">Ground-truth files</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create-the-benchmark">Create the benchmark</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#parsing-benchmark-results">Parsing benchmark results</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#text-costs">Text costs</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#flow-scores">Flow scores</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#individual-matches">Individual matches</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#text-distance-functions">Text distance functions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#benchmark-separately-parsed-parts">Benchmark separately parsed parts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#missing-predictions">Missing predictions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#how-diagrams-are-matched">How diagrams are matched</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#how-nodes-are-matched-within-each-ground-truth-option">How nodes are matched within each ground-truth option</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#how-a-ground-truth-option-is-selected">How a ground-truth option is selected</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Benchmarking</li>
+      <li class="breadcrumb-item active">Parsing</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/benchmarking/parsing.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="parsing-benchmark">Parsing benchmark</h1>
+<p>The
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+is used to evaluate how well a parsing function has extracted node text, labels,
+flow and additional text.</p>
+<h2 id="input-format">Input format</h2>
+<p>Suppose we have the following flowchart, <code>example_0</code>:</p>
+<!-- prettier-ignore -->
+<p><img alt="Follow-up flowchart" class="docs-image" src="../../images/parsing-benchmark-flowchart.svg" /></p>
+<p>For this flowchart, the prediction and ground-truth files could have the
+following directory structure:</p>
+<pre><code class="language-text">data/ground-truth/
+├── nodes/
+│   └── example_0.json
+├── labels/
+│   └── example_0.json
+├── flow/
+│   └── example_0.json
+└── additional_texts/
+    └── example_0.json
+results/predictions/
+└── example_0.json
+</code></pre>
+<p>The filename stem, <code>example_0</code>, identifies the same flowchart in every
+directory. Ground truth must contain all four parts, even when the predictions
+contain only some parts.</p>
+<h3 id="prediction-files">Prediction files</h3>
+<p>Predictions use the JSON format saved by
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>. The
+prediction contains deliberate text and flow errors to demonstrate the benchmark
+scores. <code>results/predictions/example_0.json</code> contains:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    {
+      &quot;node_number&quot;: 1,
+      &quot;text&quot;: &quot;Screened (n = 11)&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [2, 3]
+    },
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;8&quot;,
+      &quot;labels&quot;: [&quot;Follow-up&quot;, &quot;26 week&quot;],
+      &quot;points_to&quot;: []
+    },
+    {
+      &quot;node_number&quot;: 3,
+      &quot;text&quot;: &quot;7&quot;,
+      &quot;labels&quot;: [&quot;Follow-up&quot;, &quot;52 weeks&quot;],
+      &quot;points_to&quot;: []
+    }
+  ],
+  &quot;additional_texts&quot;: [&quot;Figure 2&quot;]
+}
+</code></pre>
+<h3 id="ground-truth-files">Ground-truth files</h3>
+<p>Ground truth separates node text, labels, flow and additional text into four
+files. Each file contains an <code>options</code> list, and each ground-truth option
+describes one complete accepted interpretation.</p>
+<p>The flowchart above can be correctly represented using the two possible options:</p>
+<table>
+<thead>
+<tr>
+<th>Option index</th>
+<th>Node-text file</th>
+<th>Label file</th>
+<th>Flow file</th>
+<th>Additional-text file</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>Screened node and one follow-up node containing <code>8\n7</code>.</td>
+<td>Joined <code>26 weeks\n52 weeks</code> label.</td>
+<td><code>1 → 2</code>.</td>
+<td><code>Figure 1</code>.</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>Screened node and separate follow-up nodes containing <code>8</code> and <code>7</code>.</td>
+<td>Separate <code>26 weeks</code> and <code>52 weeks</code> labels.</td>
+<td><code>1 → 2 → 3</code>.</td>
+<td><code>Figure 1</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Therefore the ground truth files are given by:</p>
+<p><strong>Node text:</strong> <code>data/ground-truth/nodes/example_0.json</code></p>
+<pre><code class="language-json">{
+  &quot;options&quot;: [
+    {
+      &quot;nodes&quot;: [
+        { &quot;node_number&quot;: 1, &quot;text&quot;: &quot;Screened (n = 10)&quot; },
+        { &quot;node_number&quot;: 2, &quot;text&quot;: &quot;8\n7&quot; }
+      ]
+    },
+    {
+      &quot;nodes&quot;: [
+        { &quot;node_number&quot;: 1, &quot;text&quot;: &quot;Screened (n = 10)&quot; },
+        { &quot;node_number&quot;: 2, &quot;text&quot;: &quot;8&quot; },
+        { &quot;node_number&quot;: 3, &quot;text&quot;: &quot;7&quot; }
+      ]
+    }
+  ]
+}
+</code></pre>
+<p><strong>Labels:</strong> <code>data/ground-truth/labels/example_0.json</code></p>
+<pre><code class="language-json">{
+  &quot;options&quot;: [
+    {
+      &quot;nodes&quot;: [
+        { &quot;node_number&quot;: 1, &quot;labels&quot;: [] },
+        { &quot;node_number&quot;: 2, &quot;labels&quot;: [&quot;Follow-up&quot;, &quot;26 weeks\n52 weeks&quot;] }
+      ]
+    },
+    {
+      &quot;nodes&quot;: [
+        { &quot;node_number&quot;: 1, &quot;labels&quot;: [] },
+        { &quot;node_number&quot;: 2, &quot;labels&quot;: [&quot;Follow-up&quot;, &quot;26 weeks&quot;] },
+        { &quot;node_number&quot;: 3, &quot;labels&quot;: [&quot;Follow-up&quot;, &quot;52 weeks&quot;] }
+      ]
+    }
+  ]
+}
+</code></pre>
+<p><strong>Flow:</strong> <code>data/ground-truth/flow/example_0.json</code></p>
+<pre><code class="language-json">{
+  &quot;options&quot;: [
+    {
+      &quot;nodes&quot;: [
+        { &quot;node_number&quot;: 1, &quot;points_to&quot;: [2] },
+        { &quot;node_number&quot;: 2, &quot;points_to&quot;: [] }
+      ]
+    },
+    {
+      &quot;nodes&quot;: [
+        { &quot;node_number&quot;: 1, &quot;points_to&quot;: [2] },
+        { &quot;node_number&quot;: 2, &quot;points_to&quot;: [3] },
+        { &quot;node_number&quot;: 3, &quot;points_to&quot;: [] }
+      ]
+    }
+  ]
+}
+</code></pre>
+<p><strong>Additional text:</strong> <code>data/ground-truth/additional_texts/example_0.json</code></p>
+<pre><code class="language-json">{
+  &quot;options&quot;: [
+    { &quot;additional_texts&quot;: [&quot;Figure 1&quot;] },
+    { &quot;additional_texts&quot;: [&quot;Figure 1&quot;] }
+  ]
+}
+</code></pre>
+<p>The benchmark selects one ground-truth option for each prediction and uses that
+option for all text and flow scores. See <a href="#how-diagrams-are-matched">how diagrams are matched</a>
+for details on how the benchmark selects which option to use.</p>
+<h2 id="create-the-benchmark">Create the benchmark</h2>
+<p>You can use
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+to evaluate the saved predictions:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.benchmarks.parsing.parsing_bench import ParsingBenchmark
+
+truth_dir = Path(&quot;data/ground-truth&quot;)
+
+benchmark = ParsingBenchmark(
+    pred_diagrams_dir=Path(&quot;results/predictions&quot;),
+    true_nodes_dir=truth_dir / &quot;nodes&quot;,
+    true_labels_dir=truth_dir / &quot;labels&quot;,
+    true_flow_dir=truth_dir / &quot;flow&quot;,
+    true_additional_texts_dir=truth_dir / &quot;additional_texts&quot;,
+    expected_num_diagrams=1,
+)
+</code></pre>
+<p>The benchmark loads the prediction and ground-truth files and checks that the
+files are valid. <code>expected_num_diagrams</code> counts flowcharts in the complete
+ground-truth dataset. This example contains one flowchart with two accepted
+Ground-Truth Options, so <code>expected_num_diagrams=1</code>.</p>
+<p>By default, the benchmark uses
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_with_text_normalisation"><code>levenshtein_with_text_normalisation()</code></a>
+to count character edits after normalising Unicode, whitespace and selected
+punctuation variants. You can choose a different
+<a href="#text-distance-functions">text distance function</a> through <code>distance_fn</code>.</p>
+<p>See the
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+API reference for full details of the parameters and validation rules.</p>
+<h3 id="parsing-benchmark-results">Parsing benchmark results</h3>
+<p>After creating the benchmark object, you can calculate the scores through its
+methods:</p>
+<!-- markdownlint-disable MD033 -->
+
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Return type</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches"><code>benchmark.node_matches()</code></a></td>
+<td><code>list[<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code></td>
+<td>Matched and unmatched nodes, with node-text costs, for each flowchart.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches_with_flow"><code>benchmark.node_matches_with_flow()</code></a></td>
+<td><code>list[<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code></td>
+<td>Node matches for each flowchart, requiring parsed flow so each result can calculate its <code>flow_score</code>.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_and_label_matches"><code>benchmark.node_and_label_matches()</code></a></td>
+<td><code>list[<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench_types.NodeMatches">NodeMatches</a>]</code></td>
+<td>Node matches and matched and unmatched labels, with label costs, for each flowchart.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.additional_text_matches"><code>benchmark.additional_text_matches()</code></a></td>
+<td><code>list[<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench_types.TextListMatches">TextListMatches</a>]</code></td>
+<td>Matched and unmatched additional-text strings, with costs, for each flowchart.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.diagram_matches"><code>benchmark.diagram_matches()</code></a></td>
+<td><code>list[<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench_types.DiagramMatch">DiagramMatch</a>]</code></td>
+<td>Combined node, label, flow and additional-text comparisons for each flowchart.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_node_text_cost"><code>benchmark.total_node_text_cost()</code></a></td>
+<td><code>float</code></td>
+<td>Total node-text cost across the evaluated flowcharts.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_label_cost"><code>benchmark.total_label_cost()</code></a></td>
+<td><code>float</code></td>
+<td>Total label cost across the evaluated flowcharts.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.total_additional_text_cost"><code>benchmark.total_additional_text_cost()</code></a></td>
+<td><code>float</code></td>
+<td>Total additional-text cost across the evaluated flowcharts.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_scores"><code>benchmark.all_flow_scores()</code></a></td>
+<td><code>list[<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench_types.FlowScores">FlowScores</a>]</code></td>
+<td>Flow scores for each flowchart, in filename-stem order.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_jaccard_scores"><code>benchmark.all_flow_jaccard_scores()</code></a></td>
+<td><code>list[float]</code></td>
+<td>One flow Jaccard score per flowchart, in filename-stem order.</td>
+</tr>
+<tr>
+<td><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.avg_flow_jaccard"><code>benchmark.avg_flow_jaccard()</code></a></td>
+<td><code>float</code></td>
+<td>Mean flow Jaccard score across the evaluated flowcharts.</td>
+</tr>
+</tbody>
+</table>
+<!-- markdownlint-enable MD033 -->
+
+<p>Before calculating scores, Flowde matches predicted nodes to the ground-truth
+nodes they represent. A <strong>Node Match</strong> can pair nodes with different node
+numbers: predicted node <code>2</code> might represent ground-truth node <code>1</code>. Flowde then
+uses those matches to compare the node text, labels and connections. See
+<a href="#how-diagrams-are-matched">how diagrams are matched</a> for the matching rules.</p>
+<h3 id="text-costs">Text costs</h3>
+<p>For example, you can print the text costs:</p>
+<pre><code class="language-python">print(benchmark.total_node_text_cost())        # 1
+print(benchmark.total_label_cost())            # 1
+print(benchmark.total_additional_text_cost())  # 1
+</code></pre>
+<p>With the default distance function, each cost counts the character insertions,
+deletions or substitutions needed to make the normalised prediction match the
+normalised ground-truth text. For the selected Ground-Truth Option 1, the
+example contains three text differences:</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Ground truth</th>
+<th>Prediction</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node text</td>
+<td><code>Screened (n = 10)</code></td>
+<td><code>Screened (n = 11)</code></td>
+<td><code>1</code>: replace the final <code>1</code> with <code>0</code>.</td>
+</tr>
+<tr>
+<td>Labels</td>
+<td><code>26 weeks</code></td>
+<td><code>26 week</code></td>
+<td><code>1</code>: insert the missing <code>s</code>.</td>
+</tr>
+<tr>
+<td>Additional text</td>
+<td><code>Figure 1</code></td>
+<td><code>Figure 2</code></td>
+<td><code>1</code>: replace <code>2</code> with <code>1</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Each total includes matched and unmatched text across all evaluated flowcharts.</p>
+<h3 id="flow-scores">Flow scores</h3>
+<p>You can inspect the flow scores for the example flowchart:</p>
+<pre><code class="language-python">score = benchmark.all_flow_scores()[0]
+print(score.tp, score.fp, score.fn)  # 1 1 1
+print(score.precision)              # 0.5
+print(score.recall)                 # 0.5
+print(score.f1)                     # 0.5
+print(score.jaccard)                # 0.3333333333333333
+print(score.missing_edges)          # {(2, 3)}
+print(score.extra_edges)            # {(1, 3)}
+</code></pre>
+<p>The selected ground-truth Option 1 has connections <code>1 → 2</code> and <code>2 → 3</code>. The
+prediction has connections <code>1 → 2</code> and <code>1 → 3</code>. The benchmark therefore finds
+one correct connection, one extra connection and one missing connection.</p>
+<p>Each item returned by
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.all_flow_scores"><code>all_flow_scores()</code></a>
+is a
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench_types.FlowScores"><code>FlowScores</code></a>
+object with:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Description</th>
+<th>Value in this example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tp</code></td>
+<td>Number of connections present in both the prediction and ground truth.</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>fp</code></td>
+<td>Number of predicted connections absent from the ground truth.</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>fn</code></td>
+<td>Number of ground-truth connections absent from the prediction.</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>precision</code></td>
+<td>Proportion of predicted connections that are correct: <code>TP / (TP + FP)</code>.</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>recall</code></td>
+<td>Proportion of ground-truth connections found: <code>TP / (TP + FN)</code>.</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>f1</code></td>
+<td>Harmonic mean of precision and recall.</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>jaccard</code></td>
+<td>Correct connections divided by all distinct connections in either diagram: <code>TP / (TP + FP + FN)</code>.</td>
+<td><code>1 / 3</code></td>
+</tr>
+<tr>
+<td><code>missing_edges</code></td>
+<td>Ground-truth connections absent from the prediction.</td>
+<td><code>{(2, 3)}</code></td>
+</tr>
+<tr>
+<td><code>extra_edges</code></td>
+<td>Predicted connections absent from the ground truth.</td>
+<td><code>{(1, 3)}</code></td>
+</tr>
+</tbody>
+</table>
+<p>Connections are directed: <code>1 → 2</code> differs from <code>2 → 1</code>. The reported connection
+pairs use ground-truth node numbers after matching; connections involving
+unmatched predicted nodes use generated identifiers.</p>
+<p>For a dataset containing several flowcharts, you can also print the individual
+Jaccard scores and their mean:</p>
+<pre><code class="language-python">print(benchmark.all_flow_jaccard_scores())
+print(benchmark.avg_flow_jaccard())
+</code></pre>
+<p><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.avg_flow_jaccard"><code>avg_flow_jaccard()</code></a>
+gives each flowchart equal weight. For example, scores of <code>1.0</code> and <code>0.5</code> give a
+mean of <code>0.75</code>, regardless of how many connections each flowchart contains.</p>
+<h3 id="individual-matches">Individual matches</h3>
+<p>Flowde matches predicted nodes to ground-truth nodes using node-text costs,
+with mixed-integer linear programming (MILP) to resolve ties using available
+flow and labels. See <a href="#how-diagrams-are-matched">How diagrams are matched</a> for the matching
+rules.</p>
+<p>You can use the benchmark's matching methods, such as
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark.node_matches"><code>node_matches()</code></a>,
+to inspect which predicted nodes match which ground-truth nodes and compare
+the text and cost of each node pair:</p>
+<pre><code class="language-python">for matches in benchmark.node_matches():
+    print(&quot;Flowchart:&quot;, matches.parent_img_code)
+    print(&quot;Ground-truth option:&quot;, matches.true_diagram_option_idx)
+    for match in matches.matches:
+        print(&quot;Predicted node:&quot;, match.pred_node)
+        print(&quot;Ground-truth node:&quot;, match.true_node)
+        print(&quot;Node-text cost:&quot;, match.node_text_cost)
+</code></pre>
+<p>An unmatched predicted node has <code>true_node=None</code>; an unmatched ground-truth
+node has <code>pred_node=None</code>.</p>
+<h2 id="text-distance-functions">Text distance functions</h2>
+<p>By default, the parsing benchmark uses
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.text_distance_fns.levenshtein_fn.levenshtein_with_text_normalisation"><code>levenshtein_with_text_normalisation()</code></a>
+to calculate the cost of differences between ground-truth and predicted text.</p>
+<p>You can use a different text metric by passing a custom cost function as
+<code>distance_fn</code> to
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>.
+For example, this function returns <code>0</code> for identical text and <code>1</code> for different
+text:</p>
+<pre><code class="language-python">def exact_match_cost(*, true_text: str | None, pred_text: str | None) -&gt; int:
+    return 0 if (true_text or &quot;&quot;) == (pred_text or &quot;&quot;) else 1
+
+
+benchmark = ParsingBenchmark(
+    pred_diagrams_dir=Path(&quot;results/predictions&quot;),
+    true_nodes_dir=truth_dir / &quot;nodes&quot;,
+    true_labels_dir=truth_dir / &quot;labels&quot;,
+    true_flow_dir=truth_dir / &quot;flow&quot;,
+    true_additional_texts_dir=truth_dir / &quot;additional_texts&quot;,
+    expected_num_diagrams=1,
+    distance_fn=exact_match_cost,
+)
+</code></pre>
+<p>See the
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.text_distance_fns.distance_fn_protocol.DistanceFnProtocol"><code>DistanceFnProtocol</code></a>
+API reference for the full requirements for custom cost functions.</p>
+<h2 id="benchmark-separately-parsed-parts">Benchmark separately parsed parts</h2>
+<p>When developing prompts,
+<a href="../../pipeline/parsing/#parse-parts-separately">parsing parts separately</a>
+can help improve parsing performance. You can benchmark the parts already
+parsed to evaluate each prompt without first parsing every part. For example,
+this benchmark evaluates separately parsed node text and labels:</p>
+<pre><code class="language-python">benchmark = ParsingBenchmark(
+    pred_diagrams_dir=[
+        Path(&quot;results/parsing/node_text&quot;),
+        Path(&quot;results/parsing/labels&quot;),
+    ],
+    true_nodes_dir=truth_dir / &quot;nodes&quot;,
+    true_labels_dir=truth_dir / &quot;labels&quot;,
+    true_flow_dir=truth_dir / &quot;flow&quot;,
+    true_additional_texts_dir=truth_dir / &quot;additional_texts&quot;,
+    expected_num_diagrams=1,
+)
+
+print(&quot;Node-text cost:&quot;, benchmark.total_node_text_cost())
+print(&quot;Label cost:&quot;, benchmark.total_label_cost())
+</code></pre>
+<p>Predictions must include node text so Flowde can match predicted nodes to
+ground-truth nodes. The ground-truth files must still contain all four parts,
+even when you have parsed only some parts.</p>
+<p>Some methods require additional parsed parts. To see which methods are
+available for the predictions in your current benchmark, use:</p>
+<pre><code class="language-python">print(benchmark.capabilities.available_methods)
+</code></pre>
+<h2 id="missing-predictions">Missing predictions</h2>
+<p>By default, the prediction files must cover every ground-truth flowchart. You
+can add <code>allow_missing_pred_diagrams=True</code> when creating the benchmark to
+evaluate only flowcharts with predictions.</p>
+<h2 id="how-diagrams-are-matched">How diagrams are matched</h2>
+<p><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+matches predicted nodes to ground-truth nodes by their content, rather than
+requiring node numbers to agree. For example, these diagrams describe the same
+flow despite using different node numbers:</p>
+<pre><code class="language-text">Ground truth:  Node 1: Screened → Node 2: Included
+Prediction:    Node 2: Screened → Node 1: Included
+</code></pre>
+<p><a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+matches predicted node <code>2</code> to ground-truth node <code>1</code>, and predicted node <code>1</code>
+to ground-truth node <code>2</code>. The predicted flow therefore matches the
+ground-truth flow.</p>
+<h3 id="how-nodes-are-matched-within-each-ground-truth-option">How nodes are matched within each ground-truth option</h3>
+<p>For each option in the ground-truth files,
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+chooses node matches in this order:</p>
+<ol>
+<li>Minimise the total node-text cost, including costs for unmatched nodes.</li>
+<li>Among matches with the same node-text cost, maximise flow similarity if
+   flow was parsed.</li>
+<li>Among matches still tied, minimise label cost if labels were parsed.</li>
+</ol>
+<p>For example, this flowchart contains four nodes with the text
+<code>Lost to follow-up</code>, each labelled <code>Before treatment</code> or <code>During treatment</code>:</p>
+<!-- prettier-ignore -->
+<p><img alt="Flow and label matching" src="../../images/node-matching-example.svg" width="100%" /></p>
+<p>All four nodes have identical text. Flow distinguishes the loss nodes under
+<code>Intervention</code> from the loss nodes under <code>Control</code>. Within each arm, both
+loss nodes have the same incoming flow, so the labels distinguish
+<code>Before treatment</code> from <code>During treatment</code>.</p>
+<h3 id="how-a-ground-truth-option-is-selected">How a ground-truth option is selected</h3>
+<p>After matching nodes within each option,
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+selects the ground-truth option with the lowest total node-text cost. If options
+have the same cost,
+<a href="../../reference/benchmarks/#flowde.benchmarks.parsing.parsing_bench.ParsingBenchmark"><code>ParsingBenchmark</code></a>
+compares the tied options in this order:</p>
+<ol>
+<li>Highest flow Jaccard score, if flow was parsed.</li>
+<li>Lowest label cost, if labels were parsed.</li>
+<li>Lowest additional-text cost, if additional text was parsed.</li>
+</ol>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../rotation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../recipes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

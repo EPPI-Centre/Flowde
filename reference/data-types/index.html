@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/reference/data-types/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Data types - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Data types";
+        var mkdocs_page_input_path = "reference/data-types.md";
+        var mkdocs_page_url = "/Flowde/reference/data-types/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pipeline/few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../pipeline/custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Data types</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#classification-schemas">Classification schemas</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#parsing-schemas">Parsing schemas</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#few-shot-example">Few-shot example</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.utils.VisionFewShotExample">VisionFewShotExample</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.utils.VisionFewShotExample.expected_output_text">expected_output_text</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#token-prices">Token prices</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.pricing.TokenPrices">TokenPrices</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.pricing.TokenPrices.estimate">estimate</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage-reports">Usage reports</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.usage.RequestUsage">RequestUsage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.usage.report_usage">report_usage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#function-contracts">Function contracts</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.extract_fns.extract_types.ExtractImgsFunction">ExtractImgsFunction</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.extract_fns.extract_types.ExtractImgsFunction.__call__">__call__</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.classify_fns.classify_types.ClassificationFunction">ClassificationFunction</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.classify_fns.classify_types.ClassificationFunction.__call__">__call__</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flowde.parsing_fns.parsing_types.ParsingFunction">ParsingFunction</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#flowde.parsing_fns.parsing_types.ParsingFunction.__call__">__call__</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+      <li class="breadcrumb-item active">Data types</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/reference/data-types.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="data-types">Data types</h1>
+<h2 id="classification-schemas">Classification schemas</h2>
+<p>Import these types from <code>flowde.classify_fns.classify_types</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code id="flowde.classify_fns.classify_types.Classification">Classification[LabelType]</code></td>
+<td>Pydantic model with a single <code>label</code> field. Specialise the generic with a type or a <code>Literal</code> of allowed values.</td>
+</tr>
+<tr>
+<td><code id="flowde.classify_fns.classify_types.BinaryClassification">BinaryClassification</code></td>
+<td><code>label</code> is integer <code>0</code> or <code>1</code>.</td>
+</tr>
+<tr>
+<td><code>ConsortClassification</code></td>
+<td>Binary schema for the supplied CONSORT classification prompt: <code>0</code> for other images, <code>1</code> for CONSORT diagrams.</td>
+</tr>
+<tr>
+<td><code id="flowde.classify_fns.classify_types.RotationClassification">RotationClassification</code></td>
+<td><code>label</code> is <code>0</code>, <code>90</code>, <code>180</code> or <code>270</code>: the clockwise correction to apply.</td>
+</tr>
+</tbody>
+</table>
+<p>Classification schemas use strict validation. For example, the JSON string
+<code>"1"</code> is not the same as the integer <code>1</code> required by <code>BinaryClassification</code>.
+Model factories return the validated label from the response.</p>
+<pre><code class="language-python">from typing import Literal
+
+from flowde.classify_fns.classify_types import Classification
+
+ImageType = Classification[Literal[&quot;flowchart&quot;, &quot;table&quot;, &quot;other&quot;]]
+answer = ImageType.model_validate({&quot;label&quot;: &quot;flowchart&quot;})
+print(answer.label)
+</code></pre>
+<h2 id="parsing-schemas">Parsing schemas</h2>
+<p>Import <code>ParseType</code>, <code>Node</code>, <code>Flowchart</code> and the schema-building helpers from
+<code>flowde.parsing_fns.parsing_types</code>.</p>
+<table>
+<thead>
+<tr>
+<th><code>ParseType</code> value</th>
+<th>JSON fields requested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"node_text"</code></td>
+<td><code>nodes</code>, with <code>node_number</code> and <code>text</code> for every node</td>
+</tr>
+<tr>
+<td><code>"labels"</code></td>
+<td><code>nodes</code>, with <code>node_number</code> and <code>labels</code> for every node</td>
+</tr>
+<tr>
+<td><code>"flow"</code></td>
+<td><code>nodes</code>, with <code>node_number</code> and <code>points_to</code> for every node</td>
+</tr>
+<tr>
+<td><code>"additional_texts"</code></td>
+<td>Top-level <code>additional_texts</code> list</td>
+</tr>
+</tbody>
+</table>
+<p><code>Node</code> has <code>node_number: int</code>, <code>text: str</code>, <code>labels: list[str]</code> and
+<code>points_to: list[int]</code>. <code>Flowchart</code> has <code>nodes: list[Node]</code> and
+<code>additional_texts: list[str]</code>. The default parsing factories create a schema for
+the selected parts using
+<a href="../helpers/#flowde.parsing_fns.parsing_types.build_partial_flowchart_schema"><code>build_partial_flowchart_schema()</code></a>
+.</p>
+<p>Inference writes one JSON object per image. Ground truth uses an <code>options</code>
+wrapper and separates the four parts into different directories. See the
+<a href="../../benchmarking/parsing/#input-format">parsing benchmark format</a>.</p>
+<p>Pydantic results support
+<a href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump"><code>model_dump()</code></a>
+for a Python dictionary,
+<a href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump_json"><code>model_dump_json(indent=2)</code></a>
+for JSON text, and
+<a href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_json_schema"><code>model_json_schema()</code></a>
+for the
+schema. See <a href="../../pipeline/parsing/">parsing</a> for complete examples.</p>
+<h2 id="few-shot-example">Few-shot example</h2>
+<!-- prettier-ignore-start -->
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.utils.VisionFewShotExample" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">VisionFewShotExample</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">VisionFewShotExample(*, img_path: Path, expected_output_path: Path, partial_flowchart: BaseModel | None = None)</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Describe one example image and its expected JSON answer for a model prompt.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>img_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to an existing example image. The image is included in the prompt
+as a worked example, before the target image being classified or parsed.
+The image format must be supported by the selected provider.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>expected_output_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to an existing UTF-8 JSON file containing the desired response for
+the example image. For binary classification, the file could contain
+<code>{"label": 1}</code>. For parsing, the JSON should match the requested parts
+or custom response schema, without a benchmark ground truth's <code>options</code>
+wrapper. Schema compatibility is the caller's responsibility; this class
+does not validate the example answer against the model's response schema.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>partial_flowchart</code></b>
+                  (<code><span title="pydantic.BaseModel">BaseModel</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Previously parsed data supplied as input context for this example image,
+such as node numbers and text when demonstrating label parsing.
+Defaults to <code>None</code>, meaning no partial context accompanies the example.
+This context belongs to <code>img_path</code>, not to the target image that the
+returned classifier or parser will later process.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>img_path</code> or <code>expected_output_path</code> does not point to an existing
+file when the example is created.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Constructor arguments must be passed by name. The dataclass is frozen, so
+its fields cannot be reassigned after construction. The referenced files
+and the supplied Pydantic model are not made immutable.</p>
+<p>Creating an example checks that both paths point to files; it does not
+decode the image, read the expected JSON or make an API request.
+<a class="autorefs autorefs-internal" title="expected_output_text" href="#flowde.utils.VisionFewShotExample.expected_output_text"><code>expected_output_text()</code></a>
+reads and formats the expected JSON when a request is prepared. File
+contents are read from disk rather than cached in this object.</p>
+<p>You can pass a list of these instances as <code>few_shot_examples</code> to an OpenAI
+or Gemini classification or parsing factory. Each request includes the
+worked examples in list order, followed by the target image. Example
+answers demonstrate the desired response; they are not predictions for
+the target image.</p>
+<p>When a factory's callable is used in a saved Flowde run, the example image,
+expected-response file and partial context contribute to the settings
+checked on resume. Changes to those files or that context require a new
+run or explicit overwrite.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Given an existing <code>flowchart.png</code> and a <code>flowchart.json</code> containing
+<code>{"label": 1}</code>, create a classification example:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.utils import VisionFewShotExample
+
+example = VisionFewShotExample(
+    img_path=Path(&quot;data/examples/flowchart.png&quot;),
+    expected_output_path=Path(&quot;data/examples/flowchart.json&quot;),
+)
+</code></pre>
+<p>The factory's <code>few_shot_examples</code> argument can then receive <code>[example]</code>.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.utils.VisionFewShotExample.expected_output_text" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">expected_output_text</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">expected_output_text() -&gt; str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Read the expected-response file and return its contents as formatted JSON.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="str">str</span></code>
+              –
+              <div class="doc-md-description">
+                <p>JSON text with two-space indentation. Non-ASCII characters are
+preserved rather than escaped. The file is read afresh on every
+call; no response-schema validation is performed.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="OSError">OSError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If <code>expected_output_path</code> cannot be opened or read, including when
+the file has been removed after the example was created.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="UnicodeDecodeError">UnicodeDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the expected-response file is not valid UTF-8 text.</p>
+              </div>
+            </li>
+            <li>
+                  <code><span title="json.JSONDecodeError">JSONDecodeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the expected-response file does not contain valid JSON.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div><!-- prettier-ignore-end -->
+
+<p>See <a href="../../pipeline/few-shot/">few-shot examples</a> for classification and parsing
+examples using model factories.</p>
+<h2 id="token-prices">Token prices</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.pricing.TokenPrices" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">TokenPrices</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">TokenPrices(*, input: float, output: float, cached_input: float | None = None, cache_write: float | None = None, long_context_threshold: int | None = None)</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Store token prices for estimating the cost of a model request.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>input</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Price in USD per million uncached input tokens.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>output</code></b>
+                  (<code><span title="float">float</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Price in USD per million output tokens.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>cached_input</code></b>
+                  (<code><span title="float">float</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Price in USD per million input tokens read from a cache. This rate
+replaces the ordinary <code>input</code> rate for those tokens. Defaults to <code>None</code>,
+meaning the cache-read rate is unknown. A value of <code>0</code> means cache reads
+are free. An unknown rate prevents a cost estimate only when the
+request includes cache-read tokens.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>cache_write</code></b>
+                  (<code><span title="float">float</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Price in USD per million input tokens written to a cache. This rate
+replaces the ordinary <code>input</code> rate for those tokens. Defaults to <code>None</code>,
+meaning the cache-write rate is unknown. A value of <code>0</code> means cache
+writes are free. An unknown rate prevents a cost estimate only when
+the request includes cache-write tokens.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>long_context_threshold</code></b>
+                  (<code><span title="int">int</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Input-token count above which higher rates apply. Defaults to <code>None</code>,
+meaning the same rates apply at every request length. When a request's
+total input-token count is strictly greater than this threshold, all
+input rates, including cache reads and writes, are multiplied by <code>2</code>,
+and the output rate is multiplied by <code>1.5</code>. The higher rates apply to
+the entire request, not just tokens beyond the threshold. These
+multipliers are fixed; this option is suitable only for prices that
+follow that rule.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Constructor arguments must be passed by name. The dataclass is frozen, so
+its fields cannot be reassigned after construction. Rates and the threshold
+are stored as supplied, without numeric-range validation or a provider
+price lookup.</p>
+<p>You can pass an instance as <code>token_prices</code> to an OpenAI or Gemini model
+factory to override Flowde's bundled prices for cost reporting. The
+override changes estimates, not provider billing or model requests.
+<a class="autorefs autorefs-internal" title="estimate" href="#flowde.pricing.TokenPrices.estimate"><code>estimate()</code></a> can also calculate a
+cost directly from token counts. Creating a <code>TokenPrices</code> instance or
+calculating a cost makes no API request.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Define illustrative rates of $2 per million uncached input tokens,
+$8 per million output tokens and $0.50 per million cached input tokens:</p>
+<pre><code class="language-python">from flowde.pricing import TokenPrices
+
+prices = TokenPrices(input=2.0, output=8.0, cached_input=0.5)
+</code></pre>
+<p>These are example rates, not prices for a particular model.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.pricing.TokenPrices.estimate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">estimate</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">estimate(input_tokens: int | None, output_tokens: int | None, *, cached_tokens: int = 0, cache_write_tokens: int = 0) -&gt; float | None</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Estimate one request's cost from its input, output and cache token counts.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>input_tokens</code></b>
+                  (<code><span title="int">int</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Total input tokens, including the tokens counted in <code>cached_tokens</code>
+and <code>cache_write_tokens</code>. <code>None</code> means the count is unknown and
+prevents a cost estimate. This total determines whether the
+long-context threshold is exceeded.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>output_tokens</code></b>
+                  (<code><span title="int">int</span> | None</code>)
+              –
+              <div class="doc-md-description">
+                <p>Total output tokens to price at the <code>output</code> rate. Include any
+reasoning or thinking tokens charged as output. <code>None</code> means the
+count is unknown and prevents a cost estimate.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>cached_tokens</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>0</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Input tokens read from a cache, priced at <code>cached_input</code> instead
+of <code>input</code>. Defaults to <code>0</code>. These tokens must already be included
+in <code>input_tokens</code> and must not also count as cache-write tokens.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>cache_write_tokens</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code>0</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Input tokens written to a cache, priced at <code>cache_write</code> instead
+of <code>input</code>. Defaults to <code>0</code>. These tokens must already be included
+in <code>input_tokens</code> and must not also count as cache-read tokens.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="float">float</span> | None</code>
+              –
+              <div class="doc-md-description">
+                <p>Estimated cost in USD. Returns <code>None</code> if either total token count
+is unknown, a nonzero cache count has no corresponding price, or
+the two cache counts together exceed <code>input_tokens</code>. Known zero
+counts or zero prices can produce a cost of <code>0.0</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Uncached input tokens are calculated as
+<code>input_tokens - cached_tokens - cache_write_tokens</code>. Each input group
+is multiplied by its own per-million-token rate; output tokens are
+multiplied by the output rate. The sum is divided by <code>1_000_000</code>.</p>
+<p>When <code>input_tokens</code> exceeds a configured <code>long_context_threshold</code>, the combined
+input cost is doubled and the output cost is multiplied by <code>1.5</code>
+before summing. At exactly the threshold, the original rates apply.
+Output tokens do not contribute to the threshold comparison.</p>
+<p>Counts are expected to be nonnegative integers. Apart from the checks
+described under Returns, counts and prices are used as supplied.
+The method does not validate every numeric range, contact a provider,
+round the estimate or include charges unrelated to these token counts.</p>
+</details>
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>Calculate a cost using illustrative rates and 1,000 input tokens,
+of which 400 were read from a cache, plus 200 output tokens:</p>
+<pre><code class="language-python">from flowde.pricing import TokenPrices
+
+prices = TokenPrices(input=2.0, output=8.0, cached_input=0.5)
+cost = prices.estimate(
+    input_tokens=1_000,
+    output_tokens=200,
+    cached_tokens=400,
+)
+</code></pre>
+<p>The estimated cost is <code>$0.003</code>: <code>$0.0012</code> for the 600 uncached input
+tokens, <code>$0.0002</code> for the 400 cached input tokens and <code>$0.0016</code> for the
+200 output tokens.</p>
+
+
+    </div>
+
+</div><p>See <a href="../../pipeline/usage/">tokens and costs</a> for usage reporting and custom-price
+examples.</p>
+<h2 id="usage-reports">Usage reports</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.usage.RequestUsage" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">RequestUsage</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">RequestUsage(*, model: str, provider: str, input_tokens: int | None = None, output_tokens: int | None = None, total_tokens: int | None = None, cost: float | None = None)</code></pre>
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Usage from one contributing operation; unknown values remain <code>None</code>.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div><p>Create a report with <code>model</code> and <code>provider</code>, plus any known <code>input_tokens</code>,
+<code>output_tokens</code>, <code>total_tokens</code> and <code>cost</code>. Unknown values default to <code>None</code>.
+For a custom function, supply <code>total_tokens</code> explicitly if you want the total to
+appear in Flowde's summary; the report object does not calculate that field.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowde.usage.report_usage" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">report_usage</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">report_usage(usage: RequestUsage) -&gt; None</code></pre>
+
+    <div class="doc doc-contents first">
+
+        <p>Report a contributing operation without changing the callable's return value.</p>
+<p>Outside a tracked run this does nothing. Custom functions may call this for
+each model response or separately known charge; reporting is never required.
+Costs are USD and token counts must describe this operation, not a running sum.</p>
+
+
+    </div>
+
+</div><p>Records a <code>RequestUsage</code> report for the currently running item. Custom
+classifiers and parsers can report more than one request per image. Calling
+<a href="./#flowde.usage.report_usage"><code>report_usage()</code></a> outside a managed usage
+context has no effect. See
+<a href="../../pipeline/usage/#report-usage-from-a-custom-function">custom usage reporting</a>.</p>
+<h2 id="function-contracts">Function contracts</h2>
+<p>These protocols describe the callable interfaces that Flowde's processing
+functions must follow. Custom functions do not need to inherit from a protocol.</p>
+<table>
+<thead>
+<tr>
+<th>Pipeline stage</th>
+<th>Function contract</th>
+<th>Result for one input file</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Extraction</td>
+<td><a href="./#flowde.extract_fns.extract_types.ExtractImgsFunction"><code>ExtractImgsFunction</code></a></td>
+<td>Write PNG files for one PDF into the supplied directory; return <code>None</code>.</td>
+</tr>
+<tr>
+<td>Classification and rotation</td>
+<td><a href="./#flowde.classify_fns.classify_types.ClassificationFunction"><code>ClassificationFunction</code></a></td>
+<td>Return one label, or a clockwise correction angle for rotation.</td>
+</tr>
+<tr>
+<td>Parsing</td>
+<td><a href="./#flowde.parsing_fns.parsing_types.ParsingFunction"><code>ParsingFunction</code></a></td>
+<td>Return a Pydantic model matching the callable's <code>result_structure</code> class.</td>
+</tr>
+</tbody>
+</table>
+<p>The contracts below describe the arguments, return values and requirements
+for each callable. See the <a href="../../pipeline/custom-functions/">custom-function guide</a>
+for working examples and instructions on declaring settings for saved runs.</p>
+<!-- prettier-ignore-start -->
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.extract_fns.extract_types.ExtractImgsFunction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ExtractImgsFunction</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+
+
+        <p>Describe a callable that extracts PNG images from one PDF.</p>
+<p>Pass an extractor with this interface as <code>extract_fn</code> to
+<a class="autorefs autorefs-internal" title="extract_imgs" href="../pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>. Flowde supplies one
+PDF and a temporary output directory per call. The extractor writes the
+PNG files; Flowde validates the files and publishes the completed PDF's
+images in the run's output directory.</p>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This protocol describes an interface; it does not implement extraction
+or perform runtime validation. A function or callable object can satisfy
+the interface without inheriting from <code>ExtractImgsFunction</code>.</p>
+<p>Custom extractors must also declare their settings with
+<a class="autorefs autorefs-internal" title="model_function" href="../helpers/#flowde.model_function"><code>model_function()</code></a>. The resulting <code>run_settings</code>
+attribute lets Flowde check compatibility when resuming a saved run.
+This requirement applies in addition to the call signature defined here.
+Built-in extractor factories declare their settings automatically.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.extract_fns.extract_types.ExtractImgsFunction.__call__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__call__</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">__call__(*, pdf_path: Path, save_dir: Path) -&gt; None</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Extract images from one PDF into the supplied temporary directory.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>pdf_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to the input PDF. Flowde supplies this argument by keyword.
+The extractor must leave the input PDF unchanged.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>save_dir</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Existing, empty temporary directory for this PDF. Flowde supplies
+this argument by keyword. This directory is separate from the
+final <code>save_dir</code> passed to
+<a class="autorefs autorefs-internal" title="extract_imgs" href="../pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>.</p>
+<p>Save only valid PNG files with the lowercase <code>.png</code> extension
+directly inside this directory. Do not create subdirectories,
+symbolic links or other files. Filenames must be unique across
+all images in the run, including when compared without letter
+case. Including the PDF's filename stem in each PNG's name helps
+avoid collisions between PDFs.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code>None</code>
+              –
+              <div class="doc-md-description">
+                <p>The saved PNG files are the extraction results. Finish writing
+and close every output file before returning. Leaving <code>save_dir</code>
+empty is valid when the PDF contains no images to extract.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Raise an exception if extraction fails. Flowde publishes a PDF's
+PNG files only after the extractor returns successfully and the PNGs
+pass validation. An extractor must not leave background work writing
+files after returning.</p>
+</details>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.classify_fns.classify_types.ClassificationFunction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ClassificationFunction</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span>[<span title="flowde.classify_fns.classify_types.LabelType_co">LabelType_co</span>]</code></p>
+
+
+
+        <p>Describe a callable that returns one classification label for one image.</p>
+<p>Pass a classifier with this interface as <code>classify_fn</code> to
+<a class="autorefs autorefs-internal" title="classify_imgs" href="../pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>. The generic label
+type describes the callable's return value: a <code>str</code>, <code>int</code> or <code>bool</code>.
+For example, <code>ClassificationFunction[str]</code> returns string labels.</p>
+<p>Rotation uses the same interface. A <code>ClassificationFunction[RotationLabel]</code>
+passed to <a class="autorefs autorefs-internal" title="rotate_imgs" href="../pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> must return
+the clockwise correction angle as an integer: <code>0</code>, <code>90</code>, <code>180</code> or <code>270</code>.
+The classifier predicts the angle; Flowde applies the rotation and saves
+corrected image copies.</p>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This protocol describes an interface; it does not implement classification
+or perform runtime validation. A function or callable object can satisfy
+the interface without inheriting from <code>ClassificationFunction</code>.</p>
+<p>Custom classifiers must also declare their settings with
+<a class="autorefs autorefs-internal" title="model_function" href="../helpers/#flowde.model_function"><code>model_function()</code></a>. The resulting <code>run_settings</code>
+attribute lets Flowde check compatibility when resuming a saved run.
+This requirement applies in addition to the call signature defined here.
+Built-in classifier factories declare their settings automatically.</p>
+<p>A classifier can optionally expose a <code>result_structure</code> class with a
+<code>label</code> field to restrict the permitted labels. For example,
+<a href="./#flowde.classify_fns.classify_types.BinaryClassification"><code>BinaryClassification</code></a>
+permits only the integers <code>0</code> and <code>1</code>. The classification pipeline checks
+each returned label against the supplied schema. Without a schema, the
+classification pipeline accepts any <code>str</code>, <code>int</code> or <code>bool</code> label. The
+rotation pipeline always checks for one of the four correction angles.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.classify_fns.classify_types.ClassificationFunction.__call__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__call__</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">__call__(img_path: Path) -&gt; LabelType_co</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Classify one image and return its label or clockwise correction angle.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>img_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to the target image. Flowde supplies the path as the first
+positional argument. The classifier must support the image's
+format and leave the source image unchanged.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="flowde.classify_fns.classify_types.LabelType_co">LabelType_co</span></code>
+              –
+              <div class="doc-md-description">
+                <p>One <code>str</code>, <code>int</code> or <code>bool</code> label matching the callable's declared
+generic label type. Return the label itself, not a dictionary,
+JSON string containing an object, or Pydantic model. A rotation
+classifier must return the integer clockwise correction angle
+<code>0</code>, <code>90</code>, <code>180</code> or <code>270</code>; <code>0</code> means no correction is needed.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Raise an exception if classification or angle prediction fails.
+Returning <code>None</code> causes a pipeline error and does not mark the image
+as successfully processed.</p>
+</details>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="flowde.parsing_fns.parsing_types.ParsingFunction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ParsingFunction</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+
+
+        <p>Describe a callable that parses one image into a Pydantic result.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Attributes:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>result_structure</code></b>
+                  (<code><span title="type">type</span>[<span title="pydantic.BaseModel">BaseModel</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>Pydantic class describing the parser's output. Every successful call
+must return an instance of this class. The attribute holds the class,
+not an already parsed result. The class can describe a complete
+flowchart, selected flowchart parts or a custom output format.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This protocol describes an interface; it does not implement image parsing.
+A function or callable object can satisfy the interface without inheriting
+from <code>ParsingFunction</code>. The callable accepts <code>img_path</code> and optional
+<code>partial_flowchart</code> arguments, as described by
+<a class="autorefs autorefs-internal" title="__call__" href="#flowde.parsing_fns.parsing_types.ParsingFunction.__call__"><code>__call__()</code></a>.</p>
+<p>The OpenAI and Gemini parsing factories return callables with this
+interface. A returned parser processes one image per call and returns its
+Pydantic result. You can pass the parser to
+<a class="autorefs autorefs-internal" title="parse_imgs" href="../pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a> to process a directory and
+save one JSON file per image.</p>
+<p>A custom parser used by Flowde must also expose its declared <code>run_settings</code>.
+You can attach these settings and the required <code>result_structure</code> class with
+<a class="autorefs autorefs-internal" title="model_function" href="../helpers/#flowde.model_function"><code>model_function()</code></a>. These settings allow saved-run
+compatibility checks;
+<code>run_settings</code> is a pipeline requirement beyond the attributes declared
+by this protocol. Built-in factories attach these settings automatically.</p>
+<p>The protocol itself performs no runtime validation. The directory pipeline
+checks that <code>result_structure</code> is a Pydantic class and that each returned
+result is an instance of that class. A dictionary, JSON string or <code>None</code>
+is not an accepted parsing result.</p>
+</details>
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="flowde.parsing_fns.parsing_types.ParsingFunction.__call__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__call__</span>
+
+
+</h4>
+<pre class="highlight"><code class="language-python doc-signature">__call__(img_path: Path, partial_flowchart: BaseModel | None = None) -&gt; BaseModel</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Parse one image, optionally using previously parsed data as context.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>img_path</code></b>
+                  (<code><span title="pathlib.Path">Path</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Path to the target image. The parser implementation must support
+the image's format. Flowde supplies this argument by keyword.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>partial_flowchart</code></b>
+                  (<code><span title="pydantic.BaseModel">BaseModel</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Previously parsed data for the same image, such as node numbers
+and text when requesting labels. Defaults to <code>None</code>, meaning no
+earlier results are supplied. Flowde supplies this argument by
+keyword when context files are provided to
+<a class="autorefs autorefs-internal" title="parse_imgs" href="../pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="pydantic.BaseModel">BaseModel</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Parsed result for the target image, as an instance of the callable's
+<code>result_structure</code> class. The output schema determines which fields
+the result contains. Supplying partial context does not require
+those context fields to appear in the result.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This method defines the call signature; a parser implementation performs
+the actual work. The implementation can raise an exception when parsing
+fails. Returning <code>None</code> does not mark an image as successfully parsed.</p>
+</details>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div><!-- prettier-ignore-end -->
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../helpers/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../benchmarks/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

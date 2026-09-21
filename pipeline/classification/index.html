@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/classification/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Image classification - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Image classification";
+        var mkdocs_page_input_path = "pipeline/classification.md";
+        var mkdocs_page_url = "/Flowde/pipeline/classification/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Image classification</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#classify-images-from-a-directory">Classify images from a directory</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#classification-results">Classification results</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#resume-classification">Resume classification</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multiclass-classification">Multiclass classification</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bring-your-own-classification-function">Bring your own classification function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#next-step">Next step</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Image classification</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/classification.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="image-classification">Image classification</h1>
+<p>Classification takes images as input and assigns a label to each image. In the
+core pipeline, classification selects the relevant images after
+<a href="../image-extraction/">extraction</a>.</p>
+<p>For example, label a flowchart <code>1</code> and any other figure <code>0</code>. You can also define
+several classes, such as CONSORT diagram, other flowchart, table and graph.</p>
+<h2 id="classify-images-from-a-directory">Classify images from a directory</h2>
+<p><a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>
+takes a directory of images and saves their labels into one dedicated output
+directory.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+from flowde.classify_imgs import classify_imgs
+
+img_dir = Path(&quot;results/extraction&quot;)
+save_dir = Path(&quot;results/classification&quot;)
+
+input_text = &quot;&quot;&quot;
+Classify whether this image is a flowchart.
+Return 1 if it is a flowchart.
+Return 0 if it is not a flowchart.
+&quot;&quot;&quot;
+
+classify_fn = make_openai_classify_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+)
+
+labels = classify_imgs(
+    classify_fn=classify_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    positive_classes={1},
+    max_concurrent_jobs=1,
+)
+</code></pre>
+<p><a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>
+processes <code>*.png</code> files inside <code>img_dir</code>, in sorted path order.
+Subdirectories are not searched. The returned <code>labels</code> list contains one label
+per processed image: <code>labels[0]</code> corresponds to the first sorted image path,
+<code>labels[1]</code> to the second sorted image path, and so on.</p>
+<p>The example above uses OpenAI and requires the
+<a href="../setup-default-funcs/#set-up-openai">OpenAI setup</a>.
+For <code>classify_fn</code>, you can use an OpenAI classifier created with
+<a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn"><code>make_openai_classify_fn()</code></a>,
+a Gemini classifier created with
+<a href="../../reference/helpers/#flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn"><code>make_gemini_classify_fn()</code></a>,
+or <a href="../custom-functions/#a-classification-function">your own classification function</a>.</p>
+<p>You can use <code>positive_classes</code> to save copies of images with selected labels.
+For example, <code>positive_classes={1}</code> copies images labelled <code>1</code> into
+<code>save_dir / "positive_images"</code> for use in the core pipeline's
+<a href="../rotation/">image rotation</a> or <a href="../parsing/">image parsing</a> stage.
+Without <code>positive_classes</code>, Flowde saves the labels without copying images.</p>
+<p><a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn"><code>make_openai_classify_fn()</code></a>
+creates a binary classification function by default, returning <code>0</code> or <code>1</code>.
+You can change the allowed labels through its <code>result_structure</code> parameter;
+see <a href="#multiclass-classification">multiclass classification</a>.</p>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+<div class="admonition note">
+<p class="admonition-title">Note: concurrency</p>
+<p><code>max_concurrent_jobs</code> controls how many calls to <code>classify_fn</code> can run
+concurrently and defaults to <code>10</code>. Parallel execution in
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>
+uses threads, allowing concurrency to greatly exceed the CPU core count
+when waiting for API responses. Choose <code>max_concurrent_jobs</code> based on your
+API limits.</p>
+</div>
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
+
+<p>See the
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>
+and
+<a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn"><code>make_openai_classify_fn()</code></a>
+API references for full details of all parameters.</p>
+<h2 id="classification-results">Classification results</h2>
+<p>In the example above, Flowde saves the labels and copies images labelled <code>1</code>:</p>
+<pre><code class="language-text">results/classification/
+├── classifications.json
+├── positive_images/
+│   ├── paper-1_0.png
+│   └── paper-2_0.png
+└── .flowde/
+</code></pre>
+<p><code>classifications.json</code> contains image paths and labels:</p>
+<pre><code class="language-json">[
+  { &quot;img_path&quot;: &quot;results/extraction/paper-1_0.png&quot;, &quot;label&quot;: 1 },
+  { &quot;img_path&quot;: &quot;results/extraction/paper-1_1.png&quot;, &quot;label&quot;: 0 },
+  { &quot;img_path&quot;: &quot;results/extraction/paper-2_0.png&quot;, &quot;label&quot;: 1 }
+]
+</code></pre>
+<p><code>.flowde</code> records which images have been classified, their labels,
+the classification settings and file fingerprints. Flowde uses this metadata
+to resume the run and detect changes to the input images or saved results.</p>
+<h2 id="resume-classification">Resume classification</h2>
+<p>To continue an unfinished classification run whose results are saved in
+<code>save_dir</code>, you can set <code>on_existing="resume"</code>:</p>
+<pre><code class="language-python">labels = classify_imgs(
+    classify_fn=classify_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    positive_classes={1},
+    max_concurrent_jobs=1,
+    on_existing=&quot;resume&quot;,
+)
+</code></pre>
+<p>The <code>.flowde</code> directory inside <code>save_dir</code> stores the classification run's
+state. Flowde uses these records to resume unfinished work and check the integrity
+of the run.
+Resume raises an error if the classifier's settings or <code>positive_classes</code> have
+changed, or if previously classified input images or saved outputs have been
+edited.</p>
+<p>To use different settings, you can start a run in a new <code>save_dir</code> or replace
+the previous run with <code>on_existing="overwrite"</code>. See
+<a href="../resuming/">managing runs</a> for the full rules.</p>
+<h2 id="multiclass-classification">Multiclass classification</h2>
+<p>You can classify images into more than two categories. This example creates
+a classifier with five possible labels:</p>
+<pre><code class="language-python">from typing import Literal
+
+from flowde.classify_fns.classify_types import Classification
+from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+
+
+class ImageTypeClassification(
+    Classification[Literal[&quot;consort&quot;, &quot;other_flowchart&quot;, &quot;table&quot;, &quot;graph&quot;, &quot;other&quot;]]
+):
+    pass
+
+
+image_type_fn = make_openai_classify_fn(
+    input_text=(
+        &quot;Classify this image as consort, other_flowchart, table, graph, or other. &quot;
+        &quot;Use consort for a CONSORT-style participant flow diagram.&quot;
+    ),
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+    result_structure=ImageTypeClassification,
+)
+</code></pre>
+<p><code>ImageTypeClassification</code> defines the allowed labels using
+<a href="../../reference/data-types/#flowde.classify_fns.classify_types.Classification"><code>Classification</code></a>.
+Passing this schema as <code>result_structure</code> to
+<a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn"><code>make_openai_classify_fn()</code></a>
+creates a classifier that returns one of those five labels.</p>
+<h2 id="bring-your-own-classification-function">Bring your own classification function</h2>
+<p>You can write your own classifier and pass it to
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>
+as <code>classify_fn</code>. See the
+<a href="../custom-functions/#a-classification-function">custom classification tutorial</a>
+for the requirements your function must meet and a complete working example.</p>
+<h2 id="next-step">Next step</h2>
+<p>You can use <code>save_dir / "positive_images"</code> as the input directory for
+<a href="../rotation/">image rotation</a> or, if the copied images are already correctly
+oriented, <a href="../parsing/">image parsing</a>.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../image-extraction/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../rotation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

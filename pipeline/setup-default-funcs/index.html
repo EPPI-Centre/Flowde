@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/setup-default-funcs/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Setup default pipeline functions - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Setup default pipeline functions";
+        var mkdocs_page_input_path = "pipeline/setup-default-funcs.md";
+        var mkdocs_page_url = "/Flowde/pipeline/setup-default-funcs/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Setup default pipeline functions</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#set-up-image-extraction">Set up image extraction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#set-up-openai">Set up OpenAI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#use-azure-openai">Use Azure OpenAI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#use-gemini">Use Gemini</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#next-step">Next step</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Setup default pipeline functions</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/setup-default-funcs.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="set-up-the-default-functions">Set up the default functions</h1>
+<p>Flowde handles directories, saved results, parallel workers and benchmarking.
+The function supplied to each pipeline stage does the actual extraction,
+classification or parsing. You can use a default helper or
+<a href="../custom-functions/">bring your own function</a>.</p>
+<h2 id="set-up-image-extraction">Set up image extraction</h2>
+<p>Install the <a href="../../installation/#paddleocr-helpers">PaddleOCR dependencies</a>, then
+create an extractor:</p>
+<pre><code class="language-python">from flowde.extract_fns.paddle_layout_detect_extraction import (
+    make_paddle_layout_extract_fn,
+)
+
+extract_fn = make_paddle_layout_extract_fn(device=&quot;cpu&quot;, cpu_threads=1)
+</code></pre>
+<p>The layout model is loaded when extraction starts. The first run may download
+model files. Use <code>device="gpu"</code> only after completing the
+<a href="../../installation/#gpu-support">GPU setup</a>.</p>
+<p>See <a href="../image-extraction/">image extraction</a> for the function that processes your
+PDF directory.</p>
+<h2 id="set-up-openai">Set up OpenAI</h2>
+<p>Install the <a href="../../installation/#openai-helpers">OpenAI extra</a>. In the directory
+where you will run your script or notebook, create a <code>.env</code> file containing:</p>
+<pre><code class="language-text">OPENAI_API_KEY=your-openai-api-key
+</code></pre>
+<p>Load that file explicitly at the start of your example:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv(Path(&quot;.env&quot;))
+</code></pre>
+<p>Flowde's helpers also load environment settings. Explicitly loading the file
+above makes its location clear when your script and working directory differ.</p>
+<p>With your API key loaded, you can create functions that use OpenAI's Responses
+API to classify, rotate or parse images:</p>
+<!-- markdownlint-disable MD033 -->
+
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Create the function with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../classification/">Classification</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn">make_openai_classify_fn</a>(...)</code></td>
+</tr>
+<tr>
+<td><a href="../rotation/">Rotation</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn">make_openai_classify_fn</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;...,<br>&nbsp;&nbsp;&nbsp;&nbsp;result_structure=<a href="../../reference/data-types/#flowde.classify_fns.classify_types.RotationClassification">RotationClassification</a>,<br>)</code></td>
+</tr>
+<tr>
+<td><a href="../parsing/">Parsing</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn">make_openai_parse_fn</a>(...)</code></td>
+</tr>
+</tbody>
+</table>
+<!-- markdownlint-enable MD033 -->
+
+<p>For example, create a classifier:</p>
+<pre><code class="language-python">from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+
+classify_fn = make_openai_classify_fn(
+    input_text=&quot;Return 1 if the image is a flowchart, otherwise return 0.&quot;,
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+)
+</code></pre>
+<p>Creating the function does not classify any images. Pass <code>classify_fn</code> to
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a> to run
+the requests. Model requests are
+billable through your provider account.</p>
+<h2 id="use-azure-openai">Use Azure OpenAI</h2>
+<p>Install the <a href="../../installation/#openai-helpers">OpenAI extra</a>. In the directory
+where you will run your script or notebook, create a <code>.env</code> file containing:</p>
+<pre><code class="language-text">AZURE_API_KEY=your-azure-api-key
+AZURE_API_BASE=https://your-resource.openai.azure.com/openai/v1/
+</code></pre>
+<p>Load the <code>.env</code> file as shown in <a href="#set-up-openai">Set up OpenAI</a>, then use
+<code>from_azure=True</code> to send requests through Azure:</p>
+<!-- markdownlint-disable MD033 -->
+
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Create the function with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../classification/">Classification</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn">make_openai_classify_fn</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;...,<br>&nbsp;&nbsp;&nbsp;&nbsp;from_azure=True,<br>)</code></td>
+</tr>
+<tr>
+<td><a href="../rotation/">Rotation</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.classify_fns.openai_classify_fn.make_openai_classify_fn">make_openai_classify_fn</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;...,<br>&nbsp;&nbsp;&nbsp;&nbsp;result_structure=<a href="../../reference/data-types/#flowde.classify_fns.classify_types.RotationClassification">RotationClassification</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;from_azure=True,<br>)</code></td>
+</tr>
+<tr>
+<td><a href="../parsing/">Parsing</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn">make_openai_parse_fn</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;...,<br>&nbsp;&nbsp;&nbsp;&nbsp;from_azure=True,<br>)</code></td>
+</tr>
+</tbody>
+</table>
+<!-- markdownlint-enable MD033 -->
+
+<p>For example, create a classifier:</p>
+<pre><code class="language-python">from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+
+classify_fn = make_openai_classify_fn(
+    input_text=&quot;Return 1 if the image is a flowchart, otherwise return 0.&quot;,
+    model=&quot;your-deployment-name&quot;,
+    effort=&quot;medium&quot;,
+    from_azure=True,
+)
+</code></pre>
+<h2 id="use-gemini">Use Gemini</h2>
+<p>Install the <a href="../../installation/#gemini-helpers">Gemini extra</a>. In the directory
+where you will run your script or notebook, create a <code>.env</code> file containing:</p>
+<pre><code class="language-text">GOOGLE_GENAI_API_KEY=your-gemini-api-key
+</code></pre>
+<p>Load the <code>.env</code> file as shown in <a href="#set-up-openai">Set up OpenAI</a>, then create
+functions that use the Gemini API to classify, rotate or parse images:</p>
+<!-- markdownlint-disable MD033 -->
+
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Create the function with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../classification/">Classification</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn">make_gemini_classify_fn</a>(...)</code></td>
+</tr>
+<tr>
+<td><a href="../rotation/">Rotation</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.classify_fns.gemini_classify_fn.make_gemini_classify_fn">make_gemini_classify_fn</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;...,<br>&nbsp;&nbsp;&nbsp;&nbsp;result_structure=<a href="../../reference/data-types/#flowde.classify_fns.classify_types.RotationClassification">RotationClassification</a>,<br>)</code></td>
+</tr>
+<tr>
+<td><a href="../parsing/">Parsing</a></td>
+<td><code class="function-call"><a href="../../reference/helpers/#flowde.parsing_fns.gemini_parse.make_gemini_parse_fn">make_gemini_parse_fn</a>(...)</code></td>
+</tr>
+</tbody>
+</table>
+<!-- markdownlint-enable MD033 -->
+
+<p>For example, create a classifier:</p>
+<pre><code class="language-python">from flowde.classify_fns.gemini_classify_fn import make_gemini_classify_fn
+
+classify_fn = make_gemini_classify_fn(
+    input_text=&quot;Return 1 if the image is a flowchart, otherwise return 0.&quot;,
+    model=&quot;gemini-3.1-flash-lite&quot;,
+    effort=&quot;high&quot;,
+)
+</code></pre>
+<h2 id="next-step">Next step</h2>
+<p><a href="../image-extraction/">Extract images</a>, or start with
+<a href="../classification/">classification</a> if you already have PNGs. The
+<a href="../../reference/helpers/">API reference</a> lists the helper parameters.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../image-extraction/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
