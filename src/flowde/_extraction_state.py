@@ -45,12 +45,12 @@ class ExtractionRunState(RunState):
 
     def prepare(self, inputs: list[dict[str, Any]]) -> None:
         # Validate the persisted inventory before using any saved output paths.
-        if self.path.exists():
+        if self.metadata_path.exists():
             self._recorded_output_paths()
         super().prepare(inputs)
         owners: dict[str, str] = {}
-        for key, record in self.items.items():
-            for name in record.get("outputs", []):
+        for key, record in self.input_records.items():
+            for name in record["outputs"]:
                 other = owners.setdefault(name.casefold(), key)
                 if other != key:
                     msg = f"Extracted image {name} belongs to more than one PDF."
@@ -58,13 +58,13 @@ class ExtractionRunState(RunState):
             self._check_existing(key)
 
     def _check_existing(self, key: str) -> None:
-        record = self.items[key]
-        for name in record.get("outputs", []):
+        record = self.input_records[key]
+        for name in record["outputs"]:
             path = self.root / name
             # During interrupted publication a file may still contain the old
             # extraction or may already contain the newly recorded extraction.
             allowed = {
-                self.data["artifacts"].get(name),
+                record["output_fingerprints"].get(name),
                 (record.get("result") or {}).get(name),
             }
             if path.is_symlink() or (
@@ -78,9 +78,9 @@ class ExtractionRunState(RunState):
                 raise ValueError(msg)
 
     def can_restore(self, key: str) -> bool:
-        record = self.items[key]
+        record = self.input_records[key]
         reusable = bool(record["has_result"]) and (
-            set(record.get("outputs", [])) == set(record["result"])
+            set(record["outputs"]) == set(record["result"])
             and all(
                 (self.root / name).is_file() and file_digest(self.root / name) == digest
                 for name, digest in record["result"].items()
@@ -91,18 +91,18 @@ class ExtractionRunState(RunState):
         return reusable
 
     def result(self, key: str, result: Any) -> None:
-        record = self.items[key]
-        if file_digest(Path(key)) != record["input"]["pdf"]:
+        record = self.input_records[key]
+        if file_digest(Path(key)) != record["input"]["file_digest"]:
             msg = f"Input PDF changed during extraction: {record['path']}."
             raise ValueError(msg)
         self._check_existing(key)
         other_names = {
             name.casefold()
-            for other, item in self.items.items()
+            for other, other_record in self.input_records.items()
             if other != key
-            for name in item.get("outputs", [])
+            for name in other_record["outputs"]
         }
-        own_names = set(record.get("outputs", []))
+        own_names = set(record["outputs"])
         existing_names = {path.name.casefold() for path in self.root.iterdir()}
         staged = image_manifest(staging_directory(self.staging_root, key))
         if result != staged:
@@ -126,14 +126,14 @@ class ExtractionRunState(RunState):
         for name in own_names:
             path = self.root / name
             if path.is_file():
-                self.data["artifacts"][name] = file_digest(path)
+                record["output_fingerprints"][name] = file_digest(path)
         record["outputs"] = sorted(own_names | result.keys())
         for name, digest in result.items():
-            self.data["artifacts"].setdefault(name, digest)
+            record["output_fingerprints"].setdefault(name, digest)
         super().result(key, result)
 
     def publish(self, key: str) -> None:
-        record = self.items[key]
+        record = self.input_records[key]
         self._check_existing(key)
         stage = staging_directory(self.staging_root, key)
         if stage.exists():
@@ -141,13 +141,13 @@ class ExtractionRunState(RunState):
                 msg = "Staged extraction changed before it could be published."
                 raise ValueError(msg)
             for name in record["result"]:
-                self.write_artifact(name, (stage / name).read_bytes())
+                self.write_artifact(name, (stage / name).read_bytes(), key=key)
             for name in set(record["outputs"]) - record["result"].keys():
                 (self.root / name).unlink(missing_ok=True)
-                self.data["artifacts"].pop(name, None)
+                record["output_fingerprints"].pop(name, None)
             record["outputs"] = sorted(record["result"])
         record.update(completed=True, error=None)
-        self.save()
+        self.save(key)
         if stage.exists():
             for path in stage.iterdir():
                 path.unlink()

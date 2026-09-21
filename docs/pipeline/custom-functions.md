@@ -20,7 +20,7 @@ extract_fn = model_function(render_pages, extractor="whole-pages", dpi=DPI, vers
 ```
 
 Flowde stores the declared settings as metadata about the run in the
-`.flowde/run.state` file inside `save_dir`. If any declared setting changes,
+`.flowde` directory inside `save_dir`. If any declared setting changes,
 Flowde raises an error when you try to resume the existing run.
 
 ## Examples

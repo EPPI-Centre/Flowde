@@ -134,7 +134,9 @@ def test_ignores_metadata_non_json_files_and_subdirectories(tmp_path, part_dirs)
     for directory in part_dirs.values():
         metadata = directory / ".flowde"
         metadata.mkdir()
-        (metadata / "run.state").write_text("invalid state, intentionally ignored")
+        (metadata / "run_metadata.state").write_text(
+            "invalid state, intentionally ignored"
+        )
         write_json(directory / "nested" / "extra.json", {"invalid": True})
         (directory / "notes.txt").write_text("not a parsing result")
         (directory / "directory.json").mkdir()

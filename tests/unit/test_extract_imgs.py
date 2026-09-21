@@ -1,4 +1,3 @@
-import json
 import signal
 import time
 from unittest.mock import Mock
@@ -60,7 +59,7 @@ def contents(output):
 
 
 def test_each_pdf_is_published_only_after_success_and_staging_is_cleaned(
-    api, pdf_dir, tmp_path
+    api, pdf_dir, tmp_path, saved_state
 ):
     output = tmp_path / "output"
     calls = []
@@ -84,7 +83,17 @@ def test_each_pdf_is_published_only_after_success_and_staging_is_cleaned(
     ]
     assert all(not stage.exists() for stage in stages)
     assert contents(pdf_dir) == original_pdfs
-    assert {p.name for p in (output / ".flowde").iterdir()} == {"run.state", "run.lock"}
+    assert {p.name for p in (output / ".flowde").iterdir()} == {
+        "run_metadata.state",
+        "run.lock",
+        "input_records",
+        "shared_output_fingerprints.state",
+    }
+    records = saved_state(output)["input_records"]
+    for name in "abc":
+        record = records[str((pdf_dir / f"{name}.pdf").resolve())]
+        assert record["outputs"] == [f"{name}_0.png", f"{name}_1.png"]
+        assert "output" not in record
 
 
 @pytest.mark.parametrize("n_jobs", [1, 2, 3])
@@ -105,7 +114,7 @@ def test_workers_save_distinct_complete_image_sets(api, pdf_dir, tmp_path, n_job
 
 
 def test_partial_failure_restarts_entire_pdf_and_keeps_completed_pdfs(
-    api, pdf_dir, tmp_path
+    api, pdf_dir, tmp_path, saved_state
 ):
     output = tmp_path / "output"
     calls = []
@@ -125,9 +134,9 @@ def test_partial_failure_restarts_entire_pdf_and_keeps_completed_pdfs(
     assert calls == ["a", "b"]
     assert image_names(output) == ["a_0.png", "a_1.png"]
     assert all(not stage.exists() for stage in stages)
-    state = json.loads((output / ".flowde/run.state").read_text())
+    state = saved_state(output)
     assert (
-        state["items"][str((pdf_dir / "b.pdf").resolve())]["error"]["message"]
+        state["input_records"][str((pdf_dir / "b.pdf").resolve())]["error"]["message"]
         == "page 5 failed"
     )
     # Failed PDFs can be corrected, and new PDFs can be added to a resumed run.
@@ -150,15 +159,16 @@ def test_partial_failure_restarts_entire_pdf_and_keeps_completed_pdfs(
     ]
 
 
-def test_zero_images_is_a_completed_pdf(api, pdf_dir, tmp_path):
+def test_zero_images_is_a_completed_pdf(api, pdf_dir, tmp_path, saved_state):
     output = tmp_path / "output"
     run(api, pdf_dir, output, extractor(count=0))
     never = model_function(Mock(spec=[]), version=1)
     run(api, pdf_dir, output, never, on_existing="resume")
     never.assert_not_called()
     assert image_names(output) == []
-    state = json.loads((output / ".flowde/run.state").read_text())
-    assert all(item["completed"] for item in state["items"].values())
+    state = saved_state(output)
+    assert all(record["completed"] for record in state["input_records"].values())
+    assert all(record["outputs"] == [] for record in state["input_records"].values())
 
 
 def test_existing_run_settings_and_completed_pdf_changes_are_rejected(
@@ -258,9 +268,9 @@ def test_resume_and_overwrite_refuse_untracked_existing_images(api, pdf_dir, tmp
     output = tmp_path / "output"
     output.mkdir()
     png(output / "old.png")
-    with pytest.raises(ValueError, match="No saved run"):
+    with pytest.raises(ValueError, match="Missing or invalid saved run record"):
         run(api, pdf_dir, output, on_existing="resume")
-    with pytest.raises(ValueError, match="valid Flowde"):
+    with pytest.raises(ValueError, match="Missing or invalid saved run record"):
         run(api, pdf_dir, output, on_existing="overwrite")
     assert image_names(output) == ["old.png"]
 

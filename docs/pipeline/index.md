@@ -53,9 +53,9 @@ results/
     └── .flowde/
 ```
 
-Each `.flowde` directory contains the saved run record (`run.state`), including
-run settings and processing progress, and a lock file (`run.lock`). Keep
-`.flowde` with the outputs so Flowde can resume the run.
+Each `.flowde` directory contains run settings, a separate progress record for
+each image or PDF, and a lock file (`run.lock`). Keep the whole `.flowde`
+directory with the outputs so Flowde can resume the run.
 
 ## Next step
 

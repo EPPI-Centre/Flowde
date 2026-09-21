@@ -30,7 +30,7 @@ def classifier():
     "positive_classes", [None, {1, 2}], ids=["labels-only", "copy-positives"]
 )
 def test_classification_saves_ordered_labels_and_selected_images(
-    images, classifier, tmp_path, max_concurrent_jobs, positive_classes
+    images, classifier, tmp_path, max_concurrent_jobs, positive_classes, saved_state
 ):
     output = tmp_path / "output"
 
@@ -48,8 +48,17 @@ def test_classification_saves_ordered_labels_and_selected_images(
         {"img_path": str(images / "b.png"), "label": 2},
         {"img_path": str(images / "c.png"), "label": 0},
     ]
-    assert (output / ".flowde" / "run.state").is_file()
+    assert (output / ".flowde" / "run_metadata.state").is_file()
     assert list(output.rglob("*.json")) == [output / "classifications.json"]
+    records = saved_state(output)["input_records"]
+    for name, expected in (
+        ("a.png", ["positive_images/a.png"] if positive_classes else []),
+        ("b.png", ["positive_images/b.png"] if positive_classes else []),
+        ("c.png", []),
+    ):
+        record = records[str((images / name).resolve())]
+        assert record["outputs"] == expected
+        assert "output" not in record
     if positive_classes is None:
         assert not (output / "positive_images").exists()
     else:

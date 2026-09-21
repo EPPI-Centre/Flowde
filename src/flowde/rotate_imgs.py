@@ -41,7 +41,8 @@ def rotate_imgs_from_paths(
         Return one of `0`, `90`, `180`, or `270`. Custom functions declare their
         settings with `model_function()`; built-in factories already do this.
     img_paths : list[Path]
-        Input images in the requested result order, with unique stems.
+        Input images in the requested result order. Filename stems must be unique
+        ignoring case across the run, including inputs from earlier resumed calls.
     save_dir : Path
         Dedicated directory containing `rotations.json`, corrected copies in
         `rotated_images`, and run metadata in `.flowde`. Inputs must be outside it.
@@ -57,6 +58,8 @@ def rotate_imgs_from_paths(
         Show reported token usage and estimated costs. Defaults to `True`.
     on_existing : {"error", "resume", "overwrite"}, optional
         How to handle an existing run. Defaults to `"error"`.
+        See [`rotate_imgs()`][flowde.rotate_imgs.rotate_imgs] for saved-run
+        compatibility and recovery requirements.
 
     Returns
     -------
@@ -81,8 +84,8 @@ def rotate_imgs_from_paths(
         {
             "key": str(path.resolve()),
             "path": str(path),
-            "output": path.name,
-            "input": {"image": file_digest(path)},
+            "outputs": [f"rotated_images/{path.name}"],
+            "input": {"file_digest": file_digest(path)},
             "kwargs": {"img_path": path},
         }
         for path in img_paths
@@ -137,10 +140,12 @@ def rotate_imgs(
     img_dir : Path
         Directory containing the original `*.png` files. Subdirectories are not
         searched. Image paths are sorted before applying `range_indices`.
+        Selected filename stems must be unique ignoring case across the run,
+        including images from earlier resumed calls.
     save_dir : Path
         Dedicated output directory, created if needed. Correction angles are
         saved in `rotations.json`, corrected copies in `rotated_images`, and run
-        metadata in `.flowde/run.state`. Original images remain unchanged.
+        metadata in `.flowde`. Original images remain unchanged.
         Input images and files referenced by the classifier's declared settings
         must be outside this directory.
     range_indices : tuple[int | None, int | None] | None, optional
@@ -173,6 +178,9 @@ def rotate_imgs(
           then start a new run. Also works in a new or empty directory.
           Unrelated files in an existing output directory cause an error.
 
+        Resume and overwrite require all internal records. Missing or invalid
+        records raise an error.
+
     Returns
     -------
     list[RotationLabel]
@@ -187,8 +195,9 @@ def rotate_imgs(
         If `save_dir` contains existing work and `on_existing="error"`.
     ValueError
         If `img_dir` is missing or is not a directory, no PNGs are selected,
-        an angle is unsupported, inputs are inside `save_dir`, or the saved
-        run fails compatibility or integrity checks.
+        filename stems conflict ignoring case, an angle is unsupported, inputs
+        are inside `save_dir`, or the saved run fails compatibility or integrity
+        checks.
     TypeError
         If the classifier returns `None` instead of an angle.
     RuntimeError
@@ -199,6 +208,10 @@ def rotate_imgs(
     `rotations.json` contains objects with `img_path` and `label` fields, where
     `label` is the clockwise correction angle. The JSON file accumulates angles
     across resumed calls and orders entries by resolved input paths.
+
+    Flowde saves settings in `.flowde/run_metadata.state` and each image's angle,
+    usage and progress in `.flowde/input_records`. Keep the whole `.flowde`
+    directory with the outputs for resume and overwrite.
 
     Every successfully processed image has a copy in `rotated_images`, including
     images with a zero-degree correction. Copies retain their filenames and

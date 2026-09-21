@@ -97,8 +97,6 @@ results/rotation/
 │   ├── paper-1_0.png
 │   └── paper-2_0.png
 └── .flowde/
-    ├── run.state
-    └── run.lock
 ```
 
 `rotations.json` records the input image path and correction angle:
@@ -121,7 +119,7 @@ Every successfully processed image has a copy in
 rotation. The copies retain their filenames, and the original images in
 `img_dir` remain unchanged.
 
-`.flowde/run.state` records which images have been processed, their correction
+`.flowde` records which images have been processed, their correction
 angles, the rotation settings and file fingerprints. Flowde uses this metadata
 to resume the run and detect changes to the input images or saved results.
 
@@ -140,8 +138,8 @@ angles = rotate_imgs(
 )
 ```
 
-The `.flowde/run.state` file inside `save_dir` stores the rotation run's state.
-Flowde uses this record to resume unfinished work and check the integrity of the run.
+The `.flowde` directory inside `save_dir` stores the rotation run's state.
+Flowde uses these records to resume unfinished work and check the integrity of the run.
 Resume raises an error if the classifier's settings have changed, or if
 previously processed input images or saved outputs have been edited.
 

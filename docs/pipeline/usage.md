@@ -4,7 +4,7 @@
 [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs) and
 [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs) collect
 token usage and estimated API costs reported by their model helpers and record
-them in the `.flowde/run.state` file inside `save_dir`. The
+them in the `.flowde` directory inside `save_dir`. The
 [OpenAI, Azure OpenAI and Gemini helpers](setup-default-funcs.md) automatically
 report usage from model responses.
 

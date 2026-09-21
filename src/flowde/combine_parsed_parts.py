@@ -193,10 +193,10 @@ def combine_parsed_parts(
 
     Combining makes no model requests and does not modify the source files.
     The separate `.flowde/combined.state` file records only output ownership;
-    no `.flowde/run.state` is created. Source run records, token usage and costs
-    are not combined. Overwrite permits replacing manually edited recorded
-    outputs. Older combined directories without an output record cannot be
-    overwritten; use a new output directory.
+    combining does not create resumable pipeline state. Source run records,
+    token usage and costs are not combined. Overwrite permits replacing manually
+    edited recorded outputs. Older combined directories without an output record
+    cannot be overwritten; use a new output directory.
 
     Examples
     --------

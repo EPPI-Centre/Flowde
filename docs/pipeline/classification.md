@@ -100,8 +100,6 @@ results/classification/
 │   ├── paper-1_0.png
 │   └── paper-2_0.png
 └── .flowde/
-    ├── run.state
-    └── run.lock
 ```
 
 `classifications.json` contains image paths and labels:
@@ -114,7 +112,7 @@ results/classification/
 ]
 ```
 
-`.flowde/run.state` records which images have been classified, their labels,
+`.flowde` records which images have been classified, their labels,
 the classification settings and file fingerprints. Flowde uses this metadata
 to resume the run and detect changes to the input images or saved results.
 
@@ -134,8 +132,8 @@ labels = classify_imgs(
 )
 ```
 
-The `.flowde/run.state` file inside `save_dir` stores the classification run's
-state. Flowde uses this record to resume unfinished work and check the integrity
+The `.flowde` directory inside `save_dir` stores the classification run's
+state. Flowde uses these records to resume unfinished work and check the integrity
 of the run.
 Resume raises an error if the classifier's settings or `positive_classes` have
 changed, or if previously classified input images or saved outputs have been

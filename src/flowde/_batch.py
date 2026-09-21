@@ -265,11 +265,11 @@ def run_batch(
         # Validate saved answers before any new request, and repair missing outputs.
         results = {}
         for item in inputs:
-            record = state.items[item["key"]]
+            record = state.input_records[item["key"]]
             if state.can_restore(item["key"]):
                 results[item["key"]] = decode(record["result"])
                 state.publish(item["key"])
-        indices = {key: index for index, key in enumerate(state.items)}
+        indices = {key: index for index, key in enumerate(state.input_records)}
         description = {
             "classification": "Classifying images...",
             "parsing": "Parsing images...",
@@ -277,7 +277,7 @@ def run_batch(
             "extraction": "Extracting images from PDFs",
         }[kind]
         display = UsageProgress(
-            len(state.items), description, show_usage, totals=state.totals()
+            len(state.input_records), description, show_usage, totals=state.totals()
         )
 
         def report(key: str, usage: RequestUsage) -> None:
@@ -295,11 +295,12 @@ def run_batch(
             if stop.error is None:
                 stop.error = error
                 error.add_note(
-                    f"While processing {state.items[key]['path']}. "
+                    f"While processing {state.input_records[key]['path']}. "
                     f"Saved work is in {save_dir}; resume with on_existing='resume'."
                 )
             tqdm.write(
-                f"Failed: {state.items[key]['path']}: {type(error).__name__}: {error}",
+                f"Failed: {state.input_records[key]['path']}: "
+                f"{type(error).__name__}: {error}",
                 file=sys.stderr,
             )
             try:

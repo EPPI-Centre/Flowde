@@ -2,7 +2,7 @@
 
 When you run image extraction, classification, rotation or parsing, Flowde
 records the settings, input files and output files belonging to the run in the
-`.flowde/run.state` file inside `save_dir`. Flowde can use this record to
+`.flowde` directory inside `save_dir`. Flowde can use these records to
 continue unfinished work with `on_existing="resume"`, or to identify the
 previous run's output files before replacing the run with
 `on_existing="overwrite"`.
@@ -24,8 +24,8 @@ any of the core pipeline functions:
 [`classify_imgs()`](../reference/pipeline.md#flowde.classify_imgs.classify_imgs),
 [`rotate_imgs()`](../reference/pipeline.md#flowde.rotate_imgs.rotate_imgs) and
 [`parse_imgs()`](../reference/pipeline.md#flowde.parse_imgs.parse_imgs). Each
-function records completed work in the `.flowde/run.state` file inside
-`save_dir` as the run progresses. Flowde uses the saved record to recover
+function records completed work in the `.flowde` directory inside
+`save_dir` as the run progresses. Flowde uses the saved records to recover
 completed work and check that the run can safely continue.
 
 For example, using `classify_fn`, `img_dir` and `save_dir` from the
