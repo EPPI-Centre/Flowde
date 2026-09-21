@@ -30,9 +30,14 @@ def parse_imgs_from_paths(
     """
     Parse explicit image paths into same-stem JSON files inside `save_dir`.
 
+    Input filename stems must be unique ignoring case across the run, including
+    inputs from earlier resumed calls. Each image has a separate saved input
+    record in `.flowde/input_records`; keep the whole `.flowde` directory with
+    the outputs for resume and overwrite.
+
     Image functions run in threads in a separate worker process, even with
     `max_concurrent_jobs=1`. See [`parse_imgs()`][flowde.parse_imgs.parse_imgs]
-    for concurrency and custom-function requirements.
+    for concurrency, custom-function requirements and saved-run compatibility.
     """
     validate_unique_stems(img_paths)
 
@@ -125,9 +130,9 @@ def parse_imgs_from_paths(
             {
                 "key": str(path.resolve()),
                 "path": str(path),
-                "output": f"{path.stem}.json",
+                "outputs": [f"{path.stem}.json"],
                 "input": {
-                    "image": file_digest(path),
+                    "file_digest": file_digest(path),
                     "partial_flowchart": partial.model_dump(mode="json")
                     if partial is not None
                     else None,
@@ -203,10 +208,12 @@ def parse_imgs(
         Matching paths are sorted before applying `range_indices`. Filename stems
         must be unique across all matching images, including different extensions,
         because each stem determines an output JSON filename.
+        Selected stems must also remain unique ignoring case across the run,
+        including images from earlier resumed calls.
     save_dir : Path
         Dedicated output directory, created if needed. Each image produces a JSON
         file with the same stem, such as `diagram.png` producing `diagram.json`.
-        Run metadata is saved in `.flowde/run.state`. Input images, partial JSONs
+        Run metadata is saved in `.flowde`. Input images, partial JSONs
         and files referenced by the parser's declared settings must be outside
         this directory.
     nodes_dir : Path | None, optional
@@ -262,6 +269,9 @@ def parse_imgs(
           then start a new run. Also works in a new or empty directory.
           Unrelated files in an existing output directory cause an error.
 
+        Resume and overwrite require all internal records. Missing or invalid
+        records raise an error.
+
     Returns
     -------
     list[BaseModel]
@@ -276,8 +286,9 @@ def parse_imgs(
     FileExistsError
         If `save_dir` contains existing work and `on_existing="error"`.
     ValueError
-        If `img_dir` is invalid, no images are selected, image stems are not
-        unique, context files do not match the images or required part schemas,
+        If `img_dir` is invalid, no images are selected, image stems conflict
+        (including case-only differences across the run), context files do not
+        match the images or required part schemas,
         node numbers cannot be joined, inputs are inside `save_dir`, or the saved
         run fails compatibility or integrity checks.
     TypeError
@@ -304,10 +315,16 @@ def parse_imgs(
     For built-in parsers, the factory's `parts_to_parse` or `result_structure`
     argument chooses those fields.
 
-    On resume, missing output JSONs are recreated from the results recorded in
-    `.flowde/run.state` without another parsing request. Edited saved outputs or
-    changes to previously parsed input images or their assembled partial context
-    cause an error.
+    Flowde saves settings in `.flowde/run_metadata.state` and each image's result,
+    usage and progress in `.flowde/input_records/<stem>.state`. Progress updates
+    rewrite only that image's record, without rewriting other images' results
+    or the run metadata. Keep the whole `.flowde` directory with the outputs.
+
+    Flowde records each result before writing its output JSON. On resume, missing
+    output JSONs are recreated from these records without another parsing request.
+    Edited saved outputs or changes to previously parsed input images or their
+    assembled partial context cause an error. Missing or invalid internal records
+    cause an error even when the output JSONs still exist.
 
     """
     if not img_dir.is_dir():

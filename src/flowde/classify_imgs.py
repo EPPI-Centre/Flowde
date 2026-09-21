@@ -33,9 +33,13 @@ def classify_imgs_from_paths(
     already attach their settings.
     Return labels in the supplied image order, including restored results.
 
+    Input filename stems must be unique ignoring case across the run, including
+    inputs from earlier resumed calls. Keep the whole `.flowde` directory with
+    the outputs; each image's progress is saved in a separate input record.
+
     Image functions run in threads in a separate worker process, even with
     `max_concurrent_jobs=1`. See [`classify_imgs()`][flowde.classify_imgs.classify_imgs]
-    for concurrency and custom-function requirements.
+    for concurrency, custom-function requirements and saved-run compatibility.
     """
     if not img_paths:
         msg = "img_paths cannot be empty."
@@ -59,8 +63,8 @@ def classify_imgs_from_paths(
         {
             "key": str(path.resolve()),
             "path": str(path),
-            "output": path.name,
-            "input": {"image": file_digest(path)},
+            "outputs": [],
+            "input": {"file_digest": file_digest(path)},
             "kwargs": {"img_path": path},
         }
         for path in img_paths
@@ -124,9 +128,11 @@ def classify_imgs(
     img_dir : Path
         Directory containing the input `*.png` files. Subdirectories are not
         searched. Image paths are sorted before applying `range_indices`.
+        Selected filename stems must be unique ignoring case across the run,
+        including images from earlier resumed calls.
     save_dir : Path
         Dedicated output directory, created if needed. Labels are saved in
-        `classifications.json`, run metadata in `.flowde/run.state`, and optional
+        `classifications.json`, run metadata in `.flowde`, and optional
         image copies in `positive_images`. Input images and files referenced by
         the classifier's declared settings must be outside this directory.
     positive_classes : set[ClassificationLabel] | None, optional
@@ -165,6 +171,9 @@ def classify_imgs(
           then start a new run. Also works in a new or empty directory.
           Unrelated files in an existing output directory cause an error.
 
+        Resume and overwrite require all internal records. Missing or invalid
+        records raise an error.
+
     Returns
     -------
     list[LabelType]
@@ -179,8 +188,8 @@ def classify_imgs(
         If `save_dir` contains existing work and `on_existing="error"`.
     ValueError
         If `img_dir` is missing or is not a directory, no PNGs are selected,
-        inputs are inside `save_dir`, or the saved run fails compatibility or
-        integrity checks.
+        filename stems conflict ignoring case, inputs are inside `save_dir`,
+        or the saved run fails compatibility or integrity checks.
     TypeError
         If the classifier returns a label that is not a string, integer or
         boolean, including `None`.
@@ -191,8 +200,9 @@ def classify_imgs(
     -----
     `classifications.json` contains objects with `img_path` and `label` fields.
     The JSON file accumulates labels across resumed calls and orders entries
-    by resolved input paths. Run metadata records classifier settings, labels
-    and file fingerprints so resume can detect changed inputs or saved outputs.
+    by resolved input paths. Flowde saves settings in `.flowde/run_metadata.state`
+    and each image's label, usage and progress in `.flowde/input_records`.
+    Keep the whole `.flowde` directory with the outputs for resume and overwrite.
 
     On resume, missing `classifications.json` or selected `positive_images`
     copies are recreated from saved labels and unchanged input images without

@@ -90,7 +90,7 @@ def saved_names(task, output):
 
 
 def test_failure_preserves_successes_and_resume_skips_them(
-    task, images, tmp_path, calls
+    task, images, tmp_path, calls, saved_state
 ):
     output = tmp_path / "output"
 
@@ -107,9 +107,9 @@ def test_failure_preserves_successes_and_resume_skips_them(
 
     assert list(calls) == ["a", "b"]
     assert saved_names(task, output) == ["a"]
-    state = json.loads((output / ".flowde" / "run.state").read_text())
+    state = saved_state(output)
     assert (
-        state["items"][str((images / "b.png").resolve())]["error"]["message"]
+        state["input_records"][str((images / "b.png").resolve())]["error"]["message"]
         == "quota exhausted"
     )
 
@@ -142,14 +142,14 @@ def read_run_state(monkeypatch):
         yield Path.read_text
         return
 
-    # Windows refuses replacement while the test has run.state open for reading.
+    # Windows refuses replacement while the test has an input record open for reading.
     with SyncManager(ctx=get_context()) as manager:
         state_lock = manager.Lock()
         save = _run_state.RunState.save
 
-        def save_with_lock(state):
+        def save_with_lock(state, key):
             with state_lock:
-                save(state)
+                save(state, key)
 
         def read_with_lock(path):
             with state_lock:
@@ -165,8 +165,7 @@ def test_parallel_failure_saves_the_other_active_image_and_starts_no_more(
 ):
     output = tmp_path / "output"
     started = tmp_path / "b-started"
-    state_path = output / ".flowde" / "run.state"
-    failed_key = str((images / "a.png").resolve())
+    state_path = output / ".flowde" / "input_records" / "a.state"
 
     def process(path):
         if path.stem == "a":
@@ -187,10 +186,7 @@ def test_parallel_failure_saves_the_other_active_image_and_starts_no_more(
             started.touch()
             # Finish only after the parent has observed the other worker's error.
             wait_for(
-                lambda: (
-                    json.loads(read_run_state(state_path))["items"][failed_key]["error"]
-                    is not None
-                )
+                lambda: json.loads(read_run_state(state_path))["error"] is not None
             )
         if path.stem == "c":
             (tmp_path / "unexpected-third-request").touch()
@@ -220,11 +216,11 @@ def test_existing_work_requires_an_explicit_choice(task, images, tmp_path):
     output = tmp_path / "output"
     fn = make_function(task)
     run(task, fn, images, output)
-    original = (output / ".flowde" / "run.state").read_bytes()
+    before = directory_contents(output)
 
     with pytest.raises(FileExistsError, match=r"resume.*overwrite"):
         run(task, fn, images, output)
-    assert (output / ".flowde" / "run.state").read_bytes() == original
+    assert directory_contents(output) == before
 
     fn = model_function(fn, version=2)
     with pytest.raises(ValueError, match="settings have changed"):
@@ -234,7 +230,7 @@ def test_existing_work_requires_an_explicit_choice(task, images, tmp_path):
 
 
 def test_overwrite_removes_old_outputs_when_the_input_images_change(
-    task, images, tmp_path
+    task, images, tmp_path, saved_state
 ):
     output = tmp_path / "output"
     options = {"positive_classes": {"a", "b", "c"}} if task == "classification" else {}
@@ -276,12 +272,12 @@ def test_overwrite_removes_old_outputs_when_the_input_images_change(
         assert sorted(p.name for p in (output / "rotated_images").iterdir()) == [
             "d.png"
         ]
-    state = json.loads((output / ".flowde" / "run.state").read_text())
-    assert set(state["items"]) == {str((new_images / "d.png").resolve())}
+    state = saved_state(output)
+    assert set(state["input_records"]) == {str((new_images / "d.png").resolve())}
 
 
 def directory_contents(directory):
-    """Snapshot the directory to check that a refused overwrite leaves it intact."""
+    """Snapshot a directory to check that a rejected operation leaves it intact."""
     return {
         str(path.relative_to(directory)): path.read_bytes() if path.is_file() else None
         for path in directory.rglob("*")
@@ -300,7 +296,7 @@ def directory_contents(directory):
 def test_overwrite_requires_a_valid_run_record(images, tmp_path, state_contents, calls):
     output = tmp_path / "output"
     run("parsing", make_function("parsing"), images, output)
-    state_path = output / ".flowde" / "run.state"
+    state_path = output / ".flowde" / "run_metadata.state"
     if state_contents is None:
         state_path.unlink()
     elif isinstance(state_contents, dict):
@@ -311,9 +307,7 @@ def test_overwrite_requires_a_valid_run_record(images, tmp_path, state_contents,
         state_path.write_text(state_contents)
     before = directory_contents(output)
 
-    with pytest.raises(
-        ValueError, match=r"a valid Flowde \.flowde/run\.state is required"
-    ):
+    with pytest.raises(ValueError, match=r"saved run (record|version)"):
         run(
             "parsing",
             make_function("parsing", lambda path: calls.append(path.stem)),
@@ -399,16 +393,16 @@ def test_overwrite_rejects_recorded_paths_outside_the_run(
     outside = tmp_path / "outside.json"
     outside.write_text("Unrelated work")
     unsafe_path = str(outside) if absolute else "../outside.json"
-    state_path = output / ".flowde" / "run.state"
-    state = json.loads(state_path.read_text())
-    state["items"][str((images / "a.png").resolve())]["output"] = unsafe_path
-    state["artifacts"][unsafe_path] = state["artifacts"].pop("a.json")
+    state_path = output / ".flowde" / "input_records" / "a.state"
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    state["outputs"] = [unsafe_path]
+    state["output_fingerprints"][unsafe_path] = state["output_fingerprints"].pop(
+        "a.json"
+    )
     state_path.write_text(json.dumps(state))
     before = directory_contents(output)
 
-    with pytest.raises(
-        ValueError, match=r"a valid Flowde \.flowde/run\.state is required"
-    ):
+    with pytest.raises(ValueError, match=r"saved run (record|version)"):
         run(
             "parsing",
             make_function("parsing", lambda path: calls.append(path.stem)),
@@ -454,7 +448,7 @@ def test_resume_requires_a_saved_run_even_in_an_existing_directory(
 ):
     output = tmp_path / "empty"
     output.mkdir()
-    with pytest.raises(ValueError, match="No saved run"):
+    with pytest.raises(ValueError, match="Missing or invalid saved run record"):
         run(task, make_function(task), images, output, on_existing="resume")
 
 
@@ -485,7 +479,7 @@ def test_resume_rejects_a_different_image_with_the_same_output_name(
     other_images.mkdir()
     (other_images / "a.png").write_text("a different image")
 
-    with pytest.raises(ValueError, match="already associated with a different image"):
+    with pytest.raises(ValueError, match="filename stems must be unique ignoring case"):
         run(
             task,
             make_function(task, lambda path: calls.append(path.stem)),
@@ -520,7 +514,7 @@ def test_failed_inputs_can_be_fixed_and_new_images_can_be_added(task, images, tm
 
 
 def test_usage_from_failed_attempts_is_restored_without_recounting_saved_answers(
-    task, images, tmp_path, monkeypatch
+    task, images, tmp_path, monkeypatch, saved_state
 ):
     output = tmp_path / "output"
 
@@ -565,13 +559,17 @@ def test_usage_from_failed_attempts_is_restored_without_recounting_saved_answers
     )
 
     assert initial_totals == [(1, 200, 2)]
-    state = json.loads((output / ".flowde" / "run.state").read_text())
-    usages = [usage for item in state["items"].values() for usage in item["usage"]]
+    state = saved_state(output)
+    usages = [
+        usage for record in state["input_records"].values() for usage in record["usage"]
+    ]
     assert sum(usage["total_tokens"] for usage in usages) == 400
     assert sum(usage["cost"] for usage in usages) == 4
 
 
-def test_none_is_a_failure_and_never_saved_as_a_success(task, images, tmp_path, calls):
+def test_none_is_a_failure_and_never_saved_as_a_success(
+    task, images, tmp_path, calls, saved_state
+):
     fn = make_function(task)
     empty = Mock(side_effect=lambda img_path: calls.append(img_path.stem))
     empty.run_settings = fn.run_settings
@@ -582,8 +580,8 @@ def test_none_is_a_failure_and_never_saved_as_a_success(task, images, tmp_path, 
         run(task, empty, images, output)
 
     assert list(calls) == ["a"]
-    state = json.loads((output / ".flowde" / "run.state").read_text())
-    assert not any(item["completed"] for item in state["items"].values())
+    state = saved_state(output)
+    assert not any(record["completed"] for record in state["input_records"].values())
     assert list(output.glob("*.json")) == []
 
 
@@ -716,7 +714,7 @@ def test_changed_partial_flowchart_is_rejected_before_resuming(images, tmp_path,
 
 
 def test_failed_atomic_write_leaves_previous_file_intact(tmp_path, monkeypatch):
-    path = tmp_path / "run.state"
+    path = tmp_path / "run_metadata.state"
     path.write_text("previous complete record")
 
     def fail_replace(source, destination):

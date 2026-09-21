@@ -75,11 +75,9 @@ results/
     ├── paper-2_0.png
     ├── paper-3_0.png
     └── .flowde/
-        ├── run.state
-        └── run.lock
 ```
 
-`.flowde/run.state` stores run metadata, including extraction settings, completed
+`.flowde` stores run metadata, including extraction settings, completed
 PDFs and file fingerprints. Flowde uses this metadata to resume the run and
 detect changes to the input PDFs or saved PNGs.
 

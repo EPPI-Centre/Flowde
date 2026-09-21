@@ -95,8 +95,6 @@ results/parsing/full/
 ├── paper-1_0.json
 ├── paper-2_0.json
 └── .flowde/
-    ├── run.state
-    └── run.lock
 ```
 
 You can also inspect a result from the returned `responses` list:
@@ -105,7 +103,7 @@ You can also inspect a result from the returned `responses` list:
 print(responses[0].model_dump_json(indent=2))
 ```
 
-`.flowde/run.state` records which images have been parsed, their results, parser
+`.flowde` records which images have been parsed, their results, parser
 settings, image fingerprints and any supplied partial flowchart data. Flowde
 uses this metadata to resume the run and detect changes to the inputs or saved
 results.
@@ -382,8 +380,8 @@ responses = parse_imgs(
 )
 ```
 
-The `.flowde/run.state` file inside `save_dir` stores the parsing run's state.
-Flowde uses this record to resume unfinished work and check the integrity of the run.
+The `.flowde` directory inside `save_dir` stores the parsing run's state.
+Flowde uses these records to resume unfinished work and check the integrity of the run.
 Resume raises an error if the parser's settings have changed, or if previously
 parsed input images, their supplied partial flowchart data or saved results
 have changed.

@@ -1,6 +1,6 @@
 # Pipeline functions
 
-All four stages save a run record in the `.flowde/run.state` file inside
+All four stages save run state in the `.flowde` directory inside
 `save_dir`. Each stage needs its own output directory. Do not put source files
 or unrelated results in that directory. See
 [stopping and resuming](../pipeline/resuming.md) for the complete recovery
@@ -10,7 +10,7 @@ rules.
 
 | Parameter             | Meaning                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `save_dir`            | Directory for this run's results and `.flowde` record. Created when needed.                                                                                                                                              |
+| `save_dir`            | Directory for this run's results and `.flowde` records. Created when needed.                                                                                                                                             |
 | `on_existing`         | `"error"` (default) rejects an existing run; `"resume"` restores a compatible run; `"overwrite"` starts a fresh run and replaces the previous run's tracked outputs. Overwrite also works with a new or empty directory. |
 | `n_jobs`              | Extraction only: number of worker processes, default `1`.                                                                                                                                                                |
 | `max_concurrent_jobs` | Classification, rotation and parsing: maximum image jobs in a separate process's thread pool, default `10`. Must be a positive integer.                                                                                  |
@@ -23,6 +23,33 @@ Image functions return results for the selected inputs in sorted input order.
 Resuming an overlapping slice restores completed answers within that slice.
 Answers outside the current slice remain saved, but are not included in the
 returned list.
+
+Input filename stems must be unique ignoring case across the run, including
+inputs from earlier resumed calls. For example, `diagram.png` and `DIAGRAM.jpg`
+cannot belong to the same run, even in separate calls.
+
+## Saved run state
+
+Keep the whole `.flowde` directory with the outputs. Its files have these roles:
+
+| Path inside `.flowde`              | Contents                                                                                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `run_metadata.state`               | Format version, pipeline stage, settings and input paths.                                      |
+| `input_records/<stem>.state`       | One input's result, reported usage, error, completion status and output fingerprints.          |
+| `shared_output_fingerprints.state` | Fingerprints for `classifications.json` or `rotations.json`; empty for parsing and extraction. |
+| `run.lock`                         | Lock that prevents concurrent runs from writing to the same output directory.                  |
+
+Progress updates rewrite only the affected input record. Run metadata is written
+when inputs are first registered or added on resume. Parsing saves each result
+before publishing its output JSON, so resume can recover a saved answer without
+another parsing request. Classification and rotation still rewrite their combined
+output JSON and its fingerprints as results are published.
+
+On resume and overwrite, Flowde validates all expected internal records,
+including records outside the selected slice. Missing or invalid records cause
+an error; Flowde does not reconstruct them from output files. This differs from a missing public
+output: saved image results can recreate missing JSONs or image copies, while
+missing extracted PNGs require re-extracting the source PDF.
 
 ## Extraction
 

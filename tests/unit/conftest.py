@@ -1,3 +1,4 @@
+import json
 from multiprocessing.managers import SyncManager
 
 import pytest
@@ -14,3 +15,24 @@ def process_manager():
 def calls(process_manager):
     """Observe calls across the image worker process boundary."""
     return process_manager.list()
+
+
+@pytest.fixture
+def saved_state():
+    """Read the saved run metadata and input records for assertions after a run."""
+
+    def read(output):
+        metadata = output / ".flowde"
+        run_metadata = json.loads(
+            (metadata / "run_metadata.state").read_text(encoding="utf-8")
+        )
+        records = [
+            json.loads(path.read_text(encoding="utf-8"))
+            for path in (metadata / "input_records").glob("*.state")
+        ]
+        return {
+            **run_metadata,
+            "input_records": {record["key"]: record for record in records},
+        }
+
+    return read

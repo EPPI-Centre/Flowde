@@ -28,7 +28,8 @@ def extract_imgs_pdf_list(
     Parameters
     ----------
     pdf_paths : list[Path]
-        PDFs in the requested processing order, with unique filename stems.
+        PDFs in the requested processing order. Filename stems must be unique
+        ignoring case across the run, including PDFs from earlier resumed calls.
     save_dir : Path
         Dedicated run directory. PNGs go directly here; tracking information goes
         in `.flowde`. Input PDFs must be outside this directory.
@@ -40,6 +41,8 @@ def extract_imgs_pdf_list(
     on_existing : {"error", "resume", "overwrite"}, optional
         Defaults to `"error"`. Resume skips completed PDFs and restarts unfinished
         PDFs. Missing PNGs trigger re-extraction; edited PNGs cause an error.
+        See [`extract_imgs()`][flowde.extract_imgs.extract_imgs] for saved-run
+        compatibility and recovery requirements.
 
     Returns
     -------
@@ -60,8 +63,8 @@ def extract_imgs_pdf_list(
         {
             "key": str(path.resolve()),
             "path": str(path),
-            "output": path.name,
-            "input": {"pdf": file_digest(path)},
+            "outputs": [],
+            "input": {"file_digest": file_digest(path)},
             "kwargs": {"pdf_path": path},
         }
         for path in pdf_paths
@@ -107,6 +110,8 @@ def extract_imgs(
     ----------
     pdf_dir : Path
         Directory containing input PDFs. Subdirectories are not searched.
+        Filename stems must be unique ignoring case across the run, including
+        PDFs from earlier resumed calls.
     save_dir : Path
         Dedicated output directory containing PNGs and `.flowde` run metadata.
     extract_fn : ExtractImgsFunction
@@ -128,13 +133,43 @@ def extract_imgs(
     n_jobs : int, optional
         Number of PDFs processed concurrently. Defaults to `1`.
     on_existing : {"error", "resume", "overwrite"}, optional
-        Defaults to `"error"`. Resume skips completed PDFs and restarts unfinished
-        PDFs. Missing PNGs trigger re-extraction; edited PNGs cause an error.
+        How to handle an existing run in `save_dir`. Defaults to `"error"`.
+
+        - `"error"`: start in a new or empty directory; reject existing work.
+        - `"resume"`: require a saved extraction run with matching settings.
+          Skip completed PDFs with intact PNGs and re-extract unfinished PDFs
+          or those with missing PNGs. Edited saved PNGs cause an error.
+        - `"overwrite"`: remove the previous run's tracked outputs and saved state,
+          then start a new run. Also works in a new or empty directory.
+          Unrelated files in an existing output directory cause an error.
+
+        Resume and overwrite require all internal records. Missing or invalid
+        records raise an error.
 
     Returns
     -------
     None
         Extracted images are written into `save_dir`.
+
+    Raises
+    ------
+    FileExistsError
+        If `save_dir` contains existing work and `on_existing="error"`.
+    ValueError
+        If `pdf_dir` is invalid, no PDFs are found, filename stems conflict
+        ignoring case, inputs are inside `save_dir`, extraction outputs are
+        invalid or conflict, or the saved run fails compatibility or integrity
+        checks.
+    RuntimeError
+        If another Flowde call is already using the same `save_dir`.
+
+    Notes
+    -----
+    Flowde saves settings in `.flowde/run_metadata.state` and each PDF's progress
+    and PNG fingerprints in `.flowde/input_records/<stem>.state`, including PDFs
+    that produce no images. Progress updates rewrite only that PDF's record.
+    Keep the whole `.flowde` directory with the outputs for resume and overwrite.
+    The records do not contain image data; missing PNGs require re-extraction.
 
     """
     if not pdf_dir.is_dir():

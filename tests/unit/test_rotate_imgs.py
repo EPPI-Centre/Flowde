@@ -27,7 +27,7 @@ def labels(output):
 
 @pytest.mark.parametrize("max_concurrent_jobs", [1, 2])
 def test_explicit_paths_preserve_order_and_always_save_copies(
-    tmp_path, max_concurrent_jobs
+    tmp_path, max_concurrent_jobs, saved_state
 ):
     sources = [
         create_image(tmp_path / "inputs" / f"{a}.png") for a in (270, 0, 90, 180)
@@ -55,6 +55,11 @@ def test_explicit_paths_preserve_order_and_always_save_copies(
         {"img_path": str(p), "label": int(p.stem)} for p in sorted(sources)
     ]
     assert [p.read_bytes() for p in sources] == originals
+    records = saved_state(output)["input_records"]
+    for source in sources:
+        record = records[str(source.resolve())]
+        assert record["outputs"] == [f"rotated_images/{source.name}"]
+        assert "output" not in record
 
 
 @pytest.mark.parametrize(
@@ -152,7 +157,7 @@ def test_invalid_angle_preserves_previous_copy_and_stops_new_images(
     "stage", ["encode-image", "replace-image", "record-completion"]
 )
 def test_failed_image_publication_resumes_without_repeating_or_rotating_twice(
-    tmp_path, monkeypatch, stage, calls
+    tmp_path, monkeypatch, stage, calls, saved_state
 ):
     source = create_image(tmp_path / "source.png")
     original = source.read_bytes()
@@ -177,11 +182,11 @@ def test_failed_image_publication_resumes_without_repeating_or_rotating_twice(
             raise OSError(msg)
         return replace(path, target)
 
-    def broken_completion(state):
-        if any(record["completed"] for record in state.items.values()):
+    def broken_completion(state, key):
+        if any(record["completed"] for record in state.input_records.values()):
             msg = "completion save failed"
             raise OSError(msg)
-        save_state(state)
+        save_state(state, key)
 
     if stage == "encode-image":
         monkeypatch.setattr(Image.Image, "save", broken_image_save)
@@ -194,8 +199,8 @@ def test_failed_image_publication_resumes_without_repeating_or_rotating_twice(
         rotate_imgs_from_paths(fn, [source], output, max_concurrent_jobs=1)
     assert list(calls) == [source.name]
     del calls[:]
-    state = json.loads((output / ".flowde" / "run.state").read_text())
-    record = state["items"][str(source.resolve())]
+    state = saved_state(output)
+    record = state["input_records"][str(source.resolve())]
     assert record["has_result"]
     assert not record["completed"]
     assert record["result"] == 90

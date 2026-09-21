@@ -71,8 +71,10 @@ def scenario(directory, workers, force):
         saved = sorted(path.stem for path in output.glob("*.json"))
         assert saved == (list("a") if {force!r} else list("abc"[:{workers} + 1]))
 
-        state = json.loads((output / ".flowde" / "run.state").read_text())
-        saved_usage = [usage for item in state["items"].values() for usage in item["usage"]]
+        records = [json.loads(path.read_text(encoding="utf-8"))
+                   for path in (output / ".flowde" / "input_records").glob("*.state")]
+        records.sort(key=lambda record: record["key"])
+        saved_usage = [usage for record in records for usage in record["usage"]]
         tokens = sum(item["total_tokens"] for item in saved_usage)
         if {force!r}:
             assert 10 <= tokens <= 10 * ({workers} + 1)
@@ -91,8 +93,10 @@ def scenario(directory, workers, force):
         assert sorted(path.name for path in root.glob("resumed-*")) == [
             f"resumed-{{name}}" for name in "abcd" if name not in saved
         ]
-        state = json.loads((output / ".flowde" / "run.state").read_text())
-        usage = [usage for item in state["items"].values() for usage in item["usage"]]
+        records = [json.loads(path.read_text(encoding="utf-8"))
+                   for path in (output / ".flowde" / "input_records").glob("*.state")]
+        records.sort(key=lambda record: record["key"])
+        usage = [usage for record in records for usage in record["usage"]]
         assert usage == saved_usage
         (root / "passed").touch()
     """)
