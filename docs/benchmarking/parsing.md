@@ -233,11 +233,15 @@ uses those matches to compare the node text, labels and connections. See
 
 For example, you can print the text costs:
 
+<!-- fmt:off -->
+
 ```python
 print(benchmark.total_node_text_cost())        # 1
 print(benchmark.total_label_cost())            # 1
 print(benchmark.total_additional_text_cost())  # 1
 ```
+
+<!-- fmt:on -->
 
 With the default distance function, each cost counts the character insertions,
 deletions or substitutions needed to make the normalised prediction match the
@@ -256,6 +260,8 @@ Each total includes matched and unmatched text across all evaluated flowcharts.
 
 You can inspect the flow scores for the example flowchart:
 
+<!-- fmt:off -->
+
 ```python
 score = benchmark.all_flow_scores()[0]
 print(score.tp, score.fp, score.fn)  # 1 1 1
@@ -266,6 +272,8 @@ print(score.jaccard)                # 0.3333333333333333
 print(score.missing_edges)          # {(2, 3)}
 print(score.extra_edges)            # {(1, 3)}
 ```
+
+<!-- fmt:on -->
 
 The selected ground-truth Option 1 has connections `1 → 2` and `2 → 3`. The
 prediction has connections `1 → 2` and `1 → 3`. The benchmark therefore finds

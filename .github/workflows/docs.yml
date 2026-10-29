@@ -11,18 +11,19 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.3
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
+          python-version: "3.12"
+          check-latest: true
 
       - name: Build docs
-        run: uv run --group docs mkdocs build --strict
+        run: uv run --upgrade --group docs mkdocs build --strict
 
       - name: Deploy docs
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml?query=branch%3Amain)
 [![Pre-commit](https://github.com/EPPI-Centre/Flowde/actions/workflows/pre-commit.yml/badge.svg?branch=main)](https://github.com/EPPI-Centre/Flowde/actions/workflows/pre-commit.yml?query=branch%3Amain)
-[![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml)
+[![Python](https://img.shields.io/badge/Python-3.12%20%7C%203.13-blue)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml)
 [![Coverage](https://raw.githubusercontent.com/EPPI-Centre/Flowde/badges/coverage.svg)](https://github.com/EPPI-Centre/Flowde/actions/workflows/tests.yml?query=branch%3Amain)
 
 Flowde is a Python package for extracting structured data from flowcharts.
@@ -33,7 +33,7 @@ diagrams.
 
 ## Installation
 
-Requires Python 3.11 or later. To install all features with CPU extraction:
+Requires Python 3.12 or later. To install all features with CPU extraction:
 
 ```bash
 python -m pip install "flowde[all] @ git+https://github.com/EPPI-Centre/Flowde.git"

@@ -1,6 +1,6 @@
 # Installation
 
-Flowde requires Python 3.11 or later.
+Flowde requires Python 3.12 or later.
 
 ## Full installation {#full-installation}
 

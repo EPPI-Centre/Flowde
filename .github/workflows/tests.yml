@@ -24,13 +24,12 @@ jobs:
           - macos-latest
           - windows-latest
         python-version:
-          - "3.11"
           - "3.12"
           - "3.13"
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           lfs: false
           persist-credentials: false
@@ -41,22 +40,21 @@ jobs:
             tests
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.3.3
         with:
+          python-version: ${{ matrix.python-version }}
           enable-cache: true
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
+          cache-dependency-glob: pyproject.toml
 
       - name: Set up Python
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install package and test dependencies
-        run: uv sync --all-extras --group test
+        run: uv sync --upgrade --all-extras --group test
 
       - name: Run tests
         run: >
-          uv run python
+          uv run --no-sync python
           -m pytest
           --cov-report=json
 

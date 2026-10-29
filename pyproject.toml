@@ -2,70 +2,76 @@
 build-backend = "setuptools.build_meta"
 # TODO: Come back to setuptools-scm
 # requires = ["setuptools", "setuptools-scm"]
-requires = ["setuptools"]
+requires = ["setuptools>=84.2.1"]
 
 [dependency-groups]
 docs = [
-    "mkdocs",
-    "mkdocs-git-revision-date-localized-plugin",
-    "mkdocstrings[python]"
+    "mkdocs-git-revision-date-localized-plugin>=1.6.2",
+    "mkdocs>=1.6.1",
+    "mkdocstrings[python]>=1.0.8",
+    "ruff>=0.17.3"
 ]
 test = [
-    "ipykernel",
-    "jupyter-client",
-    "mypy",
-    "pre-commit",
-    "pyte",
-    "pytest",
-    "pytest-cov",
-    "ruff",
-    "toml-sort",
-    "tox"
+    "ipykernel>=7.4.0",
+    "jupyter-client>=8.10.0",
+    "mypy>=2.4.1",
+    "pre-commit>=4.7.0",
+    "pyte>=0.8.2",
+    "pytest-cov>=7.1.0",
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+    "toml-sort>=0.25.0",
+    "tox>=4.67.4",
+    "virtualenv>=21.15.1"
 ]
 
 [project]
 authors = [
-    {name = "Sam Molyneux"}
+    { name = "Sam Molyneux" }
 ]
 dependencies = [
-    "cloudpickle",
-    "joblib",
-    "pillow",
-    "pydantic",
-    "pymupdf",
-    "python-dotenv",
-    "tqdm"
+    "certifi>=2026.10.23",
+    "cloudpickle>=3.1.2",
+    "joblib>=1.6.0",
+    "pillow>=13.0.0",
+    "pydantic>=2.14.2",
+    "pymupdf>=2.0",
+    "python-dotenv>=1.2.4",
+    "tqdm>=4.70.1"
 ]
 description = "Extracting data from CONSORT flowcharts."
 # dynamic = ["version"]
 name = "flowde"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12.16"
 version = "0.0.0"
 
 [project.optional-dependencies]
 all = [
-    "google-genai",
-    "levenshtein",
-    "numpy",
-    "openai",
-    "paddleocr",
-    "paddlepaddle",
-    "scipy"
+    "google-genai>=2.34.0",
+    "hf-xet>=1.7.1",
+    "levenshtein>=0.27.5",
+    "numpy>=2.3.5",
+    "openai>=3.41.0",
+    "paddleocr>=3.7.0",
+    "paddlepaddle>=3.2.2,!=3.3.0,!=3.3.1; sys_platform != 'darwin'",
+    "paddlepaddle>=3.3.1; sys_platform == 'darwin'",
+    "scipy>=1.18.1"
 ]
 benchmark = [
-    "levenshtein",
-    "numpy",
-    "scipy"
+    "levenshtein>=0.27.5",
+    "numpy>=2.3.5",
+    "scipy>=1.18.1"
 ]
 gemini = [
-    "google-genai"
+    "google-genai>=2.34.0"
 ]
 openai = [
-    "openai"
+    "openai>=3.41.0"
 ]
 paddle = [
-    "paddleocr"
+    "hf-xet>=1.7.1",
+    "paddleocr>=3.7.0"
 ]
 
 [tool.coverage.report]
@@ -135,6 +141,7 @@ ignore = [
     "PLR0912",  # Too many branches.
     "PLR0913",  # Too many arguments.
     "PLR0915",  # Too many statements.
+    "PLR0917",  # Existing public APIs accept positional arguments.
     "RET504",  # Unnecessary assign before return.
     "S106",  # Hardcoded password in call.
     "S311",  # Weak cryptographic random number generator.
@@ -161,16 +168,16 @@ select = ["ALL"]
 all = true
 ignore_case = true
 in_place = true
-spaces_before_inline_comment = 2
-spaces_indent_inline_array = 4
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.pytest.ini_options.addopts".inline_arrays = false
 overrides."tool.pytest.ini_options.filterwarnings".inline_arrays = false
 overrides."tool.tox.env_run_base.commands".inline_arrays = false
+spaces_before_inline_comment = 2
+spaces_indent_inline_array = 4
 
 [tool.tox]
-env_list = ["py311", "py312", "py313"]
-requires = ["tox>=4.19"]
+env_list = ["py312", "py313"]
+requires = ["tox>=4.67.4"]
 
 [tool.tox.env_run_base]
 commands = [
@@ -180,3 +187,6 @@ dependency_groups = ["test"]
 description = "Run pytest under {base_python}"
 extras = ["benchmark", "gemini", "openai"]
 package = "wheel"
+
+[tool.uv]
+required-version = ">=0.13.6"
