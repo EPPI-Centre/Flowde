@@ -185,7 +185,7 @@ commands = [
 ]
 dependency_groups = ["test"]
 description = "Run pytest under {base_python}"
-extras = ["benchmark", "gemini", "openai"]
+extras = ["benchmark", "gemini", "openai", "paddle"]
 package = "wheel"
 
 [tool.uv]
