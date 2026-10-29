@@ -1,9 +1,9 @@
 from pathlib import Path
-from typing import Generic, Literal, Protocol, TypeAlias, TypeVar
+from typing import Literal, Protocol, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 
-ClassificationLabel: TypeAlias = str | int | bool
+type ClassificationLabel = str | int | bool
 
 LabelType = TypeVar("LabelType", bound=ClassificationLabel)
 LabelType_co = TypeVar(
@@ -12,11 +12,11 @@ LabelType_co = TypeVar(
     covariant=True,
 )
 
-BinaryLabel: TypeAlias = Literal[0, 1]
-RotationLabel: TypeAlias = Literal[0, 90, 180, 270]
+type BinaryLabel = Literal[0, 1]
+type RotationLabel = Literal[0, 90, 180, 270]
 
 
-class Classification(BaseModel, Generic[LabelType]):
+class Classification[LabelType: ClassificationLabel](BaseModel):
     model_config = ConfigDict(frozen=True, strict=True)
 
     label: LabelType

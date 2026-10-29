@@ -1,7 +1,6 @@
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Generic
 
 from flowde.benchmarks.classification.classification_bench_types import (
     SingleClassificationResult,
@@ -11,7 +10,7 @@ from flowde.utils import load_json
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class ClassificationBenchmark(Generic[LabelType]):
+class ClassificationBenchmark[LabelType: ClassificationLabel]:
     """
     Compare saved image labels with ground truth and report accuracy.
 

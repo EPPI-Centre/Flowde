@@ -5,11 +5,9 @@ import json
 from collections.abc import Callable
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
 from pydantic import BaseModel
-
-Function = TypeVar("Function", bound=Callable[..., Any])
 
 
 def file_digest(path: Path) -> str:
@@ -39,7 +37,7 @@ def settings_value(value: Any) -> Any:  # noqa: PLR0911 - One case per supported
     return value
 
 
-def model_function(
+def model_function[Function: Callable[..., Any]](
     fn: Function,
     *,
     result_structure: type[BaseModel] | None = None,

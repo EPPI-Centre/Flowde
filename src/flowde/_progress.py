@@ -9,14 +9,13 @@ from multiprocessing.managers import SyncManager
 from queue import Queue
 from threading import Thread
 from time import monotonic
-from typing import Any, Protocol, TypeVar
+from typing import Any, Protocol
 
 from joblib.externals.loky.backend.context import get_context
 from tqdm import tqdm
 
 from flowde.usage import RequestUsage, UsageTotals, usage_scope
 
-Result = TypeVar("Result")
 UsageEvent = tuple[int, RequestUsage | None] | None
 
 
@@ -26,7 +25,7 @@ class EventQueue(Protocol):
     def get(self) -> UsageEvent: ...
 
 
-def run_with_usage(
+def run_with_usage[Result](
     events: EventQueue,
     item: int,
     fn: Callable[..., Result],

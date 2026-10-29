@@ -4,15 +4,12 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 from joblib import Parallel, delayed
 from pydantic import BaseModel
 
 from flowde._progress import progress_reporting, run_with_usage
-
-ItemType = TypeVar("ItemType")
-ReturnType = TypeVar("ReturnType")
 
 VISION_FEW_SHOT_INSTRUCTIONS = (
     "The following exchanges are worked examples of the task above. "
@@ -153,7 +150,7 @@ def parse_bool(value: str) -> bool:
     return normalized_value == "true"
 
 
-def _run_parallel_fn_with_better_errors(
+def _run_parallel_fn_with_better_errors[ItemType, ReturnType](
     fn: Callable[[ItemType], ReturnType], item: ItemType
 ) -> ReturnType:
     try:
@@ -168,7 +165,7 @@ def _run_parallel_fn_with_better_errors(
         raise RuntimeError(msg) from e
 
 
-def apply_fn_parallel_on_list(
+def apply_fn_parallel_on_list[ItemType, ReturnType](
     fn: Callable[[ItemType], ReturnType],
     items: Sequence[ItemType],
     msg: str = "Applying function in parallel",
@@ -195,7 +192,7 @@ def apply_fn_parallel_on_list(
     return list(response_list)
 
 
-def _run_parallel_fn_with_kwargs_better_errors(
+def _run_parallel_fn_with_kwargs_better_errors[ReturnType](
     fn: Callable[..., ReturnType],
     kwargs: dict[str, Any],
 ) -> ReturnType:
@@ -211,7 +208,7 @@ def _run_parallel_fn_with_kwargs_better_errors(
         raise RuntimeError(msg) from e
 
 
-def apply_fn_parallel_on_dict_of_lists(
+def apply_fn_parallel_on_dict_of_lists[ReturnType](
     fn: Callable[..., ReturnType],
     items_by_param: dict[str, Sequence[Any]],
     msg: str = "Applying function in parallel",

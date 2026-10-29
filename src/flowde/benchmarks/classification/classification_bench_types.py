@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import Generic
 
-from flowde.classify_fns.classify_types import LabelType
+from flowde.classify_fns.classify_types import ClassificationLabel
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class SingleClassificationResult(Generic[LabelType]):
+class SingleClassificationResult[LabelType: ClassificationLabel]:
     """
     Store the true and predicted labels for one benchmark image.
 
