@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="480" viewBox="0 0 1000 480" role="img" aria-labelledby="title description">
+  <title id="title">Flow and labels distinguish nodes with identical text</title>
+  <desc id="description">Randomised participants split into Intervention and Control arms. Each arm points to two nodes containing the same text, Lost to follow-up. Within each arm, one node has the label Before treatment and the other has the label During treatment. Flow distinguishes the study arms; labels distinguish the two loss nodes within each arm.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M2 2 L10 6 L2 10" fill="none" stroke="#577184" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="480" fill="#fff"/>
+
+  <g fill="none" stroke="#577184" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M500 88 V126 H250 V167" marker-end="url(#arrow)"/>
+    <path d="M500 126 H750 V167" marker-end="url(#arrow)"/>
+    <path d="M250 235 V280 H130 V325" marker-end="url(#arrow)"/>
+    <path d="M250 280 H370 V325" marker-end="url(#arrow)"/>
+    <path d="M750 235 V280 H630 V325" marker-end="url(#arrow)"/>
+    <path d="M750 280 H870 V325" marker-end="url(#arrow)"/>
+  </g>
+
+  <g stroke="#577184" stroke-width="2.5" fill="#f3f7fa">
+    <rect x="355" y="24" width="290" height="64" rx="8"/>
+    <rect x="115" y="167" width="270" height="68" rx="8"/>
+    <rect x="615" y="167" width="270" height="68" rx="8"/>
+    <rect x="20" y="325" width="220" height="128" rx="8"/>
+    <rect x="260" y="325" width="220" height="128" rx="8"/>
+    <rect x="520" y="325" width="220" height="128" rx="8"/>
+    <rect x="760" y="325" width="220" height="128" rx="8"/>
+  </g>
+  <g stroke="#c9d7e1" stroke-width="1.5">
+    <path d="M20 375 H240"/>
+    <path d="M260 375 H480"/>
+    <path d="M520 375 H740"/>
+    <path d="M760 375 H980"/>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="#263e50">
+    <g font-size="28">
+      <text x="500" y="66">Randomised</text>
+      <text x="250" y="211">Intervention</text>
+      <text x="750" y="211">Control</text>
+    </g>
+    <g font-size="22" font-weight="bold" fill="#476678">
+      <text x="130" y="357">Before treatment</text>
+      <text x="370" y="357">During treatment</text>
+      <text x="630" y="357">Before treatment</text>
+      <text x="870" y="357">During treatment</text>
+    </g>
+    <g font-size="24">
+      <text x="130" y="421">Lost to follow-up</text>
+      <text x="370" y="421">Lost to follow-up</text>
+      <text x="630" y="421">Lost to follow-up</text>
+      <text x="870" y="421">Lost to follow-up</text>
+    </g>
+  </g>
+</svg>

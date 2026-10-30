@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/usage/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Tokens and costs - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Tokens and costs";
+        var mkdocs_page_input_path = "pipeline/usage.md";
+        var mkdocs_page_url = "/Flowde/pipeline/usage/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Tokens and costs</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#display-usage">Display usage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#custom-token-prices">Custom token prices</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#report-usage-from-a-custom-function">Report usage from a custom function</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Tokens and costs</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/usage.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="tokens-and-costs">Tokens and costs</h1>
+<p><a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>,
+<a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> and
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a> collect
+token usage and estimated API costs reported by their model helpers and record
+them in the <code>.flowde</code> directory inside <code>save_dir</code>. The
+<a href="../setup-default-funcs/">OpenAI, Azure OpenAI and Gemini helpers</a> automatically
+report usage from model responses.</p>
+<h2 id="display-usage">Display usage</h2>
+<p>By default,
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>,
+<a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> and
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a> display
+token usage and API costs as they process images.</p>
+<p>For example, suppose Flowde records 100 tokens and a cost of $0.0001 for one
+image, and 300 tokens and $0.0003 for a second image. The display is:</p>
+<pre><code class="language-text">Est. cost: $0.000400 total | $0.000200 avg/image | $0.000300 max/image
+Tokens: 400 total | 200.0 avg/image | 300 max/image
+</code></pre>
+<p>Set <code>show_usage=False</code> to hide the usage display.</p>
+<h2 id="custom-token-prices">Custom token prices</h2>
+<p>If the current package version does not include prices for a model, you can
+supply custom prices to an existing classifier, rotation or parsing helper:</p>
+<pre><code class="language-python">from flowde.classify_fns.openai_classify_fn import make_openai_classify_fn
+from flowde.pricing import TokenPrices
+
+prices = TokenPrices(input=1.0, output=4.0, cached_input=0.1)
+
+classify_fn = make_openai_classify_fn(
+    input_text=&quot;Return 1 if the image is a flowchart, otherwise return 0.&quot;,
+    model=&quot;gpt-7&quot;,
+    effort=&quot;medium&quot;,
+    token_prices=prices,
+)
+</code></pre>
+<p>See <a href="../../reference/data-types/#flowde.pricing.TokenPrices"><code>TokenPrices</code></a> for
+all available pricing parameters.</p>
+<h2 id="report-usage-from-a-custom-function">Report usage from a custom function</h2>
+<p>Usage reporting is optional for custom functions. Inside your custom classifier
+or parser, you can use
+<a href="../../reference/data-types/#flowde.usage.report_usage"><code>report_usage()</code></a> after
+receiving a model response. For example, a response with 120 input tokens, 30
+output tokens and a known cost of $0.00024 would need to be reported like this:</p>
+<pre><code class="language-python">from flowde.usage import RequestUsage, report_usage
+
+report_usage(
+    RequestUsage(
+        provider=&quot;my-provider&quot;,
+        model=&quot;my-model&quot;,
+        input_tokens=120,
+        output_tokens=30,
+        total_tokens=150,
+        cost=0.00024,
+    )
+)
+</code></pre>
+<p>Flowde does not collect usage reports when the custom function runs outside
+<code>extract_imgs()</code>, <code>classify_imgs()</code>, <code>rotate_imgs()</code> or <code>parse_imgs()</code>. Calling
+<a href="../../reference/data-types/#flowde.usage.report_usage"><code>report_usage()</code></a> outside
+one of these runs has no effect.</p>
+<p>See the <a href="../../reference/data-types/#flowde.usage.RequestUsage"><code>RequestUsage</code></a>
+and <a href="../../reference/data-types/#flowde.usage.report_usage"><code>report_usage()</code></a> API
+references for details.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../resuming/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../few-shot/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

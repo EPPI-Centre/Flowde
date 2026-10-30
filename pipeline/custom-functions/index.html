@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/custom-functions/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Custom functions - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Custom functions";
+        var mkdocs_page_input_path = "pipeline/custom-functions.md";
+        var mkdocs_page_url = "/Flowde/pipeline/custom-functions/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Core pipeline</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../parsing/">Flowchart parsing</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Custom functions</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#declare-settings">Declare settings</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#an-extraction-function">An extraction function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#a-classification-function">A classification function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#a-rotation-function">A rotation function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#a-parsing-function">A parsing function</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#errors-workers-and-usage">Errors, workers and usage</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+      <li class="breadcrumb-item active">Custom functions</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/custom-functions.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="custom-processing-functions">Custom processing functions</h1>
+<p>You can replace the default extraction, classification, rotation or parsing
+functions with your own while still using Flowde's directory handling, parallel
+processing, automatic result saving and support for stopping and resuming runs.</p>
+<h2 id="declare-settings">Declare settings</h2>
+<p>To use Flowde's automatic result saving and support for stopping and resuming
+runs, <strong>you must declare the settings that affect your custom function's
+results</strong> using
+<a href="../../reference/helpers/#flowde.model_function"><code>model_function()</code></a>. For
+example, the <a href="#an-extraction-function">page extractor below</a> uses this
+declaration:</p>
+<pre><code class="language-python">from flowde import model_function
+
+extract_fn = model_function(render_pages, extractor=&quot;whole-pages&quot;, dpi=DPI, version=1)
+</code></pre>
+<p>Flowde stores the declared settings as metadata about the run in the
+<code>.flowde</code> directory inside <code>save_dir</code>. If any declared setting changes,
+Flowde raises an error when you try to resume the existing run.</p>
+<h2 id="examples">Examples</h2>
+<h3 id="an-extraction-function">An extraction function</h3>
+<p>You can pass a custom extractor as <code>extract_fn</code> to
+<a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>.
+For example, the following extractor saves each complete PDF page as a PNG:</p>
+<pre><code class="language-python">from pathlib import Path
+
+import pymupdf
+
+from flowde import model_function
+from flowde.extract_imgs import extract_imgs
+
+DPI = 144
+
+
+def render_pages(*, pdf_path: Path, save_dir: Path) -&gt; None:
+    with pymupdf.open(pdf_path) as document:
+        for index, page in enumerate(document):
+            page.get_pixmap(dpi=DPI).save(save_dir / f&quot;{pdf_path.stem}_{index}.png&quot;)
+
+
+extract_fn = model_function(render_pages, extractor=&quot;whole-pages&quot;, dpi=DPI, version=1)
+
+extract_imgs(
+    pdf_dir=Path(&quot;data/pdfs&quot;),
+    save_dir=Path(&quot;results/page-images&quot;),
+    extract_fn=extract_fn,
+    n_jobs=1,
+)
+</code></pre>
+<p>The custom extractor must:</p>
+<ul>
+<li>Accept <code>pdf_path</code> and <code>save_dir</code> as keyword arguments.</li>
+<li>Save only PNG files directly inside the supplied <code>save_dir</code>, without
+  subdirectories.</li>
+<li>Use filenames that remain unique across the input PDFs.</li>
+<li>Finish writing and close every output file before returning <code>None</code>.</li>
+</ul>
+<p>See the
+<a href="../../reference/pipeline/#flowde.extract_imgs.extract_imgs"><code>extract_imgs()</code></a>
+API reference for full details of the <code>extract_fn</code> requirements.</p>
+<h3 id="a-classification-function">A classification function</h3>
+<p>You can pass a custom classifier as <code>classify_fn</code> to
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>.
+For example, the following classifier returns <code>1</code> for images that are at least
+500 pixels wide and 500 pixels tall, and <code>0</code> if either dimension is below 500
+pixels:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from PIL import Image
+
+from flowde import model_function
+from flowde.classify_fns.classify_types import BinaryClassification
+from flowde.classify_imgs import classify_imgs
+
+MIN_DIMENSION = 500
+
+
+def classify_by_size(img_path: Path) -&gt; int:
+    with Image.open(img_path) as image:
+        width, height = image.size
+    return int(width &gt;= MIN_DIMENSION and height &gt;= MIN_DIMENSION)
+
+
+classify_fn = model_function(
+    classify_by_size,
+    result_structure=BinaryClassification,
+    method=&quot;image-size&quot;,
+    min_dimension=MIN_DIMENSION,
+    version=1,
+)
+
+labels = classify_imgs(
+    classify_fn=classify_fn,
+    img_dir=Path(&quot;results/extraction&quot;),
+    save_dir=Path(&quot;results/size-classification&quot;),
+    positive_classes={1},
+    max_concurrent_jobs=1,
+)
+</code></pre>
+<p>The custom classifier must:</p>
+<ul>
+<li>Accept an <code>img_path</code> argument.</li>
+<li>Return a <code>str</code>, <code>int</code> or <code>bool</code> label.</li>
+<li>Raise an exception if classification fails. Returning <code>None</code> raises an error.</li>
+</ul>
+<p>See the
+<a href="../../reference/pipeline/#flowde.classify_imgs.classify_imgs"><code>classify_imgs()</code></a>
+API reference for full details of the <code>classify_fn</code> requirements.</p>
+<p>Flowde saves the returned labels in <code>classifications.json</code> inside <code>save_dir</code>.</p>
+<p>You can supply <code>result_structure</code> through
+<a href="../../reference/helpers/#flowde.model_function"><code>model_function()</code></a> to validate
+the returned labels. The example uses
+<a href="../../reference/data-types/#flowde.classify_fns.classify_types.BinaryClassification"><code>BinaryClassification</code></a>,
+which permits only the integers <code>0</code> and <code>1</code>. Without <code>result_structure</code>, Flowde
+checks that the label is a string, integer or boolean but does not restrict the
+allowed values.</p>
+<h3 id="a-rotation-function">A rotation function</h3>
+<p>You can pass a custom rotation classifier as <code>classify_fn</code> to
+<a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a>. For
+example, the following function returns <code>90</code> for images that are wider than they
+are tall, and <code>0</code> for portrait or square images. Flowde uses these angles to
+rotate landscape images into portrait orientation:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from PIL import Image
+
+from flowde import model_function
+from flowde.rotate_imgs import rotate_imgs
+
+
+def portrait_rotation_angle(img_path: Path) -&gt; int:
+    with Image.open(img_path) as image:
+        width, height = image.size
+    return 90 if width &gt; height else 0
+
+
+rotation_fn = model_function(
+    portrait_rotation_angle,
+    method=&quot;portrait-by-dimensions&quot;,
+    version=1,
+)
+
+angles = rotate_imgs(
+    classify_fn=rotation_fn,
+    img_dir=Path(&quot;results/extraction&quot;),
+    save_dir=Path(&quot;results/portrait-rotation&quot;),
+    max_concurrent_jobs=1,
+)
+</code></pre>
+<p>The custom rotation classifier must:</p>
+<ul>
+<li>Accept an <code>img_path</code> argument.</li>
+<li>Return a clockwise correction in degrees as an <code>int</code>: <code>0</code>, <code>90</code>, <code>180</code> or
+  <code>270</code>.</li>
+<li>Raise an exception if angle prediction fails. Returning <code>None</code> raises an
+  error.</li>
+</ul>
+<p>See the
+<a href="../../reference/pipeline/#flowde.rotate_imgs.rotate_imgs"><code>rotate_imgs()</code></a> API
+reference for full details of the <code>classify_fn</code> requirements.</p>
+<p>Flowde applies the returned angles, saves image copies in <code>rotated_images</code> and
+records the angles in <code>rotations.json</code>, both inside <code>save_dir</code>.</p>
+<h3 id="a-parsing-function">A parsing function</h3>
+<p>You can pass a custom parser as <code>parse_fn</code> to
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>. For
+example, the following parser reads each image's width, height and colour mode
+into a custom Pydantic result:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from PIL import Image
+from pydantic import BaseModel
+
+from flowde import model_function
+from flowde.parse_imgs import parse_imgs
+
+
+class ImageDetails(BaseModel):
+    width: int
+    height: int
+    colour_mode: str
+
+
+def parse_image_details(img_path: Path) -&gt; ImageDetails:
+    with Image.open(img_path) as image:
+        return ImageDetails(
+            width=image.width,
+            height=image.height,
+            colour_mode=image.mode,
+        )
+
+
+parse_fn = model_function(
+    parse_image_details,
+    result_structure=ImageDetails,
+    method=&quot;image-details&quot;,
+    version=1,
+)
+
+results = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=Path(&quot;results/extraction&quot;),
+    save_dir=Path(&quot;results/image-details&quot;),
+    max_concurrent_jobs=1,
+)
+</code></pre>
+<p>The custom parser must:</p>
+<ul>
+<li>Accept <code>img_path</code> as a keyword argument.</li>
+<li>Declare a Pydantic result class through <code>result_structure</code> in
+  <a href="../../reference/helpers/#flowde.model_function"><code>model_function()</code></a>.</li>
+<li>Return an instance of the declared result class, rather than a dictionary or
+  JSON string.</li>
+<li>Raise an exception if parsing fails. Returning <code>None</code> raises an error.</li>
+</ul>
+<p>See the <a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>
+API reference for full details of the <code>parse_fn</code> requirements.</p>
+<p>The example uses a custom result class as its <code>result_structure</code>. For the
+standard flowchart format, you can use
+<a href="../../reference/helpers/#flowde.parsing_fns.parsing_types.build_partial_flowchart_schema"><code>build_partial_flowchart_schema()</code></a>
+to create a result class containing node text, labels, flow or additional text.</p>
+<p>To support <a href="../parsing/#parse-parts-separately">previously parsed parts</a>, your
+parser must also accept <code>partial_flowchart</code> as a keyword argument. Flowde
+supplies a Pydantic model containing the saved parts for the image being parsed.
+Without saved parts, Flowde passes only <code>img_path</code>.</p>
+<h2 id="errors-workers-and-usage">Errors, workers and usage</h2>
+<p>Your function must raise an exception if processing fails. Flowde stops starting
+further PDFs or images after detecting the error.</p>
+<p>You can use
+<a href="../../reference/data-types/#flowde.usage.report_usage"><code>report_usage()</code></a> inside
+your classification, rotation or parsing function to include token counts and
+estimated costs in the progress display. See
+<a href="../usage/#report-usage-from-a-custom-function">report usage from a custom function</a>
+for an example.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../few-shot/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../benchmarking/classification/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

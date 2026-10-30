@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://eppi-centre.github.io/Flowde/pipeline/parsing/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Flowchart parsing - flowde</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Flowchart parsing";
+        var mkdocs_page_input_path = "pipeline/parsing.md";
+        var mkdocs_page_url = "/Flowde/pipeline/parsing/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> flowde
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Core pipeline</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../setup-default-funcs/">Setup default pipeline functions</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../image-extraction/">Image extraction</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../classification/">Image classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../rotation/">Image rotation</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Flowchart parsing</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#parse-images-from-a-directory">Parse images from a directory</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#parsing-results">Parsing results</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#understand-the-flowchart-format">Understand the flowchart format</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#example-1-a-basic-flowchart">Example 1: A basic flowchart</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example-2-keeping-branches-separate">Example 2: Keeping branches separate</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example-3-advanced-labels">Example 3: Advanced labels</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#resume-parsing">Resume parsing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#parse-parts-separately">Parse parts separately</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#1-parse-node-text">1. Parse node text</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#2-parse-flow-using-the-saved-nodes">2. Parse flow using the saved nodes</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#3-parse-labels-and-additional-text">3. Parse labels and additional text</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#matching-images-and-parsed-parts">Matching images and parsed parts</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#combine-the-parsed-parts">Combine the parsed parts</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#use-a-custom-output-schema">Use a custom output schema</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bring-your-own-parsing-function">Bring your own parsing function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#next-step">Next step</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resuming/">Stopping and resuming</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../usage/">Tokens and costs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../few-shot/">Few-shot examples</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-functions/">Custom functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Benchmarking</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/classification/">Classification</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/rotation/">Rotation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../benchmarking/parsing/">Parsing</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Recipes</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../recipes/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >End-to-end</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../recipes/consort/">CONSORT</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/pipeline/">Pipeline functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/helpers/">Function factories and helpers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/data-types/">Data types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/benchmarks/">Benchmarks</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">flowde</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">User Guide</li>
+          <li class="breadcrumb-item">Core pipeline</li>
+      <li class="breadcrumb-item active">Flowchart parsing</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/EPPI-Centre/Flowde/edit/main/docs/pipeline/parsing.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="flowchart-parsing">Flowchart parsing</h1>
+<p>Parsing is the final stage of the core pipeline. It takes flowchart images as
+input and extracts structured flowchart data.</p>
+<p>The parsed data describes the nodes, their text and labels, the connections
+between nodes, and any additional text in the diagram.</p>
+<h2 id="parse-images-from-a-directory">Parse images from a directory</h2>
+<p><a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>
+takes a directory of flowchart images and saves one JSON result per image
+into a dedicated output directory.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.parse_imgs import parse_imgs
+from flowde.parsing_fns.openai_parse import make_openai_parse_fn
+
+img_dir = Path(&quot;results/rotation/rotated_images&quot;)
+save_dir = Path(&quot;results/parsing/full&quot;)
+
+input_text = &quot;&quot;&quot;
+Parse this flowchart into structured data.
+Assign consecutive node numbers starting at 1.
+Capture each node's text, labels and outgoing connections.
+Put text that does not belong to a node in additional_texts.
+&quot;&quot;&quot;
+
+parse_fn = make_openai_parse_fn(
+    input_text=input_text,
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+)
+
+responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    max_concurrent_jobs=1,
+)
+</code></pre>
+<p>By default,
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>
+processes <code>*.png</code> files inside <code>img_dir</code>, in sorted path order.
+Subdirectories are not searched. The returned <code>responses</code> list contains one
+Pydantic model per processed image: <code>responses[0]</code> contains the parsed data for
+the first sorted image path, <code>responses[1]</code> for the second, and so on.</p>
+<p>The example above uses OpenAI and requires the
+<a href="../setup-default-funcs/#set-up-openai">OpenAI setup</a>.
+For <code>parse_fn</code>, you can use an OpenAI parser created with
+<a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn"><code>make_openai_parse_fn()</code></a>,
+a Gemini parser created with
+<a href="../../reference/helpers/#flowde.parsing_fns.gemini_parse.make_gemini_parse_fn"><code>make_gemini_parse_fn()</code></a>,
+or <a href="../custom-functions/#a-parsing-function">your own parsing function</a>.
+The <a href="../setup-default-funcs/#use-azure-openai">provider setup guide</a> also covers
+Azure OpenAI.</p>
+<p><a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn"><code>make_openai_parse_fn()</code></a>
+creates a parser for the complete flowchart format by default. You can instead
+<a href="#parse-parts-separately">parse selected parts</a>, such as node text or connections,
+or <a href="#use-a-custom-output-schema">use a custom output schema</a>.</p>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+<div class="admonition note">
+<p class="admonition-title">Note: concurrency</p>
+<p><code>max_concurrent_jobs</code> controls how many calls to <code>parse_fn</code> can run
+concurrently and defaults to <code>10</code>. Parallel execution in
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>
+uses threads, allowing concurrency to greatly exceed the CPU core count
+when waiting for API responses. Choose <code>max_concurrent_jobs</code> based on your
+API limits.</p>
+</div>
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
+
+<p>See the
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>
+and
+<a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn"><code>make_openai_parse_fn()</code></a>
+API references for full details of all parameters.</p>
+<h2 id="parsing-results">Parsing results</h2>
+<p>Each image's result is saved as a JSON file with the same filename stem.
+For example, <code>paper-1_0.png</code> produces <code>paper-1_0.json</code>:</p>
+<pre><code class="language-text">results/parsing/full/
+├── paper-1_0.json
+├── paper-2_0.json
+└── .flowde/
+</code></pre>
+<p>You can also inspect a result from the returned <code>responses</code> list:</p>
+<pre><code class="language-python">print(responses[0].model_dump_json(indent=2))
+</code></pre>
+<p><code>.flowde</code> records which images have been parsed, their results, parser
+settings, image fingerprints and any supplied partial flowchart data. Flowde
+uses this metadata to resume the run and detect changes to the inputs or saved
+results.</p>
+<h2 id="understand-the-flowchart-format">Understand the flowchart format</h2>
+<p>Flowde represents a flowchart as a list of nodes and a list of additional texts.</p>
+<p>A complete parsed flowchart has this structure:</p>
+<pre><code class="language-python">from pydantic import BaseModel
+
+
+class Node(BaseModel):
+    node_number: int
+    text: str
+    labels: list[str]
+    points_to: list[int]
+
+
+class Flowchart(BaseModel):
+    nodes: list[Node]
+    additional_texts: list[str]
+</code></pre>
+<p>Each node represents one box or item in the flowchart.</p>
+<p>The fields have the following meanings:</p>
+<ul>
+<li><code>node_number</code>: a unique identifier given to each node;</li>
+<li><code>text</code>: the text inside the node;</li>
+<li><code>labels</code>: text labels that apply to the node;</li>
+<li><code>points_to</code>: the node numbers reached by following this node's outgoing arrows;</li>
+<li><code>additional_texts</code>: text that is not assigned to a specific node, such as a caption.</li>
+</ul>
+<p>The examples below show how this format represents the information in a
+diagram. These interpretation conventions are also used in the supplied
+<a href="../../reference/helpers/#supplied-consort-prompts">CONSORT prompts</a>.</p>
+<h3 id="example-1-a-basic-flowchart">Example 1: A basic flowchart</h3>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD013 -->
+<p><img alt="Example flowchart for demonstrating parsing" class="docs-image" src="../../images/demo-flowchart.webp" /></p>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD013 -->
+
+<p>A complete parse of this diagram looks like:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    {
+      &quot;node_number&quot;: 1,
+      &quot;text&quot;: &quot;Assessed for eligibility\n(n = 120)&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [2, 3]
+    },
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;Allocated to intervention\n(n = 60)&quot;,
+      &quot;labels&quot;: [&quot;Allocation&quot;],
+      &quot;points_to&quot;: [4]
+    },
+    {
+      &quot;node_number&quot;: 3,
+      &quot;text&quot;: &quot;Allocated to control\n(n = 60)&quot;,
+      &quot;labels&quot;: [&quot;Allocation&quot;],
+      &quot;points_to&quot;: [5]
+    },
+    {
+      &quot;node_number&quot;: 4,
+      &quot;text&quot;: &quot;Completed follow-up\n(n = 55)&quot;,
+      &quot;labels&quot;: [&quot;Follow-up&quot;],
+      &quot;points_to&quot;: []
+    },
+    {
+      &quot;node_number&quot;: 5,
+      &quot;text&quot;: &quot;Completed follow-up\n(n = 57)&quot;,
+      &quot;labels&quot;: [&quot;Follow-up&quot;],
+      &quot;points_to&quot;: []
+    }
+  ],
+  &quot;additional_texts&quot;: [&quot;Figure 1. Example flowchart for demonstrating parsing.&quot;]
+}
+</code></pre>
+<h3 id="example-2-keeping-branches-separate">Example 2: Keeping branches separate</h3>
+<p>Some diagrams use one box to describe a step that applies separately to two or
+more branches. Here, the eight-week treatment phase applies independently to
+the intervention group and the control group:</p>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD013 -->
+<p><img alt="Separate intervention and control branches with a shared eight-week treatment phase box" class="docs-image" src="../../images/treatment-phase-flowchart.png" /></p>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD013 -->
+
+<p>The aligned arrows show two separate participant flows. Of the 50 participants
+allocated to intervention, 43 are analysed after the treatment phase. Of the
+50 participants allocated to control, 45 are analysed. The shared treatment
+box avoids repeating the same text; the two groups do not merge during treatment.</p>
+<p>If the parsed data used just one treatment node, both allocation nodes would
+point to that treatment node, and the treatment node would point to both
+analysis nodes. Those connections would incorrectly allow a path from
+intervention allocation to control analysis, and from control allocation to
+intervention analysis.</p>
+<p>To preserve the intended participant flows, the parsed data represents the
+treatment box as two nodes with the same text. Node <code>3</code> belongs to the
+intervention branch, and node <code>4</code> belongs to the control branch:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    {
+      &quot;node_number&quot;: 1,
+      &quot;text&quot;: &quot;Allocated to\nintervention\n(n = 50)&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [3]
+    },
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;Allocated to\ncontrol\n(n = 50)&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [4]
+    },
+    {
+      &quot;node_number&quot;: 3,
+      &quot;text&quot;: &quot;Eight-week treatment phase&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [5]
+    },
+    {
+      &quot;node_number&quot;: 4,
+      &quot;text&quot;: &quot;Eight-week treatment phase&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: [6]
+    },
+    {
+      &quot;node_number&quot;: 5,
+      &quot;text&quot;: &quot;Intervention\nparticipants analysed\n(n = 43)&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: []
+    },
+    {
+      &quot;node_number&quot;: 6,
+      &quot;text&quot;: &quot;Control\nparticipants analysed\n(n = 45)&quot;,
+      &quot;labels&quot;: [],
+      &quot;points_to&quot;: []
+    }
+  ],
+  &quot;additional_texts&quot;: []
+}
+</code></pre>
+<p>The intervention branch follows nodes <code>1 → 3 → 5</code>, and the control branch
+follows nodes <code>2 → 4 → 6</code>. Neither branch has a connection to the other
+group's analysis node.</p>
+<h3 id="example-3-advanced-labels">Example 3: Advanced labels</h3>
+<p>A single box can contain several values, each with a label that applies only
+to that value. The parsed representation needs to preserve which label belongs
+to each value.</p>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD013 -->
+<p><img alt="Example flowcharts with advanced labels" class="docs-image" src="../../images/double-label-flowchart2.webp" /></p>
+<!-- prettier-ignore-end -->
+
+<!-- markdownlint-enable MD013 -->
+
+<p>Representing the bottom-left box as one node could produce:</p>
+<pre><code class="language-text">...
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;42\n35&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;26 weeks&quot;,
+        &quot;52 weeks&quot;
+      ],
+      &quot;points_to&quot;: []
+    },
+...
+</code></pre>
+<p>This representation lists <code>26 weeks</code> and <code>52 weeks</code> as labels for a single node
+containing both <code>42</code> and <code>35</code>, without specifying which label belongs to which
+value. The diagram's intended meaning is that <code>26 weeks</code> applies to <code>42</code> and
+<code>52 weeks</code> applies to <code>35</code>. The parsed data needs to preserve those pairings.
+Flowde's format supports two ways to represent those pairings:</p>
+<div class="indent-section">
+<h4 id="option-1-join-labels">Option 1: Join labels</h4>
+<p>You can join the timepoint labels into one label, keeping the timepoints in
+the same line order as the corresponding values:</p>
+<pre><code class="language-text">...
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;42\n35&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;26 weeks\n52 weeks&quot;,
+      ],
+      &quot;points_to&quot;: []
+    },
+...
+</code></pre>
+<p>The first line, <code>26 weeks</code>, corresponds to <code>42</code>; the second line, <code>52 weeks</code>,
+corresponds to <code>35</code>.</p>
+<h4 id="option-2-split-nodes">Option 2: Split nodes</h4>
+<p>You can instead represent the two follow-up measurements as separate nodes,
+each with its own value and timepoint label. The bottom-left box becomes:</p>
+<pre><code class="language-text">...
+    {
+      &quot;node_number&quot;: 2,
+      &quot;text&quot;: &quot;42&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;26 weeks&quot;
+      ],
+      &quot;points_to&quot;: [4]
+    },
+    ...
+    {
+      &quot;node_number&quot;: 4,
+      &quot;text&quot;: &quot;35&quot;,
+      &quot;labels&quot;: [
+        &quot;Follow-Up&quot;,
+        &quot;52 weeks&quot;
+      ],
+      &quot;points_to&quot;: []
+    },
+...
+</code></pre>
+<p>The connection from node <code>2</code> to node <code>4</code> represents
+the progression between those follow-up measurements.</p>
+</div>
+<h2 id="resume-parsing">Resume parsing</h2>
+<p>To continue an unfinished parsing run whose results are saved in <code>save_dir</code>,
+you can set <code>on_existing="resume"</code>:</p>
+<pre><code class="language-python">responses = parse_imgs(
+    parse_fn=parse_fn,
+    img_dir=img_dir,
+    save_dir=save_dir,
+    max_concurrent_jobs=1,
+    on_existing=&quot;resume&quot;,
+)
+</code></pre>
+<p>The <code>.flowde</code> directory inside <code>save_dir</code> stores the parsing run's state.
+Flowde uses these records to resume unfinished work and check the integrity of the run.
+Resume raises an error if the parser's settings have changed, or if previously
+parsed input images, their supplied partial flowchart data or saved results
+have changed.</p>
+<p>To use different settings or partial flowchart data, you can start a run in a
+new <code>save_dir</code> or replace the previous run with <code>on_existing="overwrite"</code>.
+See <a href="../resuming/">managing runs</a> for the full rules.</p>
+<h2 id="parse-parts-separately">Parse parts separately</h2>
+<p>Splitting parsing into separate tasks can improve parsing accuracy by allowing
+the model to focus on one part of the flowchart at a time and use earlier
+results as context for later requests. You can also inspect intermediate
+results.</p>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable MD046 -->
+
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code>node_text</code> must be parsed <strong>before or together with</strong> <code>labels</code> or <code>flow</code>
+so the parser knows which node numbers to use for labels and connections.
+If node text was parsed in an earlier run, pass the saved node-text
+directory as <code>nodes_dir</code>.</p>
+</div>
+<!-- markdownlint-enable MD046 -->
+<!-- prettier-ignore-end -->
+
+<h3 id="1-parse-node-text">1. Parse node text</h3>
+<pre><code class="language-python">from pathlib import Path
+
+from flowde.parse_imgs import parse_imgs
+from flowde.parsing_fns.openai_parse import make_openai_parse_fn
+
+img_dir = Path(&quot;results/rotation/rotated_images&quot;)
+parts_dir = Path(&quot;results/parsing&quot;)
+
+nodes_fn = make_openai_parse_fn(
+    input_text=(
+        &quot;Parse the text of every node. Use consecutive node numbers starting &quot;
+        &quot;at 1 and keep separate flowchart branches separate.&quot;
+    ),
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+    parts_to_parse={&quot;node_text&quot;},
+)
+
+nodes = parse_imgs(
+    parse_fn=nodes_fn,
+    img_dir=img_dir,
+    save_dir=parts_dir / &quot;node_text&quot;,
+    max_concurrent_jobs=1,
+)
+</code></pre>
+<p>The <code>parts_to_parse={"node_text"}</code> argument tells
+<a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn"><code>make_openai_parse_fn()</code></a>
+to create a parser that returns only node numbers and text. For example, a
+two-node diagram could produce:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    { &quot;node_number&quot;: 1, &quot;text&quot;: &quot;Assessed for eligibility (n = 120)&quot; },
+    { &quot;node_number&quot;: 2, &quot;text&quot;: &quot;Randomised (n = 100)&quot; }
+  ]
+}
+</code></pre>
+<p><code>node_text</code> is the parsing-part name. <code>nodes</code> is the JSON field holding the
+node objects. This example saves the node-text JSON files in
+<code>results/parsing/node_text</code>.</p>
+<p>You can choose from four parsing parts:</p>
+<table>
+<thead>
+<tr>
+<th><code>parts_to_parse</code> value</th>
+<th>Fields in the result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"node_text"</code></td>
+<td><code>nodes</code>, containing <code>node_number</code> and <code>text</code></td>
+</tr>
+<tr>
+<td><code>"labels"</code></td>
+<td><code>nodes</code>, containing <code>node_number</code> and <code>labels</code></td>
+</tr>
+<tr>
+<td><code>"flow"</code></td>
+<td><code>nodes</code>, containing <code>node_number</code> and <code>points_to</code></td>
+</tr>
+<tr>
+<td><code>"additional_texts"</code></td>
+<td>The top-level <code>additional_texts</code> list</td>
+</tr>
+</tbody>
+</table>
+<p>You can request several parts together, such as <code>{"node_text", "labels"}</code>.
+Without <code>parts_to_parse</code> or a custom <code>result_structure</code>, the OpenAI and Gemini
+parser factories request all four parts.</p>
+<h3 id="2-parse-flow-using-the-saved-nodes">2. Parse flow using the saved nodes</h3>
+<pre><code class="language-python">flow_fn = make_openai_parse_fn(
+    input_text=(
+        &quot;Find the outgoing connections for every supplied node. &quot;
+        &quot;Use the supplied node numbers without changing them.&quot;
+    ),
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+    parts_to_parse={&quot;flow&quot;},
+)
+
+flow = parse_imgs(
+    parse_fn=flow_fn,
+    img_dir=img_dir,
+    save_dir=parts_dir / &quot;flow&quot;,
+    nodes_dir=parts_dir / &quot;node_text&quot;,
+    max_concurrent_jobs=1,
+)
+</code></pre>
+<p>For each input image, <code>nodes_dir</code> supplies the node numbers and text from the
+matching JSON file in <code>results/parsing/node_text</code>. The parser receives that
+saved data alongside the image so the prompt can ask for outgoing connections
+using the existing node numbers.</p>
+<p><code>parts_to_parse={"flow"}</code> tells the parser to parse only the outgoing connections
+for each node. For example:</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    { &quot;node_number&quot;: 1, &quot;points_to&quot;: [2] },
+    { &quot;node_number&quot;: 2, &quot;points_to&quot;: [] }
+  ]
+}
+</code></pre>
+<p>The flow JSON files are saved in <code>results/parsing/flow</code>.</p>
+<h3 id="3-parse-labels-and-additional-text">3. Parse labels and additional text</h3>
+<p>Likewise, you can parse labels with <code>parts_to_parse={"labels"}</code> and additional
+text with <code>parts_to_parse={"additional_texts"}</code>. You can pass previously parsed
+parts as context through the following
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>
+parameters:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Directory containing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nodes_dir</code></td>
+<td>Previously parsed nodes</td>
+</tr>
+<tr>
+<td><code>labels_dir</code></td>
+<td>Previously parsed labels</td>
+</tr>
+<tr>
+<td><code>flow_dir</code></td>
+<td>Previously parsed flow</td>
+</tr>
+<tr>
+<td><code>additional_texts_dir</code></td>
+<td>Previously parsed additional text</td>
+</tr>
+</tbody>
+</table>
+<h3 id="matching-images-and-parsed-parts">Matching images and parsed parts</h3>
+<p>Each parsed part is saved as a JSON file with the same filename stem as the
+source image. For example, the parts parsed from <code>paper-1_0.png</code> are saved as
+<code>paper-1_0.json</code> in each part's directory:</p>
+<pre><code class="language-text">results/
+├── rotation/
+│   └── rotated_images/
+│       ├── paper-1_0.png
+│       └── paper-2_0.png
+└── parsing/
+    ├── node_text/
+    │   ├── paper-1_0.json
+    │   ├── paper-2_0.json
+    │   └── .flowde/
+    ├── flow/
+    │   ├── paper-1_0.json
+    │   ├── paper-2_0.json
+    │   └── .flowde/
+    ├── labels/
+    │   ├── paper-1_0.json
+    │   ├── paper-2_0.json
+    │   └── .flowde/
+    └── additional_texts/
+        ├── paper-1_0.json
+        ├── paper-2_0.json
+        └── .flowde/
+</code></pre>
+<h3 id="combine-the-parsed-parts">Combine the parsed parts</h3>
+<p>You can combine the saved node text, labels, connections and additional text
+into one JSON file per image:</p>
+<pre><code class="language-python">from flowde.combine_parsed_parts import combine_parsed_parts
+
+combined = combine_parsed_parts(
+    nodes_dir=parts_dir / &quot;node_text&quot;,
+    flow_dir=parts_dir / &quot;flow&quot;,
+    labels_dir=parts_dir / &quot;labels&quot;,
+    additional_texts_dir=parts_dir / &quot;additional_texts&quot;,
+    save_dir=parts_dir / &quot;combined&quot;,
+)
+</code></pre>
+<p>To replace an earlier set of combined results, you can add
+<code>on_existing="overwrite"</code>. See the
+<a href="../../reference/helpers/#flowde.combine_parsed_parts.combine_parsed_parts"><code>combine_parsed_parts()</code></a>
+API reference for full details of the parameters and validation rules.</p>
+<h2 id="use-a-custom-output-schema">Use a custom output schema</h2>
+<p>You can request a different JSON format by defining a Pydantic schema.
+This example asks for a title and a count of the diagram's boxes:</p>
+<pre><code class="language-python">from pydantic import BaseModel, ConfigDict
+
+
+class DiagramSummary(BaseModel):
+    model_config = ConfigDict(extra=&quot;forbid&quot;)
+    title: str
+    number_of_boxes: int
+
+
+summary_fn = make_openai_parse_fn(
+    input_text=&quot;Give the diagram a short title and count its boxes.&quot;,
+    model=&quot;gpt-5.6-luna&quot;,
+    effort=&quot;medium&quot;,
+    result_structure=DiagramSummary,
+)
+</code></pre>
+<p><code>result_structure=DiagramSummary</code> tells
+<a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn"><code>make_openai_parse_fn()</code></a>
+to create a parser with <code>title</code> and <code>number_of_boxes</code> in its results. A custom
+schema replaces the standard flowchart format, so <code>result_structure</code> and
+<code>parts_to_parse</code> cannot be supplied together. See the
+<a href="../../reference/helpers/#flowde.parsing_fns.openai_parse.make_openai_parse_fn">factory API reference</a>
+for the parameters.</p>
+<p>Flowde's parsing benchmark expects the standard flowchart format, so arbitrary
+custom results such as <code>DiagramSummary</code> need their own evaluation method.</p>
+<h2 id="bring-your-own-parsing-function">Bring your own parsing function</h2>
+<p>You can write your own parser and pass it to
+<a href="../../reference/pipeline/#flowde.parse_imgs.parse_imgs"><code>parse_imgs()</code></a>
+as <code>parse_fn</code>. See the
+<a href="../custom-functions/#a-parsing-function">custom parsing tutorial</a>
+for the requirements your function must meet and a complete working example.</p>
+<h2 id="next-step">Next step</h2>
+<p>You can <a href="../../benchmarking/parsing/">benchmark the parsed results</a> against
+manually annotated ground truth.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/EPPI-Centre/Flowde" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../rotation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../resuming/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/copy-code.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
