@@ -51,7 +51,7 @@ all = [
     "google-genai>=2.34.0",
     "hf-xet>=1.7.1",
     "levenshtein>=0.27.5",
-    "numpy>=2.3.5",
+    "numpy>=2.5.4",
     "openai>=3.41.0",
     "paddleocr>=3.7.0",
     "paddlepaddle>=3.2.2,!=3.3.0,!=3.3.1; sys_platform != 'darwin'",
@@ -60,7 +60,7 @@ all = [
 ]
 benchmark = [
     "levenshtein>=0.27.5",
-    "numpy>=2.3.5",
+    "numpy>=2.5.4",
     "scipy>=1.18.1"
 ]
 gemini = [
