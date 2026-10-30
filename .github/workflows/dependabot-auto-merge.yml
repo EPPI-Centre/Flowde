@@ -11,6 +11,9 @@ permissions: {}
 
 jobs:
   auto-merge:
+    permissions:
+      contents: write
+      pull-requests: write
     if: >-
       github.repository == 'EPPI-Centre/Flowde' &&
       github.event.pull_request.user.login == 'dependabot[bot]' &&
@@ -20,17 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # All update types are eligible; main's required checks gate the merge.
-      # Use a fine-grained PAT limited to Flowde with Contents, Pull requests,
-      # and Workflows write access. Do not give its owner a ruleset bypass.
+      # Built-in token merges intentionally do not trigger push workflows.
       - name: Enable auto-merge
         env:
-          GH_TOKEN: ${{ secrets.DEPENDABOT_AUTO_MERGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "::error::Add the DEPENDABOT_AUTO_MERGE_TOKEN Actions secret."
-            exit 1
-          fi
           # Refuse this request if the PR has changed since the event.
           gh pr merge --auto --squash --match-head-commit "$HEAD_SHA" "$PR_URL"
