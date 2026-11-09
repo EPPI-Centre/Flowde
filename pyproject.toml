@@ -21,7 +21,7 @@ test = [
     "pytest>=9.2.0",
     "ruff>=0.17.3",
     "toml-sort>=0.25.0",
-    "tox>=4.67.4",
+    "tox>=4.67.5",
     "virtualenv>=21.15.1"
 ]
 
@@ -177,7 +177,7 @@ spaces_indent_inline_array = 4
 
 [tool.tox]
 env_list = ["py312", "py313"]
-requires = ["tox>=4.67.4"]
+requires = ["tox>=4.67.5"]
 
 [tool.tox.env_run_base]
 commands = [
