@@ -49,7 +49,7 @@ version = "0.0.0"
 [project.optional-dependencies]
 all = [
     "google-genai>=2.34.0",
-    "hf-xet>=1.7.1",
+    "hf-xet>=1.8.0",
     "levenshtein>=0.27.5",
     "numpy>=2.3.5",
     "openai>=3.41.0",
@@ -70,7 +70,7 @@ openai = [
     "openai>=3.41.0"
 ]
 paddle = [
-    "hf-xet>=1.7.1",
+    "hf-xet>=1.8.0",
     "paddleocr>=3.7.0"
 ]
 
