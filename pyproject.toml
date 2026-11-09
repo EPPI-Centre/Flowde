@@ -6,7 +6,7 @@ requires = ["setuptools>=84.2.1"]
 
 [dependency-groups]
 docs = [
-    "mkdocs-git-revision-date-localized-plugin>=1.6.2",
+    "mkdocs-git-revision-date-localized-plugin>=1.6.3",
     "mkdocs>=1.6.1",
     "mkdocstrings[python]>=1.0.8",
     "ruff>=0.17.3"
