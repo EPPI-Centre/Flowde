@@ -9,7 +9,7 @@ docs = [
     "mkdocs-git-revision-date-localized-plugin>=1.6.3",
     "mkdocs>=1.6.1",
     "mkdocstrings[python]>=1.0.8",
-    "ruff>=0.17.3"
+    "ruff>=0.17.4"
 ]
 test = [
     "ipykernel>=7.4.0",
@@ -19,7 +19,7 @@ test = [
     "pyte>=0.8.2",
     "pytest-cov>=7.1.0",
     "pytest>=9.2.0",
-    "ruff>=0.17.3",
+    "ruff>=0.17.4",
     "toml-sort>=0.25.0",
     "tox>=4.67.5",
     "virtualenv>=21.15.2"
