@@ -35,7 +35,7 @@ dependencies = [
     "joblib>=1.6.0",
     "pillow>=13.0.0",
     "pydantic>=2.14.2",
-    "pymupdf>=2.0",
+    "pymupdf>=2.1",
     "python-dotenv>=1.2.4",
     "tqdm>=4.70.1"
 ]
