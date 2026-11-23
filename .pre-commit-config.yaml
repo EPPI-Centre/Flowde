@@ -95,7 +95,7 @@ repos:
 
   # Format toml files. Config in pyproject.toml.
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.25.0
+    rev: v0.26.0
     hooks:
       - id: toml-sort
         exclude: ^data/
