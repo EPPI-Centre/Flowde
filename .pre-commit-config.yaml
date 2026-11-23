@@ -84,7 +84,7 @@ repos:
   # Format js, json, css, html, md, yaml files. This one doesn't need a config.
   # Uses --check, so it reports formatting issues but does not edit files.
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.9.10
+    rev: v3.10.1
     hooks:
       - id: prettier
         args: [--check]
